@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.service.impl.courseExamineChildMethodsServiceIMPL;
 import com.example.service.impl.courseExamineMethodsServiceIMPL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,4 +12,8 @@ public class courseExamineMethodsController {
     //课程考核项目
     @Autowired
     private courseExamineMethodsServiceIMPL courseExamineMethodsService;
+
+    //课程考核子项目
+    @Autowired
+    private courseExamineChildMethodsServiceIMPL courseExamineChildMethodsService;
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class courseExamineMethods {
     private int id;
-    //课程基本信息中的id
+    //课程基本信息表中的id
     private int course_id;
     //课程名称
     private String course_name;
