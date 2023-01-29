@@ -6,9 +6,12 @@ import com.example.object.courseExamineMethods;
 import com.example.service.impl.courseExamineChildMethodsServiceIMPL;
 import com.example.service.impl.courseExamineMethodsServiceIMPL;
 import com.example.utility.DataResponses;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@Api(tags="考核与评价方式")
 @RestController
 @RequestMapping("/courseExam")
 public class courseExamineMethodsController {
@@ -21,6 +24,7 @@ public class courseExamineMethodsController {
     private courseExamineChildMethodsServiceIMPL courseExamineChildMethodsService;
 
     //提供课程id查询考核项目
+    @ApiOperation("提供课程id查询考核项目")
     @GetMapping("/courseExamineMethods/{courseId}")
     public DataResponses getCourseExamineMethodsById(@PathVariable int courseId) {
         QueryWrapper<courseExamineMethods> QueryWrapper = new QueryWrapper<>();
@@ -29,6 +33,7 @@ public class courseExamineMethodsController {
     }
 
     //提供考核项目id查询子考核项目
+    @ApiOperation("提供考核项目id查询子考核项目")
     @GetMapping("/courseExamineChildMethods/{courseExamineMethodsId}")
     public DataResponses getCourseExamineChildMethodsById(@PathVariable int courseExamineMethodsId) {
         QueryWrapper<courseExamineChildMethods> QueryWrapper = new QueryWrapper<>();
@@ -37,12 +42,14 @@ public class courseExamineMethodsController {
     }
 
     //提供课程id添加考核项目
+    @ApiOperation("提供课程id添加考核项目")
     @PostMapping("/courseExamineMethods")
     public DataResponses addCourseExamineMethods(@RequestBody courseExamineMethods item) {
         return new DataResponses(courseExamineMethodsService.save(item));
     }
 
     //提供考核项目id添加子考核项目
+    @ApiOperation("提供考核项目id添加子考核项目")
     @PostMapping("/courseExamineChildMethods")
     public DataResponses addCourseExamineChildMethods(@RequestBody courseExamineChildMethods item) {
         return new DataResponses(courseExamineChildMethodsService.save(item));
