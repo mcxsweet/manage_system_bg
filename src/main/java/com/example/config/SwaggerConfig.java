@@ -31,8 +31,8 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo(){
         return new ApiInfoBuilder()
-                .title("XX项目接口文档")
-                .description("XX项目描述")
+                .title("材料收集管理项目接口文档")
+                .description("项目描述")
                 .contact(new Contact("作者", "作者URL", "作者Email"))
                 .version("1.0")
                 .build();
