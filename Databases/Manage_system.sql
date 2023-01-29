@@ -62,10 +62,12 @@ CREATE TABLE `course_examine_child_methods` (
   `course_examine_methods_id` int(11) NOT NULL,
   `examine_child_item` varchar(30) NOT NULL,
   `percentage` int(3) NOT NULL,
-  `course_target` varchar(30) NOT NULL,
-  `indicator_points` varchar(30) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `course_target` varchar(300) DEFAULT NULL,
+  `indicator_points` varchar(300) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `考试方式表id` (`course_examine_methods_id`),
+  CONSTRAINT `考试方式表id` FOREIGN KEY (`course_examine_methods_id`) REFERENCES `course_examine_methods` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,6 +76,7 @@ CREATE TABLE `course_examine_child_methods` (
 
 LOCK TABLES `course_examine_child_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_child_methods` DISABLE KEYS */;
+INSERT INTO `course_examine_child_methods` VALUES (2,2,'考勤',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}');
 /*!40000 ALTER TABLE `course_examine_child_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -90,8 +93,10 @@ CREATE TABLE `course_examine_methods` (
   `course_name` varchar(30) NOT NULL,
   `examine_item` varchar(30) NOT NULL,
   `percentage` int(3) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `课程信息id` (`course_id`),
+  CONSTRAINT `课程信息id` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,6 +105,7 @@ CREATE TABLE `course_examine_methods` (
 
 LOCK TABLES `course_examine_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_methods` DISABLE KEYS */;
+INSERT INTO `course_examine_methods` VALUES (1,1,'高数','考试',70),(2,1,'高数','平时测验',30),(4,2,'线性代数','平时测验',30);
 /*!40000 ALTER TABLE `course_examine_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -112,4 +118,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-29 20:02:43
+-- Dump completed on 2023-01-29 21:42:45
