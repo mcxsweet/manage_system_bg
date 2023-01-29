@@ -6,11 +6,11 @@ import lombok.Data;
 public class courseExamineMethods {
     private int id;
     //课程基本信息表中的id
-    private int course_id;
+    private int courseId;
     //课程名称
-    private String course_name;
+    private String courseName;
     //考试项目
-    private String examine_item;
+    private String examineItem;
     //所占百分比
     private int percentage;
 }
