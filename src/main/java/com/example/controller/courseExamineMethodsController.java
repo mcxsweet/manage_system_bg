@@ -54,4 +54,32 @@ public class courseExamineMethodsController {
     public DataResponses addCourseExamineChildMethods(@RequestBody courseExamineChildMethods item) {
         return new DataResponses(courseExamineChildMethodsService.save(item));
     }
+
+    //提供考试项目id删除考核项目
+    @ApiOperation("提供课程id删除考核项目")
+    @DeleteMapping("/courseExamineMethods/{courseExamineMethodsId}")
+    public DataResponses removeCourseExamineMethods(@PathVariable int courseExamineMethodsId) {
+        return new DataResponses(courseExamineMethodsService.removeById(courseExamineMethodsId));
+    }
+
+    //提供考试子项目id删除考核子项目
+    @ApiOperation("提供考试子项目id删除考核子项目")
+    @DeleteMapping("/courseExamineChildMethods/{courseExamineChildMethodsId}")
+    public DataResponses removeCourseExamineChildMethods(@PathVariable int courseExamineChildMethodsId) {
+        return new DataResponses(courseExamineChildMethodsService.removeById(courseExamineChildMethodsId));
+    }
+
+    //提供考试项目id修改考核项目
+    @ApiOperation("提供考试项目id修改考核项目")
+    @PutMapping("/courseExamineMethods")
+    public DataResponses modifyCourseExamineMethods(@RequestBody courseExamineMethods item) {
+        return new DataResponses(courseExamineMethodsService.updateById(item));
+    }
+
+    //提供考试子项目id修改考核子项目
+    @ApiOperation("提供考试子项目id修改考核子项目")
+    @PutMapping("/courseExamineChildMethods")
+    public DataResponses modifyCourseExamineChildMethods(@RequestBody courseExamineChildMethods item) {
+        return new DataResponses(courseExamineChildMethodsService.updateById(item));
+    }
 }
