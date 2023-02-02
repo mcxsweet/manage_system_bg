@@ -10,9 +10,9 @@ public class courseExamineChildMethods {
     //考核子项目
     private String examineChildItem;
     //所占百分比
-    private int percentage;
+    private int childPercentage;
     //课程目标（json）
     private String courseTarget;
     //指标点（json）
-    private String indicatorPoints;
+    private String indicatorPointsDetail;
 }
