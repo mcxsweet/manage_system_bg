@@ -46,7 +46,7 @@ CREATE TABLE `course_basic_information` (
 
 LOCK TABLES `course_basic_information` WRITE;
 /*!40000 ALTER TABLE `course_basic_information` DISABLE KEYS */;
-INSERT INTO `course_basic_information` VALUES (1,'高数','阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,2,'指标1,指标2'),(2,'线性代数','王老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,3,'指标1,指标2,指标3'),(4,'概率论','阳老师1222',16123,41231,'计算机科学与技术2022','2022-2023.1',80111,'shanghai','专业必修课',5,2,'指标1,指标2'),(5,'高数','阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'shanghai','专业必修课',5,2,'指标1,指标2'),(6,'c语言程序设计','阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,2,'指标1,指标2');
+INSERT INTO `course_basic_information` VALUES (1,'高数','阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,2,'指标1,指标2'),(2,'线性代数','王老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,3,'指标1,指标2,指标3'),(4,'概率论','阳老师1222',16123,41231,'计算机科学与技术2022','2022-2023.1',80111,'shanghai','专业必修课',5,2,'指标1,指标2'),(6,'c语言程序设计','阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,2,'指标1,指标2');
 /*!40000 ALTER TABLE `course_basic_information` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -61,9 +61,9 @@ CREATE TABLE `course_examine_child_methods` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `course_examine_methods_id` int(11) NOT NULL,
   `examine_child_item` varchar(30) NOT NULL,
-  `percentage` int(3) NOT NULL,
+  `child_percentage` int(3) NOT NULL,
   `course_target` varchar(300) DEFAULT NULL,
-  `indicator_points` varchar(300) DEFAULT NULL,
+  `indicator_points_detail` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `考试方式表id` (`course_examine_methods_id`),
   CONSTRAINT `考试方式表id` FOREIGN KEY (`course_examine_methods_id`) REFERENCES `course_examine_methods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -76,7 +76,7 @@ CREATE TABLE `course_examine_child_methods` (
 
 LOCK TABLES `course_examine_child_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_child_methods` DISABLE KEYS */;
-INSERT INTO `course_examine_child_methods` VALUES (4,2,'平时作业',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}'),(5,2,'考勤',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}'),(6,1,'考勤',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}'),(7,1,'考勤',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}');
+INSERT INTO `course_examine_child_methods` VALUES (4,2,'平时作业',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}'),(5,2,'考勤',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}'),(6,1,'期末测试',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}'),(7,1,'期中测试',50,'{\'课程目标1\':\'是\',\'课程目标2\':\'是\',\'课程目标3\':\'是\',\'课程目标4\':\'是\',\'课程目标5\':\'是\'}','{\'指标点1.1\':\'是\',\'指标点1.2\':\'是\',\'指标点1.3\':\'是\'}'),(8,3,'期中测试',50,NULL,NULL);
 /*!40000 ALTER TABLE `course_examine_child_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -96,7 +96,7 @@ CREATE TABLE `course_examine_methods` (
   PRIMARY KEY (`id`),
   KEY `课程信息表id` (`course_id`),
   CONSTRAINT `课程信息表id` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -105,7 +105,7 @@ CREATE TABLE `course_examine_methods` (
 
 LOCK TABLES `course_examine_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_methods` DISABLE KEYS */;
-INSERT INTO `course_examine_methods` VALUES (1,1,'高数','考试',70),(2,1,'高数','平时测验',30);
+INSERT INTO `course_examine_methods` VALUES (1,1,'高数','考试',70),(2,1,'高数','平时测验',30),(3,2,'线性代数','考试',70),(4,2,'线性代数','平时测试',30);
 /*!40000 ALTER TABLE `course_examine_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -118,4 +118,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-30 12:32:06
+-- Dump completed on 2023-02-02 22:20:55
