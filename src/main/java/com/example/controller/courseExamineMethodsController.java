@@ -23,6 +23,13 @@ public class courseExamineMethodsController {
     @Autowired
     private courseExamineChildMethodsServiceIMPL courseExamineChildMethodsService;
 
+    //提供课程信息表的id查询所有有关信息
+    @ApiOperation("提供课程信息表的id查询所有有关信息")
+    @GetMapping("/allInformation/{courseId}")
+    public DataResponses getAllInformationById(@PathVariable int courseId) {
+        return new DataResponses(true, courseExamineMethodsService.getAllInformation(courseId));
+    }
+
     //提供课程id查询考核项目
     @ApiOperation("提供课程id查询考核项目")
     @GetMapping("/courseExamineMethods/{courseId}")
