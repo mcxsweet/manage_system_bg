@@ -12,7 +12,7 @@ import com.example.utility.export.export;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Api(tags="课程信息")
+@Api(tags = "课程信息")
 @RestController
 @RequestMapping("/courseInfo")
 public class courseBasicInformationController {
@@ -23,6 +23,18 @@ public class courseBasicInformationController {
     @GetMapping
     public DataResponses getAll() {
         return new DataResponses(true, courseBasicInformationService.list());
+    }
+
+    @ApiOperation("按id查询")
+    @GetMapping("{id}")
+    public DataResponses getById(@PathVariable int id) {
+        return new DataResponses(true, courseBasicInformationService.getById(id));
+    }
+
+    @ApiOperation("按id修改")
+    @PutMapping()
+    public DataResponses UpdateById(@RequestBody courseBasicInformation data) {
+        return new DataResponses(true, courseBasicInformationService.updateById(data));
     }
 
     //导出课程基本信息
@@ -43,7 +55,7 @@ public class courseBasicInformationController {
 
     @ApiOperation("删除")
     @DeleteMapping
-    public DataResponses delete(@RequestBody courseBasicInformation pages){
+    public DataResponses delete(@RequestBody courseBasicInformation pages) {
         return new DataResponses(courseBasicInformationService.removeById(pages));
     }
 
