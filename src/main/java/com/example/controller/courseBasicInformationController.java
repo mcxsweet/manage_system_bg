@@ -1,6 +1,10 @@
 package com.example.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.courseTargetMAPPER;
 import com.example.object.courseBasicInformation;
+import com.example.object.courseTarget;
+
 import com.example.service.impl.courseBasicInformationServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
@@ -18,6 +22,9 @@ import java.io.IOException;
 public class courseBasicInformationController {
     @Autowired
     private courseBasicInformationServiceIMPL courseBasicInformationService;
+
+    @Autowired
+    private courseTargetMAPPER courseTarget;
 
     @ApiOperation("查询全部")
     @GetMapping
@@ -57,6 +64,35 @@ public class courseBasicInformationController {
     @DeleteMapping
     public DataResponses delete(@RequestBody courseBasicInformation pages) {
         return new DataResponses(courseBasicInformationService.removeById(pages));
+    }
+
+/*
+    课程目标相关接口
+ */
+    @ApiOperation("获取该课程所有课程目标")
+    @GetMapping("/courseTarget/{courseId}")
+    public DataResponses getCourseTarget(@PathVariable int courseId){
+        QueryWrapper<courseTarget> QueryWrapper = new QueryWrapper<>();
+        QueryWrapper.eq("course_id",courseId);
+        return new DataResponses(true,courseTarget.selectList(QueryWrapper));
+    }
+
+    @ApiOperation("添加该课程课程目标")
+    @PostMapping("/courseTarget")
+    public DataResponses addCourseTarget(@RequestBody courseTarget Data){
+        return new DataResponses(true,courseTarget.insert(Data));
+    }
+
+    @ApiOperation("修改课程目标")
+    @PutMapping("/courseTarget")
+    public DataResponses modifyCourseTarget(@RequestBody courseTarget Data){
+        return new DataResponses(true,courseTarget.updateById(Data));
+    }
+
+    @ApiOperation("删除课程目标")
+    @DeleteMapping("/courseTarget")
+    public DataResponses DeleteCourseTarget(@RequestBody courseTarget Data){
+        return new DataResponses(true,courseTarget.deleteById(Data));
     }
 
 }
