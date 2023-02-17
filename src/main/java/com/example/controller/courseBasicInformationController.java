@@ -34,7 +34,7 @@ public class courseBasicInformationController {
     @ApiOperation("按id修改")
     @PutMapping()
     public DataResponses UpdateById(@RequestBody courseBasicInformation data) {
-        return new DataResponses(true, courseBasicInformationService.updateById(data));
+        return new DataResponses(courseBasicInformationService.updateById(data));
     }
 
     //导出课程基本信息
