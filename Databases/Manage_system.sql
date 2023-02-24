@@ -25,6 +25,7 @@ DROP TABLE IF EXISTS `course_basic_information`;
 CREATE TABLE `course_basic_information` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `course_name` varchar(30) NOT NULL,
+  `teacher_id` int(11) DEFAULT '1',
   `classroom_teacher` varchar(10) NOT NULL,
   `theoretical_hours` int(3) NOT NULL,
   `lab_hours` int(3) NOT NULL,
@@ -37,7 +38,7 @@ CREATE TABLE `course_basic_information` (
   `indicator_points_num` int(3) NOT NULL,
   `indicator_points` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,7 +47,7 @@ CREATE TABLE `course_basic_information` (
 
 LOCK TABLES `course_basic_information` WRITE;
 /*!40000 ALTER TABLE `course_basic_information` DISABLE KEYS */;
-INSERT INTO `course_basic_information` VALUES (1,'高数(必修)','阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,2,'指标1,指标2'),(2,'线性代数','王老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,3,'指标1,指标2,指标3'),(4,'概率论','阳老师1222',16123,41231,'计算机科学与技术2022','2022-2023.1',80111,'shanghai','专业必修课',5,2,'指标1,指标2'),(6,'c语言程序设计','阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,2,'指标1,指标2');
+INSERT INTO `course_basic_information` VALUES (1,'高数(必修)',1,'阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,2,'指标1,指标2'),(2,'线性代数',1,'王老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,3,'指标1,指标2,指标3'),(4,'概率论',1,'阳老师1222',16123,41231,'计算机科学与技术2022','2022-2023.1',80111,'必修','专业必修课',5,2,'指标1,指标2'),(6,'c语言程序设计',1,'阳老师',16,4,'计算机科学与技术2020','2022-2023.1',80,'必修','专业必修课',5,2,'指标1,指标2'),(7,'JAVA程序设计',1,'阳老师',1231,132,'计算,机科学与技术2020','123',123,'必修','专业必修课',5,1231,'指标点1');
 /*!40000 ALTER TABLE `course_basic_information` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -127,7 +128,7 @@ CREATE TABLE `course_target` (
   PRIMARY KEY (`id`),
   KEY `course_basic_information_id` (`course_id`),
   CONSTRAINT `course_basic_information_id` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -136,7 +137,7 @@ CREATE TABLE `course_target` (
 
 LOCK TABLES `course_target` WRITE;
 /*!40000 ALTER TABLE `course_target` DISABLE KEYS */;
-INSERT INTO `course_target` VALUES (1,1,'高数','实现基本操作sdfsdf','考试','指标点1.1','考试'),(2,1,'高数','理解信号的特征、分类，理解系统的描述和分类，掌握信号的运算和连续时不变系统的性质和判断；','通过课堂讲授、作业和考研题探讨方式，让学生理解和掌握信号、系统性质和运算。','指标点1.1:\n掌握数学、自然科学、工程基础和电子信息专业知识的基本概念，并将其运用到复杂工程问题的适当表述之中','考试'),(4,6,'c语言程序设计','aaaaaaaaaaadasdasd','1232dadXzcscascdfsdasadsadasdad','[\"选项1\",\"选项2\"]','[\"考试\",\"作业\"]'),(5,4,'概率论','wdaeasdasdasd','asdasd','[\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(6,6,'c语言程序设计','edadsadaczcweqwedad阿达是大大','大赛大赛大大','[\"选项1\",\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(8,2,'线性代数','阿三打是大势打豆豆','是大大是大大的','[\"选项1\",\"选项2\",\"选项4\"]','[\"考试\",\"作业\"]');
+INSERT INTO `course_target` VALUES (4,6,'c语言程序设计','aaaaaaaaaaadasdasd','1232dadXzcscascdfsdasadsadasdad','[\"选项1\",\"选项2\"]','[\"考试\",\"作业\"]'),(5,4,'概率论','wdaeasdasdasd','asdasd','[\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(6,6,'c语言程序设计','edadsadaczcweqwedad阿达是大大','大赛大赛大大','[\"选项1\",\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(8,2,'线性代数','阿三打是大势打豆豆','是大大是大大的','[\"选项1\",\"选项2\",\"选项4\"]','[\"考试\",\"作业\"]'),(9,1,'高数(必修)','阿斯顿焚膏继晷语序虚词是大扫除','asadadadadaxzcvvdffgdg','[\"选项1\",\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]');
 /*!40000 ALTER TABLE `course_target` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -162,7 +163,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'阳光伟','123456',0),(2,'admin','123',1);
+INSERT INTO `user` VALUES (1,'admin','123',1);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -175,4 +176,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-21 15:42:07
+-- Dump completed on 2023-02-24 16:41:33
