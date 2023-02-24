@@ -25,7 +25,8 @@ public class UserController {
     public DataResponses submit(@RequestBody User data){
         QueryWrapper<User> QueryWrapper = new QueryWrapper<>();
         QueryWrapper.eq("name",data.getName()).eq("password",data.getPassword());
-        return new DataResponses(userService.getOne(QueryWrapper) != null);
+        User user = userService.getOne(QueryWrapper);
+        return new DataResponses(user != null,user);
     }
 
     @ApiOperation("按id修改")

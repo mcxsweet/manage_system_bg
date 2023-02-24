@@ -32,6 +32,14 @@ public class courseBasicInformationController {
         return new DataResponses(true, courseBasicInformationService.list());
     }
 
+    @ApiOperation("按当前用户查询")
+    @GetMapping("/currentUser/{currentUserId}")
+    public DataResponses getByCurrentUser(@PathVariable int currentUserId) {
+        QueryWrapper<courseBasicInformation> QueryWrapper = new QueryWrapper<>();
+        QueryWrapper.eq("teacher_id",currentUserId);
+        return new DataResponses(true,courseBasicInformationService.list(QueryWrapper));
+    }
+
     @ApiOperation("按id查询")
     @GetMapping("{id}")
     public DataResponses getById(@PathVariable int id) {

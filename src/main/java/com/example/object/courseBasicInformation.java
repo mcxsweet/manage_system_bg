@@ -7,6 +7,8 @@ public class courseBasicInformation {
     private int id;
     //课程名称
     private String courseName;
+    //任课教师id
+    private int teacherId;
     //任课教师
     private String classroomTeacher;
     //理论时长
