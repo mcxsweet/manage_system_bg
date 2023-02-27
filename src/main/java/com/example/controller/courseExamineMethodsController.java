@@ -63,7 +63,7 @@ public class courseExamineMethodsController {
     }
 
     //提供考试项目id删除考核项目
-    @ApiOperation("提供课程id删除考核项目")
+    @ApiOperation("提供考试项目id删除考核项目")
     @DeleteMapping("/courseExamineMethods/{courseExamineMethodsId}")
     public DataResponses removeCourseExamineMethods(@PathVariable int courseExamineMethodsId) {
         return new DataResponses(courseExamineMethodsService.removeById(courseExamineMethodsId));
