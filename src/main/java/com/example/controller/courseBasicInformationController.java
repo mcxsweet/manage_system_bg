@@ -1,7 +1,9 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.IndicatorsMAPPER;
 import com.example.mapper.courseTargetMAPPER;
+import com.example.object.Indicators;
 import com.example.object.courseBasicInformation;
 import com.example.object.courseTarget;
 
@@ -20,11 +22,13 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/courseInfo")
 public class courseBasicInformationController {
+
+    /*
+        课程基本信息相关接口
+     */
+    //课程基本信息
     @Autowired
     private courseBasicInformationServiceIMPL courseBasicInformationService;
-
-    @Autowired
-    private courseTargetMAPPER courseTarget;
 
     @ApiOperation("查询全部")
     @GetMapping
@@ -52,7 +56,6 @@ public class courseBasicInformationController {
         return new DataResponses(courseBasicInformationService.updateById(data));
     }
 
-    //导出课程基本信息
     @ApiOperation("导出课程基本信息")
     @GetMapping("/export/{id}")
     public void exportExcel(HttpServletResponse response, @PathVariable int id) throws IOException {
@@ -77,6 +80,11 @@ public class courseBasicInformationController {
 /*
     课程目标相关接口
  */
+
+    //课程目标
+    @Autowired
+    private courseTargetMAPPER courseTarget;
+
     @ApiOperation("获取该课程所有课程目标")
     @GetMapping("/courseTarget/{courseId}")
     public DataResponses getCourseTarget(@PathVariable int courseId){
@@ -102,5 +110,37 @@ public class courseBasicInformationController {
     public DataResponses DeleteCourseTarget(@RequestBody courseTarget Data){
         return new DataResponses(true,courseTarget.deleteById(Data));
     }
+
+    /*
+        指标点相关接口
+     */
+
+    @Autowired
+    private IndicatorsMAPPER indicators;
+
+    @ApiOperation("查询全部指标点")
+    @GetMapping("indicators")
+    public DataResponses getAllIndicators() {
+        return new DataResponses(true, indicators.selectList(null));
+    }
+
+    @ApiOperation("添加指标点")
+    @PostMapping("indicators")
+    public DataResponses insertIndicators(@RequestBody Indicators item) {
+        return new DataResponses(indicators.insert(item));
+    }
+
+    @ApiOperation("删除指标点")
+    @DeleteMapping("indicators")
+    public DataResponses removeIndicators(@RequestBody Indicators item) {
+        return new DataResponses(indicators.deleteById(item));
+    }
+
+    @ApiOperation("修改指标点")
+    @PutMapping("indicators")
+    public DataResponses PutIndicators(@RequestBody Indicators item) {
+        return new DataResponses(indicators.updateById(item));
+    }
+
 
 }
