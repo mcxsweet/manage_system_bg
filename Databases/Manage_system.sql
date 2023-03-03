@@ -137,7 +137,7 @@ CREATE TABLE `course_final_exam_paper` (
 
 LOCK TABLES `course_final_exam_paper` WRITE;
 /*!40000 ALTER TABLE `course_final_exam_paper` DISABLE KEYS */;
-INSERT INTO `course_final_exam_paper` VALUES (1,1,'选择题',20,0),(3,1,'填空题',30,0),(4,1,'实验',100,1);
+INSERT INTO `course_final_exam_paper` VALUES (1,1,'选择题',35,0),(3,1,'填空题',30,0),(4,1,'实验',100,1);
 /*!40000 ALTER TABLE `course_final_exam_paper` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -158,7 +158,7 @@ CREATE TABLE `course_final_exam_paper_detail` (
   PRIMARY KEY (`id`),
   KEY `与课程试卷表id外联` (`primary_id`),
   CONSTRAINT `与课程试卷表id外联` FOREIGN KEY (`primary_id`) REFERENCES `course_final_exam_paper` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,7 +167,7 @@ CREATE TABLE `course_final_exam_paper_detail` (
 
 LOCK TABLES `course_final_exam_paper_detail` WRITE;
 /*!40000 ALTER TABLE `course_final_exam_paper_detail` DISABLE KEYS */;
-INSERT INTO `course_final_exam_paper_detail` VALUES (1,1,'1',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]');
+INSERT INTO `course_final_exam_paper_detail` VALUES (1,1,'1',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]'),(2,1,'2',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]'),(3,1,'2',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]'),(4,1,'3',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]');
 /*!40000 ALTER TABLE `course_final_exam_paper_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -200,6 +200,32 @@ LOCK TABLES `course_target` WRITE;
 /*!40000 ALTER TABLE `course_target` DISABLE KEYS */;
 INSERT INTO `course_target` VALUES (4,6,'c语言程序设计','aaaaaaaaaaadasdasd','1232dadXzcscascdfsdasadsadasdad','[\"选项1\",\"选项2\"]','[\"考试\",\"作业\"]'),(5,4,'概率论','wdaeasdasdasd','asdasd','[\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(6,6,'c语言程序设计','edadsadaczcweqwedad阿达是大大','大赛大赛大大','[\"选项1\",\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(8,2,'线性代数','阿三打是大势打豆豆','是大大是大大的','[\"选项1\",\"选项2\",\"选项4\"]','[\"考试\",\"作业\"]'),(9,1,'高数(必修)','阿斯顿焚膏继晷语序虚词是大扫除','asadadadadaxzcvvdffgdg','[\"选项1\",\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(10,8,'高数','asdadadada','adsadad','[\"选项1\",\"选项2\",\"选项3\",\"选项4\"]','[\"考试\",\"作业\"]');
 /*!40000 ALTER TABLE `course_target` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `indicators`
+--
+
+DROP TABLE IF EXISTS `indicators`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `indicators` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `indicator_name` varchar(20) NOT NULL,
+  `indicator_content` text NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `indicator_name` (`indicator_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `indicators`
+--
+
+LOCK TABLES `indicators` WRITE;
+/*!40000 ALTER TABLE `indicators` DISABLE KEYS */;
+INSERT INTO `indicators` VALUES (1,'指标点1.1','掌握数学、自然科学、工程基础和电子信息专业知识的基本概念，并将其运用到复杂工程问题的适当表述之中'),(2,'指标点1.2','针对一个复杂系统或者过程选择恰当的数学模型，对模型正确性进行严谨的推理，并能正确求解'),(3,'指标点5.2','能够针对复杂工程问题，选择与使用电 子信息领域的恰当技术手段和现代工程工 具进行分析、计算和设计'),(4,'指标点2.1','能运用数学、自然科学和电子信息领域的 基本原理，识别和判断电子信息领域复杂工程问题的关键环节');
+/*!40000 ALTER TABLE `indicators` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -237,4 +263,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-03-02 19:11:54
+-- Dump completed on 2023-03-03 17:06:56
