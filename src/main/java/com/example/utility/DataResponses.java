@@ -9,16 +9,27 @@ import lombok.Data;
 public class DataResponses {
     private Boolean flag = false;
     private Object data;
+    private String message;
 
 
-    public DataResponses(){};
+    public DataResponses(){}
 
     public DataResponses(Boolean flag){
         this.flag = flag;
     }
+
     public DataResponses(Boolean flag, Object data){
         this.flag = flag;
         this.data = data;
+    }
+
+    public DataResponses(Boolean flag,String message){
+        this.flag = flag;
+        this.message = message;
+    }
+
+    public DataResponses(int num){
+        this.flag = num != 0;
     }
 
 }

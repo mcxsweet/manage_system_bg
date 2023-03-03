@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class courseExamineChildMethods {
-    private int id;
+    private Integer id;
     //课程考核方式表中的id
     private int courseExamineMethodsId;
     //考核子项目

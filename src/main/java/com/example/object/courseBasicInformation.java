@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class courseBasicInformation {
-    private int id;
+    private Integer id;
     //课程名称
     private String courseName;
     //任课教师id

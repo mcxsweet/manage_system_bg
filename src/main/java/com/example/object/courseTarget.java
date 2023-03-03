@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class courseTarget {
-    private int id;
+    private Integer id;
     //课程基本信息表中的id
     private int courseId;
     //课程名

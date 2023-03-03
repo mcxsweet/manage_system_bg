@@ -5,7 +5,7 @@ import lombok.Data;
 //测试使用
 @Data
 public class courseAllInformation {
-    private int id;
+    private Integer id;
     //课程名称
     private String courseName;
     //任课教师
