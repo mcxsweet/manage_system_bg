@@ -18,7 +18,9 @@ public class courseBasicInformation {
     //班级名称
     private String className;
     //学期
-    private String term;
+    private int term;
+    private int termStart;
+    private int termEnd;
     //学生人数
     private int studentsNum;
     //课程性质
