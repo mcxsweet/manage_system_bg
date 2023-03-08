@@ -46,7 +46,7 @@ public class courseBasicInformationController {
         return new DataResponses(true, courseBasicInformationService.list(QueryWrapper));
     }
 
-    @ApiOperation("按当前用户查询")
+    @ApiOperation("当前用户筛选")
     @PostMapping("/currentUser/{currentUserId}")
     public DataResponses searchByCurrentUser(@PathVariable int currentUserId, @RequestBody courseBasicInformation searchTable) {
         QueryWrapper<courseBasicInformation> QueryWrapper = new QueryWrapper<>();
