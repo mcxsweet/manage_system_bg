@@ -40,8 +40,35 @@ public class courseBasicInformationController {
     @GetMapping("/currentUser/{currentUserId}")
     public DataResponses getByCurrentUser(@PathVariable int currentUserId) {
         QueryWrapper<courseBasicInformation> QueryWrapper = new QueryWrapper<>();
-        QueryWrapper.eq("teacher_id",currentUserId);
-        return new DataResponses(true,courseBasicInformationService.list(QueryWrapper));
+        QueryWrapper.eq("teacher_id", currentUserId);
+        QueryWrapper.orderByDesc("term_start");
+        QueryWrapper.orderByAsc("term");
+        return new DataResponses(true, courseBasicInformationService.list(QueryWrapper));
+    }
+
+    @ApiOperation("按当前用户查询")
+    @PostMapping("/currentUser/{currentUserId}")
+    public DataResponses searchByCurrentUser(@PathVariable int currentUserId, @RequestBody courseBasicInformation searchTable) {
+        QueryWrapper<courseBasicInformation> QueryWrapper = new QueryWrapper<>();
+        QueryWrapper.eq("teacher_id", currentUserId);
+        QueryWrapper.orderByDesc("term_start");
+        QueryWrapper.orderByAsc("term");
+        if (searchTable.getCourseName() != null) {
+            QueryWrapper.eq("course_name", searchTable.getCourseName());
+        }
+        if (searchTable.getClassName() != null) {
+            QueryWrapper.eq("class_name", searchTable.getClassName());
+        }
+        if (searchTable.getTermStart() != null) {
+            QueryWrapper.eq("term_start", searchTable.getTermStart());
+        }
+        if (searchTable.getTermEnd() != null){
+            QueryWrapper.eq("term_end", searchTable.getTermEnd());
+        }
+        if (searchTable.getTerm()!=0){
+            QueryWrapper.eq("term", searchTable.getTerm());
+        }
+        return new DataResponses(true, courseBasicInformationService.list(QueryWrapper));
     }
 
     @ApiOperation("按id查询")
@@ -87,28 +114,28 @@ public class courseBasicInformationController {
 
     @ApiOperation("获取该课程所有课程目标")
     @GetMapping("/courseTarget/{courseId}")
-    public DataResponses getCourseTarget(@PathVariable int courseId){
+    public DataResponses getCourseTarget(@PathVariable int courseId) {
         QueryWrapper<courseTarget> QueryWrapper = new QueryWrapper<>();
-        QueryWrapper.eq("course_id",courseId);
-        return new DataResponses(true,courseTarget.selectList(QueryWrapper));
+        QueryWrapper.eq("course_id", courseId);
+        return new DataResponses(true, courseTarget.selectList(QueryWrapper));
     }
 
     @ApiOperation("添加该课程课程目标")
     @PostMapping("/courseTarget")
-    public DataResponses addCourseTarget(@RequestBody courseTarget Data){
-        return new DataResponses(true,courseTarget.insert(Data));
+    public DataResponses addCourseTarget(@RequestBody courseTarget Data) {
+        return new DataResponses(true, courseTarget.insert(Data));
     }
 
     @ApiOperation("修改课程目标")
     @PutMapping("/courseTarget")
-    public DataResponses modifyCourseTarget(@RequestBody courseTarget Data){
-        return new DataResponses(true,courseTarget.updateById(Data));
+    public DataResponses modifyCourseTarget(@RequestBody courseTarget Data) {
+        return new DataResponses(true, courseTarget.updateById(Data));
     }
 
     @ApiOperation("删除课程目标")
     @DeleteMapping("/courseTarget")
-    public DataResponses DeleteCourseTarget(@RequestBody courseTarget Data){
-        return new DataResponses(true,courseTarget.deleteById(Data));
+    public DataResponses DeleteCourseTarget(@RequestBody courseTarget Data) {
+        return new DataResponses(true, courseTarget.deleteById(Data));
     }
 
     /*
