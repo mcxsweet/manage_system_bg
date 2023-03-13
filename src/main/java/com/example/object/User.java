@@ -7,6 +7,6 @@ public class User {
     private Integer id;
     private String name;
     private String password;
-    private int is_admin;
+    private int isAdmin;
 }
 

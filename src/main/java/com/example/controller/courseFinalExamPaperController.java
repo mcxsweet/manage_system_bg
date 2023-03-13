@@ -8,12 +8,8 @@ import com.example.service.impl.examinePaper.courseFinalExamPaperServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.jdbc.SQL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.sql.SQLDataException;
-import java.sql.SQLException;
 
 @Api(tags = "期末试卷成绩细明")
 @RestController
