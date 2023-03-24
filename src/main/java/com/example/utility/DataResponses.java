@@ -32,4 +32,9 @@ public class DataResponses {
         this.flag = num != 0;
     }
 
+    public DataResponses(Boolean flag, Object data, String message) {
+        this.flag = flag;
+        this.data = data;
+        this.message = message;
+    }
 }

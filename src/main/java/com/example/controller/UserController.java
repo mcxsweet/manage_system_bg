@@ -23,11 +23,6 @@ public class UserController {
     @ApiOperation("登录接口")
     @PostMapping
     public DataResponses submit(@RequestBody User user, HttpServletResponse response){
-//        QueryWrapper<User> QueryWrapper = new QueryWrapper<>();
-//        QueryWrapper.eq("name",data.getName()).eq("password",data.getPassword());
-//        User user = userService.getOne(QueryWrapper);
-//        return new DataResponses(user != null,user);
-
         return userService.loginCheck(user, response);
     }
 
