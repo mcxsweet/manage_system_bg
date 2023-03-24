@@ -98,10 +98,11 @@ CREATE TABLE `course_examine_methods` (
   `course_name` varchar(30) NOT NULL,
   `examine_item` varchar(30) NOT NULL,
   `percentage` int(3) NOT NULL,
+  `item_score` int(3) DEFAULT '100',
   PRIMARY KEY (`id`),
   KEY `课程信息表id` (`course_id`),
   CONSTRAINT `课程信息表id` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -110,7 +111,7 @@ CREATE TABLE `course_examine_methods` (
 
 LOCK TABLES `course_examine_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_methods` DISABLE KEYS */;
-INSERT INTO `course_examine_methods` VALUES (1,1,'高数(必修)','考试',69),(3,2,'线性代数','考试',70),(4,2,'线性代数','平时测试',30),(5,7,'JAVA程序设计','平时考核成绩',3),(7,6,'c语言程序设计','平时考核成绩',6),(8,6,'c语言程序设计','平时考核成绩',6),(9,6,'c语言程序设计','平时考核成绩',6),(15,4,'概率论','实验考核成绩',412),(17,2,'线性代数','平时考核成绩',4);
+INSERT INTO `course_examine_methods` VALUES (1,1,'高数(必修)','考试',69,100),(3,2,'线性代数','考试',70,100),(4,2,'线性代数','平时测试',30,100),(5,7,'JAVA程序设计','平时考核成绩',3,100),(7,6,'c语言程序设计','平时考核成绩',6,100),(8,6,'c语言程序设计','平时考核成绩',6,100),(9,6,'c语言程序设计','平时考核成绩',6,100),(15,4,'概率论','实验考核成绩',412,100),(17,2,'线性代数','平时考核成绩',4,100),(18,8,'线性代数','平时测验',30,0);
 /*!40000 ALTER TABLE `course_examine_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -123,14 +124,13 @@ DROP TABLE IF EXISTS `course_final_exam_paper`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `course_final_exam_paper` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `course_id` int(11) NOT NULL,
+  `exam_method_id` int(11) NOT NULL,
   `item_name` varchar(30) NOT NULL,
   `item_score` int(3) DEFAULT NULL,
-  `type` int(1) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `course_id` (`course_id`),
-  CONSTRAINT `course_final_exam_paper_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+  KEY `考试方式id关联期末考试表` (`exam_method_id`),
+  CONSTRAINT `考试方式id关联期末考试表` FOREIGN KEY (`exam_method_id`) REFERENCES `course_examine_methods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -139,7 +139,7 @@ CREATE TABLE `course_final_exam_paper` (
 
 LOCK TABLES `course_final_exam_paper` WRITE;
 /*!40000 ALTER TABLE `course_final_exam_paper` DISABLE KEYS */;
-INSERT INTO `course_final_exam_paper` VALUES (1,1,'选择题',35,0),(3,1,'填空题',30,0),(4,1,'实验',100,1);
+INSERT INTO `course_final_exam_paper` VALUES (3,1,'选择',20),(4,1,'填空',20),(5,1,'简答',20),(6,3,'选择题',20);
 /*!40000 ALTER TABLE `course_final_exam_paper` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -154,7 +154,7 @@ CREATE TABLE `course_final_exam_paper_detail` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `primary_id` int(11) NOT NULL,
   `title_number` varchar(10) NOT NULL,
-  `score` int(100) NOT NULL,
+  `score` int(3) DEFAULT NULL,
   `indicator_points` varchar(100) NOT NULL,
   `course_target` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
@@ -169,7 +169,6 @@ CREATE TABLE `course_final_exam_paper_detail` (
 
 LOCK TABLES `course_final_exam_paper_detail` WRITE;
 /*!40000 ALTER TABLE `course_final_exam_paper_detail` DISABLE KEYS */;
-INSERT INTO `course_final_exam_paper_detail` VALUES (1,1,'1',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]'),(2,1,'2',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]'),(3,1,'2',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]'),(4,1,'3',2,'[指标点1.1,指标点1.2]','[课程目标1,课程目标2]');
 /*!40000 ALTER TABLE `course_final_exam_paper_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -265,4 +264,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-03-08 18:29:45
+-- Dump completed on 2023-03-23 14:09:09
