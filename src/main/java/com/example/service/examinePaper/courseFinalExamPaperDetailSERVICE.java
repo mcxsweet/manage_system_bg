@@ -1,7 +1,7 @@
 package com.example.service.examinePaper;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.object.examinePaper.courseFinalExamPaperDetail;
+import com.example.object.finalExamine.courseFinalExamPaperDetail;
 
 public interface courseFinalExamPaperDetailSERVICE extends IService<courseFinalExamPaperDetail> {
     //mapper中添加的方法在此处声明

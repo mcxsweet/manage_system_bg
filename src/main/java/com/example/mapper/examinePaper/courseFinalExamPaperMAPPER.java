@@ -1,7 +1,7 @@
 package com.example.mapper.examinePaper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.object.examinePaper.courseFinalExamPaper;
+import com.example.object.finalExamine.courseFinalExamPaper;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

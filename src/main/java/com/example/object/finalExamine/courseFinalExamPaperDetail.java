@@ -1,4 +1,4 @@
-package com.example.object.examinePaper;
+package com.example.object.finalExamine;
 
 import lombok.Data;
 
@@ -14,7 +14,6 @@ public class courseFinalExamPaperDetail {
    private String indicatorPoints;
    //对应课程目标
    private String courseTarget;
-
 
 }
 

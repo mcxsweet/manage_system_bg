@@ -13,4 +13,6 @@ public class courseExamineMethods {
     private String examineItem;
     //所占百分比
     private int percentage;
+    //项目分数
+    private int itemScore;
 }

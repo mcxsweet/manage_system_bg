@@ -1,8 +1,8 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.object.examinePaper.courseFinalExamPaper;
-import com.example.object.examinePaper.courseFinalExamPaperDetail;
+import com.example.object.finalExamine.courseFinalExamPaper;
+import com.example.object.finalExamine.courseFinalExamPaperDetail;
 import com.example.service.impl.examinePaper.courseFinalExamPaperDetailServiceIMPL;
 import com.example.service.impl.examinePaper.courseFinalExamPaperServiceIMPL;
 import com.example.utility.DataResponses;
