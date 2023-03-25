@@ -9,6 +9,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MVCConfig implements WebMvcConfigurer {
 
+
+    @Bean
+    public AuthenticationInterceptor authenticationInterceptor() {
+        return new AuthenticationInterceptor();
+    }
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor())
@@ -18,10 +24,8 @@ public class MVCConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/user/**")
                 //取消拦截swagger文档
                 .excludePathPatterns("/swagger-ui/**");
+
+        WebMvcConfigurer.super.addInterceptors(registry);
     }
 
-    @Bean
-    public AuthenticationInterceptor authenticationInterceptor() {
-        return new AuthenticationInterceptor();
-    }
 }

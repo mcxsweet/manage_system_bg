@@ -22,7 +22,7 @@ public class UserController {
 
     @ApiOperation("登录接口")
     @PostMapping
-    public DataResponses submit(@RequestBody User user, HttpServletResponse response){
+    public DataResponses submit(@RequestBody User user, HttpServletResponse response) {
         return userService.loginCheck(user, response);
     }
 

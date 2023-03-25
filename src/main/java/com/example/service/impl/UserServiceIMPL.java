@@ -39,6 +39,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
 //        设置cookie的作用域：为”/“时，以在webapp文件夹下的所有应用共享cookie
         cookie.setPath("/");
         response.addCookie(cookie);
+        user2.setPassword("");
         return new DataResponses(true,user2,"登录成功");
     }
 
