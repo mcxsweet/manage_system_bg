@@ -51,7 +51,7 @@ CREATE TABLE `course_basic_information` (
 
 LOCK TABLES `course_basic_information` WRITE;
 /*!40000 ALTER TABLE `course_basic_information` DISABLE KEYS */;
-INSERT INTO `course_basic_information` VALUES (1,'高数(必修)',1,'阳老师',16,4,'计算机科学与技术2020','2020','2021',1,80,'必修','专业必修课',5,2,'[\"指标点1.1\",\"指标点1.2\"]'),(2,'线性代数',1,'王老师',16,4,'计算机科学与技术2020','2020','2021',1,80,'必修','专业必修课',5,3,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(4,'概率论',1,'阳老师1222',16123,41231,'计算机科学与技术2022','2020','2021',1,80111,'必修','专业必修课',5,2,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]'),(6,'c语言程序设计',1,'阳老师',16,4,'计算机科学与技术2020','2020','2021',1,80,'必修','专业必修课',5,2,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]'),(7,'JAVA程序设计',1,'阳老师',1231,132,'计算,机科学与技术2020','2020','2021',1,123,'必修','专业必修课',5,1231,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]'),(8,'高数',3,'admin2',12,12,'计算机科学与技术2020','2020','2021',1,122,'必修','公共必修',4,1,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]'),(9,'编译原理',1,'admin',48,23,'2020计算机科学','2023','2024',1,55,'必修','5636',1,2,'[\"指标点1.1\",\"指标点1.2\"]'),(10,'编译原理',1,'admin',48,23,'2020计算机科学','2023','2024',2,55,'必修','5636',1,2,'[\"指标点1.1\",\"指标点1.2\"]'),(11,'这是一条很长的测试数据',1,'admin',1223,213,'123123','2021','2022',1,123,'必修','123131',123131,123131,'[\"指标点1.1\",\"指标点2.1\",\"指标点1.2\",\"指标点5.2\"]');
+INSERT INTO `course_basic_information` VALUES (1,'高数(必修)',1,'阳老师',16,4,'计算机科学与技术2020','2020','2021',1,80,'必修','专业必修课',5,2,'[\"指标点1.1\",\"指标点1.2\"]'),(2,'线性代数',1,'王老师',16,4,'计算机科学与技术2020','2020','2021',1,80,'必修','专业必修课',5,3,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(4,'概率论',1,'阳老师1222',16123,41231,'计算机科学与技术2022','2020','2021',1,80111,'必修','专业必修课',5,2,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]'),(6,'c语言程序设计',1,'阳老师',16,4,'计算机科学与技术2020','2020','2021',1,80,'必修','专业必修课',5,2,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]'),(7,'JAVA程序设计',1,'阳老师',1231,132,'计算,机科学与技术2020','2020','2021',1,123,'必修','专业必修课',5,1231,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]'),(8,'高数',3,'admin2',12,12,'计算机科学与技术2020','2020','2021',1,122,'必修','公共必修',4,1,'[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]'),(10,'编译原理',1,'admin',48,23,'2020计算机科学','2023','2024',2,55,'必修','5636',1,2,'[\"指标点1.1\",\"指标点1.2\"]'),(11,'这是一条很长的测试数据',1,'admin',1223,213,'123123','2021','2022',1,123,'必修','123131',123131,123131,'[\"指标点1.1\",\"指标点2.1\",\"指标点1.2\",\"指标点5.2\"]');
 /*!40000 ALTER TABLE `course_basic_information` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -72,7 +72,7 @@ CREATE TABLE `course_examine_child_methods` (
   PRIMARY KEY (`id`),
   KEY `考试方式表id` (`course_examine_methods_id`),
   CONSTRAINT `考试方式表id` FOREIGN KEY (`course_examine_methods_id`) REFERENCES `course_examine_methods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,7 +81,7 @@ CREATE TABLE `course_examine_child_methods` (
 
 LOCK TABLES `course_examine_child_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_child_methods` DISABLE KEYS */;
-INSERT INTO `course_examine_child_methods` VALUES (10,3,'平时考核成绩',8,'[\"课程目标1\",\"课程目标2\"]','[\"指标点1\",\"指标点2\"]'),(11,1,'平时考核成绩',23,'[\"课程目标1\",\"课程目标2\"]','[\"指标点1\",\"指标点2\"]'),(13,1,'实验考核成绩',12,'[\"课程目标1\"]','[\"指标点1\"]');
+INSERT INTO `course_examine_child_methods` VALUES (11,1,'平时考核成绩',23,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(13,1,'实验考核成绩',12,'[\"课程目标1\"]','[\"指标点1\"]'),(16,20,'考勤',34,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(17,20,'课题提问',29,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(21,20,'作业',47,'[\"课程目标1\",\"课程目标2\",\"课程目标3\"]','[\"指标点1\",\"指标点2\"]'),(25,20,'期中测试',27,'[\"课程目标1\"]','[\"指标点2\"]'),(26,24,'实验项目完成分',24,'[\"课程目标1\",\"课程目标2\"]','[\"指标点2\",\"指标点1\"]'),(27,24,'大报告',23,'[\"课程目标1\",\"课程目标2\"]','[\"指标点1\",\"指标点2\"]'),(28,24,'试卷',29,'[\"课程目标1\",\"课程目标2\"]','[\"指标点1\",\"指标点2\"]'),(29,1,'考勤',18,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\"]'),(31,3,'考勤',17,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(32,3,'课题提问',11,'[\"课程目标1\"]','[\"指标点1.2\"]'),(33,25,'考勤',13,'[]','[\"指标点1.1\",\"指标点5.2\",\"指标点2.1\"]'),(34,25,'课题提问',11,'[]','[\"指标点1.1\"]'),(35,25,'考勤',50,'[]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]');
 /*!40000 ALTER TABLE `course_examine_child_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +102,7 @@ CREATE TABLE `course_examine_methods` (
   PRIMARY KEY (`id`),
   KEY `课程信息表id` (`course_id`),
   CONSTRAINT `课程信息表id` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -111,7 +111,7 @@ CREATE TABLE `course_examine_methods` (
 
 LOCK TABLES `course_examine_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_methods` DISABLE KEYS */;
-INSERT INTO `course_examine_methods` VALUES (1,1,'高数(必修)','考试',69,100),(3,2,'线性代数','考试',70,100),(4,2,'线性代数','平时测试',30,100),(5,7,'JAVA程序设计','平时考核成绩',3,100),(7,6,'c语言程序设计','平时考核成绩',6,100),(8,6,'c语言程序设计','平时考核成绩',6,100),(9,6,'c语言程序设计','平时考核成绩',6,100),(15,4,'概率论','实验考核成绩',412,100),(17,2,'线性代数','平时考核成绩',4,100),(18,8,'线性代数','平时测验',30,0);
+INSERT INTO `course_examine_methods` VALUES (1,1,'高数(必修)','考试',69,100),(3,2,'线性代数','考试',70,100),(4,2,'线性代数','平时测试',30,100),(5,7,'JAVA程序设计','平时考核成绩',3,100),(7,6,'c语言程序设计','平时考核成绩',6,100),(8,6,'c语言程序设计','平时考核成绩',6,100),(9,6,'c语言程序设计','平时考核成绩',6,100),(15,4,'概率论','实验考核成绩',412,100),(17,2,'线性代数','平时考核成绩',4,100),(18,8,'线性代数','平时测验',30,0),(19,8,'线性代数','平时测验',30,0),(20,10,'编译原理','平时考核成绩',24,0),(24,10,'编译原理','实验考核成绩',26,0),(25,11,'这是一条很长的测试数据','平时考核成绩',17,0);
 /*!40000 ALTER TABLE `course_examine_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -160,7 +160,7 @@ CREATE TABLE `course_final_exam_paper_detail` (
   PRIMARY KEY (`id`),
   KEY `与课程试卷表id外联` (`primary_id`),
   CONSTRAINT `与课程试卷表id外联` FOREIGN KEY (`primary_id`) REFERENCES `course_final_exam_paper` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -183,6 +183,7 @@ CREATE TABLE `course_target` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `course_id` int(11) NOT NULL,
   `course_name` varchar(30) NOT NULL,
+  `target_name` varchar(10) NOT NULL,
   `course_target` text NOT NULL,
   `path_ways` text NOT NULL,
   `indicator_points` text NOT NULL,
@@ -190,7 +191,7 @@ CREATE TABLE `course_target` (
   PRIMARY KEY (`id`),
   KEY `course_basic_information_id` (`course_id`),
   CONSTRAINT `course_basic_information_id` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -199,7 +200,7 @@ CREATE TABLE `course_target` (
 
 LOCK TABLES `course_target` WRITE;
 /*!40000 ALTER TABLE `course_target` DISABLE KEYS */;
-INSERT INTO `course_target` VALUES (4,6,'c语言程序设计','aaaaaaaaaaadasdasd','1232dadXzcscascdfsdasadsadasdad','[\"选项1\",\"选项2\"]','[\"考试\",\"作业\"]'),(5,4,'概率论','wdaeasdasdasd','asdasd','[\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(6,6,'c语言程序设计','edadsadaczcweqwedad阿达是大大','大赛大赛大大','[\"选项1\",\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(8,2,'线性代数','阿三打是大势打豆豆','是大大是大大的','[\"选项1\",\"选项2\",\"选项4\"]','[\"考试\",\"作业\"]'),(9,1,'高数(必修)','阿斯顿焚膏继晷语序虚词是大扫除','asadadadadaxzcvvdffgdg','[\"选项1\",\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(10,8,'高数','asdadadada','adsadad','[\"选项1\",\"选项2\",\"选项3\",\"选项4\"]','[\"考试\",\"作业\"]');
+INSERT INTO `course_target` VALUES (4,6,'c语言程序设计','课程目标1','aaaaaaaaaaadasdasd','1232dadXzcscascdfsdasadsadasdad','[\"选项1\",\"选项2\"]','[\"考试\",\"作业\"]'),(5,4,'概率论','课程目标1','wdaeasdasdasd','asdasd','[\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(6,6,'c语言程序设计','课程目标2','edadsadaczcweqwedad阿达是大大','大赛大赛大大','[\"选项1\",\"选项2\",\"选项3\",\"选项4\",\"选项5\"]','[\"考试\",\"作业\"]'),(8,2,'线性代数','课程目标1','阿三打是大势打豆豆','是大大是大大的','[\"选项1\",\"选项2\",\"选项4\"]','[\"考试\",\"作业\"]'),(9,1,'高数(必修)','课程目标1','阿斯顿焚膏继晷语序虚词是大扫除','asadadadadaxzcvvdffgdg','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]','[\"考试\",\"作业\"]'),(10,8,'高数','课程目标1','asdadadada','adsadad','[\"选项1\",\"选项2\",\"选项3\",\"选项4\"]','[\"考试\",\"作业\"]'),(11,10,'编译原理','课程目标1','啊哈三大件啊电大数据','鹅发啊是大大的','[\"指标点1.1\",\"指标点1.2\"]','[\"考试\",\"作业\"]'),(12,10,'编译原理','课程目标2','掌握运用Python编程方法，能对连续信号和离散信号进行表示和运算；','掌握运用Python编程方法，能对连续信号和离散信号进行表示和运算；','[\"指标点1.1\",\"指标点5.2\"]','[\"考试\"]'),(13,10,'编译原理','课程目标3','学习掌握Python语言和Python开发工具，能针对控制工程和电路系统中问题，进行系统分析、计算和设计。','学习掌握Python语言和Python开发工具，能针对控制工程和电路系统中问题，进行系统分析、计算和设计。','[\"指标点1.1\",\"指标点1.2\"]','[\"考试\",\"作业\"]');
 /*!40000 ALTER TABLE `course_target` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -264,4 +265,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-03-23 14:09:09
+-- Dump completed on 2023-03-25 20:27:04

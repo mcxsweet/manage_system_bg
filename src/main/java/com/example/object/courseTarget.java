@@ -9,6 +9,8 @@ public class courseTarget {
     private int courseId;
     //课程名
     private String courseName;
+    //课程目标名
+    private String targetName;
     //课程目标
     private String courseTarget;
     //达成途径
