@@ -25,12 +25,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         if (StringUtils.isEmpty(token)) {
             response.getWriter().write(JSONObject.toJSONString(new DataResponses(false, "Lack of token")));
-//            response.sendRedirect("http://localhost:8081/");
             return false;
         }
+
 //        验证Token
         if (!TokenUtil.verifyToken(token)) {
-//            response.sendRedirect("http://localhost:8081/");
+            response.getWriter().write(JSONObject.toJSONString(new DataResponses(false, "Token expires")));
             return false;
         }
         return true;
