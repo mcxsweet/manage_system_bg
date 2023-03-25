@@ -23,6 +23,13 @@ import java.io.IOException;
 @RequestMapping("/courseInfo")
 public class courseBasicInformationController {
 
+    @ApiOperation("检查登录接口")
+    @PostMapping("/checkSubmit")
+    public DataResponses checkSubmit() {
+        return new DataResponses(true);
+    }
+
+
     /*
         课程基本信息相关接口
      */
