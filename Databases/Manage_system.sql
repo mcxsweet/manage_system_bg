@@ -67,12 +67,13 @@ CREATE TABLE `course_examine_child_methods` (
   `course_examine_methods_id` int(11) NOT NULL,
   `examine_child_item` varchar(30) NOT NULL,
   `child_percentage` int(3) NOT NULL,
+  `child_score` int(3) NOT NULL DEFAULT '100',
   `course_target` varchar(300) DEFAULT NULL,
   `indicator_points_detail` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `考试方式表id` (`course_examine_methods_id`),
   CONSTRAINT `考试方式表id` FOREIGN KEY (`course_examine_methods_id`) REFERENCES `course_examine_methods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,7 +82,7 @@ CREATE TABLE `course_examine_child_methods` (
 
 LOCK TABLES `course_examine_child_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_child_methods` DISABLE KEYS */;
-INSERT INTO `course_examine_child_methods` VALUES (11,1,'平时考核成绩',23,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(13,1,'实验考核成绩',12,'[\"课程目标1\"]','[\"指标点1\"]'),(16,20,'考勤',34,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(17,20,'课题提问',29,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(21,20,'作业',47,'[\"课程目标1\",\"课程目标2\",\"课程目标3\"]','[\"指标点1\",\"指标点2\"]'),(25,20,'期中测试',27,'[\"课程目标1\"]','[\"指标点2\"]'),(26,24,'实验项目完成分',24,'[\"课程目标1\",\"课程目标2\"]','[\"指标点2\",\"指标点1\"]'),(27,24,'大报告',23,'[\"课程目标1\",\"课程目标2\"]','[\"指标点1\",\"指标点2\"]'),(28,24,'试卷',29,'[\"课程目标1\",\"课程目标2\"]','[\"指标点1\",\"指标点2\"]'),(29,1,'考勤',18,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\"]'),(31,3,'考勤',17,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(32,3,'课题提问',11,'[\"课程目标1\"]','[\"指标点1.2\"]'),(33,25,'考勤',13,'[]','[\"指标点1.1\",\"指标点5.2\",\"指标点2.1\"]'),(34,25,'课题提问',11,'[]','[\"指标点1.1\"]'),(35,25,'考勤',50,'[]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]');
+INSERT INTO `course_examine_child_methods` VALUES (11,1,'平时考核成绩',23,100,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(13,1,'实验考核成绩',12,100,'[\"课程目标1\"]','[\"指标点1\"]'),(16,20,'考勤',34,100,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(17,20,'课题提问',29,100,'[\"课程目标1\"]','[\"指标点1\",\"指标点2\"]'),(21,20,'作业',47,100,'[\"课程目标1\",\"课程目标2\",\"课程目标3\"]','[\"指标点1\",\"指标点2\"]'),(25,20,'期中测试',27,100,'[\"课程目标1\"]','[\"指标点2\"]'),(26,24,'实验项目完成分',24,100,'[\"课程目标1\",\"课程目标2\"]','[\"指标点2\",\"指标点1\"]'),(27,24,'大报告',23,100,'[\"课程目标1\",\"课程目标2\"]','[\"指标点1\",\"指标点2\"]'),(28,24,'试卷',29,100,'[\"课程目标2\"]','[\"指标点1\",\"指标点2\"]'),(29,1,'考勤',18,100,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\"]'),(31,3,'考勤',17,100,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(32,3,'课题提问',11,100,'[\"课程目标1\"]','[\"指标点1.2\"]'),(33,25,'考勤',13,100,'[]','[\"指标点1.1\",\"指标点5.2\",\"指标点2.1\"]'),(34,25,'课题提问',11,100,'[]','[\"指标点1.1\"]'),(35,25,'考勤',50,100,'[]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(36,26,'试卷',100,100,'[\"课程目标1\",\"课程目标2\",\"课程目标3\"]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\",\"指标点2.1\"]');
 /*!40000 ALTER TABLE `course_examine_child_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +103,7 @@ CREATE TABLE `course_examine_methods` (
   PRIMARY KEY (`id`),
   KEY `课程信息表id` (`course_id`),
   CONSTRAINT `课程信息表id` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -111,7 +112,7 @@ CREATE TABLE `course_examine_methods` (
 
 LOCK TABLES `course_examine_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_methods` DISABLE KEYS */;
-INSERT INTO `course_examine_methods` VALUES (1,1,'高数(必修)','考试',69,100),(3,2,'线性代数','考试',70,100),(4,2,'线性代数','平时测试',30,100),(5,7,'JAVA程序设计','平时考核成绩',3,100),(7,6,'c语言程序设计','平时考核成绩',6,100),(8,6,'c语言程序设计','平时考核成绩',6,100),(9,6,'c语言程序设计','平时考核成绩',6,100),(15,4,'概率论','实验考核成绩',412,100),(17,2,'线性代数','平时考核成绩',4,100),(18,8,'线性代数','平时测验',30,0),(19,8,'线性代数','平时测验',30,0),(20,10,'编译原理','平时考核成绩',24,0),(24,10,'编译原理','实验考核成绩',26,0),(25,11,'这是一条很长的测试数据','平时考核成绩',17,0);
+INSERT INTO `course_examine_methods` VALUES (1,1,'高数(必修)','考试',69,100),(3,2,'线性代数','考试',70,100),(4,2,'线性代数','平时测试',30,100),(5,7,'JAVA程序设计','平时考核成绩',3,100),(7,6,'c语言程序设计','平时考核成绩',6,100),(8,6,'c语言程序设计','平时考核成绩',6,100),(9,6,'c语言程序设计','平时考核成绩',6,100),(15,4,'概率论','实验考核成绩',412,100),(17,2,'线性代数','平时考核成绩',4,100),(18,8,'线性代数','平时测验',30,100),(19,8,'线性代数','平时测验',30,100),(20,10,'编译原理','平时考核成绩',24,100),(24,10,'编译原理','实验考核成绩',26,100),(25,11,'这是一条很长的测试数据','平时考核成绩',17,100),(26,10,'编译原理','期末考核成绩',50,100);
 /*!40000 ALTER TABLE `course_examine_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -265,4 +266,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-03-25 20:27:04
+-- Dump completed on 2023-03-26 18:49:46
