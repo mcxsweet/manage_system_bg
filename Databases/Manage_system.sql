@@ -125,13 +125,13 @@ DROP TABLE IF EXISTS `course_final_exam_paper`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `course_final_exam_paper` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `exam_method_id` int(11) NOT NULL,
+  `exam_child_method_id` int(11) NOT NULL,
   `item_name` varchar(30) NOT NULL,
   `item_score` int(3) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `考试方式id关联期末考试表` (`exam_method_id`),
-  CONSTRAINT `考试方式id关联期末考试表` FOREIGN KEY (`exam_method_id`) REFERENCES `course_examine_methods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+  KEY `试卷表外键考察评价方式子表` (`exam_child_method_id`),
+  CONSTRAINT `试卷表外键考察评价方式子表` FOREIGN KEY (`exam_child_method_id`) REFERENCES `course_examine_child_methods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -140,7 +140,7 @@ CREATE TABLE `course_final_exam_paper` (
 
 LOCK TABLES `course_final_exam_paper` WRITE;
 /*!40000 ALTER TABLE `course_final_exam_paper` DISABLE KEYS */;
-INSERT INTO `course_final_exam_paper` VALUES (3,1,'选择',20),(4,1,'填空',20),(5,1,'简答',20),(6,3,'选择题',20);
+INSERT INTO `course_final_exam_paper` VALUES (10,36,'选择题',20),(11,36,'填空题',30),(12,36,'简答题',50);
 /*!40000 ALTER TABLE `course_final_exam_paper` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -161,7 +161,7 @@ CREATE TABLE `course_final_exam_paper_detail` (
   PRIMARY KEY (`id`),
   KEY `与课程试卷表id外联` (`primary_id`),
   CONSTRAINT `与课程试卷表id外联` FOREIGN KEY (`primary_id`) REFERENCES `course_final_exam_paper` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -170,6 +170,7 @@ CREATE TABLE `course_final_exam_paper_detail` (
 
 LOCK TABLES `course_final_exam_paper_detail` WRITE;
 /*!40000 ALTER TABLE `course_final_exam_paper_detail` DISABLE KEYS */;
+INSERT INTO `course_final_exam_paper_detail` VALUES (1,10,'1',2,'1','1'),(2,10,'2',2,'1','1'),(3,10,'2',2,'1','1'),(4,11,'1',2,'1','1'),(5,11,'1',2,'1','1'),(6,11,'1',2,'1','1'),(7,11,'1',2,'1','1'),(8,12,'1',2,'1','1'),(9,12,'2',2,'1','1'),(10,12,'3',2,'1','1');
 /*!40000 ALTER TABLE `course_final_exam_paper_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -266,4 +267,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-03-26 18:49:46
+-- Dump completed on 2023-03-26 21:18:01

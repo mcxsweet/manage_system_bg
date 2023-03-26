@@ -29,21 +29,21 @@ public class courseFinalExamPaperController {
         return new DataResponses(true, courseFinalExamPaperService.list());
     }
 
-    @ApiOperation("提供课程信息表的id查询期末考察项目")
-    @GetMapping("/{courseId}")
-    public DataResponses getById(@PathVariable int courseId) {
+    @ApiOperation("提供考察评价方式表的id查询期末考察项目")
+    @GetMapping("/{examChildMethodId}")
+    public DataResponses getById(@PathVariable int examChildMethodId) {
         QueryWrapper<courseFinalExamPaper> QueryWrapper = new QueryWrapper<>();
-        QueryWrapper.eq("course_id", courseId);
+        QueryWrapper.eq("exam_child_method_id", examChildMethodId);
         return new DataResponses(true, courseFinalExamPaperService.list(QueryWrapper));
     }
 
-    @ApiOperation("根据课程信息表的id添加期末考察项目")
+    @ApiOperation("提供考察评价方式表的id添加期末考察项目")
     @PostMapping()
     public DataResponses addById(@RequestBody courseFinalExamPaper information) {
         return new DataResponses(courseFinalExamPaperService.save(information));
     }
 
-    @ApiOperation("提供课程信息表的id修改期末考察项目")
+    @ApiOperation("提供id修改期末考察项目")
     @PutMapping()
     public DataResponses modifyById(@RequestBody courseFinalExamPaper information) {
         return new DataResponses(courseFinalExamPaperService.updateById(information));

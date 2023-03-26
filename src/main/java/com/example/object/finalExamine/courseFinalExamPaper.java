@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class courseFinalExamPaper {
     private Integer id;
-    //外键链接课程基本信息表
-    private int examMethodId;
+    //外键考察评价方式表
+    private int examChildMethodId;
     //项目名称
     private String itemName;
     //项目分数
