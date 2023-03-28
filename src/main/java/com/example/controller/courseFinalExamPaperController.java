@@ -73,6 +73,7 @@ public class courseFinalExamPaperController {
     public DataResponses getDetailById(@PathVariable int primaryId) {
         QueryWrapper<courseFinalExamPaperDetail> QueryWrapper = new QueryWrapper<>();
         QueryWrapper.eq("primary_id", primaryId);
+        QueryWrapper.orderByAsc("title_number");
         return new DataResponses(true, courseFinalExamPaperDetailService.list(QueryWrapper));
     }
 
@@ -90,7 +91,7 @@ public class courseFinalExamPaperController {
 
     @ApiOperation("提供期末试卷表的id删除详细期末考察项目")
     @DeleteMapping("/detail")
-    public DataResponses deleteDetailById(@RequestBody int id) {
+    public DataResponses deleteDetailById(@RequestBody String id) {
         return new DataResponses(courseFinalExamPaperDetailService.removeById(id));
     }
 
