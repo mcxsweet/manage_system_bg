@@ -56,12 +56,15 @@ public class TokenUtil {
      * @return 获取token
      */
     public String getToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        for (Cookie c : cookies) {
-            if (c.getName().equals("token")) {
-//                System.out.println(c.getValue());
-                return c.getValue();
+        try {
+            Cookie[] cookies = request.getCookies();
+            for (Cookie c : cookies) {
+                if (c.getName().equals("token")) {
+                    return c.getValue();
+                }
             }
+        }catch (Exception ex){
+            return null;
         }
         return null;
     }
