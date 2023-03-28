@@ -51,7 +51,7 @@ public class courseFinalExamPaperController {
 
     @ApiOperation("提供id删除期末考察项目")
     @DeleteMapping()
-    public DataResponses deleteById(@RequestBody int id) {
+    public DataResponses deleteById(@RequestBody String id) {
         return new DataResponses(courseFinalExamPaperService.removeById(id));
     }
 
