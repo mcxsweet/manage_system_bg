@@ -7,6 +7,8 @@ public class courseBasicInformation {
     private Integer id;
     //课程名称
     private String courseName;
+    //专业
+    private String major;
     //任课教师id
     private int teacherId;
     //任课教师
@@ -21,6 +23,8 @@ public class courseBasicInformation {
     private int term;
     private String termStart;
     private String termEnd;
+    //教材
+    private String textBook;
     //学生人数
     private int studentsNum;
     //课程性质

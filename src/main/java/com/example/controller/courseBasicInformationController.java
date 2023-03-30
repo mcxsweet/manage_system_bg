@@ -79,7 +79,7 @@ public class courseBasicInformationController {
     }
 
     @ApiOperation("按id查询")
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public DataResponses getById(@PathVariable int id) {
         return new DataResponses(true, courseBasicInformationService.getById(id));
     }
