@@ -2,8 +2,13 @@ package com.example.service.examinePaper;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.object.finalExamine.courseFinalExamPaperDetail;
+import com.itextpdf.text.DocumentException;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public interface courseFinalExamPaperDetailSERVICE extends IService<courseFinalExamPaperDetail> {
-    //mapper中添加的方法在此处声明
-    //也可以通过@Override重写方法
+    ResponseEntity<byte[]> ExportExamPaperRelationExcel(HttpServletResponse response) throws IOException, DocumentException;
 }

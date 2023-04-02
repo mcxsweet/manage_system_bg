@@ -7,11 +7,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-
-import static org.apache.poi.ss.usermodel.BorderStyle.THIN;
-
+import java.io.*;
 
 public class export {
 
@@ -29,8 +25,8 @@ public class export {
 //        style.setBorderLeft(THIN);//左边框
 //        style.setBorderRight(THIN);//右边框
 
-        sheet.setColumnWidth(0,256*12);
-        sheet.setColumnWidth(5,256*12);
+        sheet.setColumnWidth(0, 256 * 12);
+        sheet.setColumnWidth(5, 256 * 12);
 
         // 将第一行的三个单元格给合并
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 5));
@@ -78,9 +74,9 @@ public class export {
         row = sheet.createRow(7);
         row.createCell(0).setCellValue("指标点编号");
 
-        String []indicator = information.getIndicatorPoints().split(",");
+        String[] indicator = information.getIndicatorPoints().split(",");
         for (int i = 0; i < indicator.length; i++) {
-            row.createCell(i+1).setCellValue(indicator[i]);
+            row.createCell(i + 1).setCellValue(indicator[i]);
         }
 
 
@@ -93,6 +89,5 @@ public class export {
         outputStream.flush();
         outputStream.close();
     }
-
 
 }

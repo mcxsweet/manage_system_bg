@@ -6,10 +6,16 @@ import com.example.object.finalExamine.courseFinalExamPaperDetail;
 import com.example.service.impl.examinePaper.courseFinalExamPaperDetailServiceIMPL;
 import com.example.service.impl.examinePaper.courseFinalExamPaperServiceIMPL;
 import com.example.utility.DataResponses;
+import com.itextpdf.text.DocumentException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Api(tags = "期末试卷成绩细明")
 @RestController
@@ -96,5 +102,14 @@ public class courseFinalExamPaperController {
     }
 
 
+    /*
+        相关的表格展示
+     */
+
+    @ApiOperation("提供课程ID生成该课程考核方式和指标点，课程目标的对应关系")
+    @GetMapping("/Table")
+    public ResponseEntity<byte[]> exportExcel(HttpServletResponse response) throws IOException, DocumentException {
+        return courseFinalExamPaperDetailService.ExportExamPaperRelationExcel(response);
+    }
 
 }
