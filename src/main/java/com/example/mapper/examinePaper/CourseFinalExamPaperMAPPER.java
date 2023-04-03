@@ -5,6 +5,6 @@ import com.example.object.finalExamine.courseFinalExamPaper;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface courseFinalExamPaperMAPPER extends BaseMapper<courseFinalExamPaper> {
+public interface CourseFinalExamPaperMAPPER extends BaseMapper<courseFinalExamPaper> {
 //    在此出写拓展sql
 }

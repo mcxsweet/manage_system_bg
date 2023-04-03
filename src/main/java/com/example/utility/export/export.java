@@ -1,6 +1,6 @@
 package com.example.utility.export;
 
-import com.example.object.courseBasicInformation;
+import com.example.object.CourseBasicInformation;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
@@ -12,7 +12,7 @@ import java.io.*;
 public class export {
 
     //导出课程基本信息
-    public static void ExportCourseBasicInformationExcel(HttpServletResponse response, courseBasicInformation information) throws IOException {
+    public static void ExportCourseBasicInformationExcel(HttpServletResponse response, CourseBasicInformation information) throws IOException {
 
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("课程基本信息");

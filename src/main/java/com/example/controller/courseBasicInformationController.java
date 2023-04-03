@@ -2,12 +2,12 @@ package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.mapper.IndicatorsMAPPER;
-import com.example.mapper.courseTargetMAPPER;
+import com.example.mapper.CourseTargetMAPPER;
 import com.example.object.Indicators;
-import com.example.object.courseBasicInformation;
-import com.example.object.courseTarget;
+import com.example.object.CourseBasicInformation;
+import com.example.object.CourseTarget;
 
-import com.example.service.impl.courseBasicInformationServiceIMPL;
+import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +35,7 @@ public class courseBasicInformationController {
      */
     //课程基本信息
     @Autowired
-    private courseBasicInformationServiceIMPL courseBasicInformationService;
+    private CourseBasicInformationServiceIMPL courseBasicInformationService;
 
     @ApiOperation("查询全部")
     @GetMapping
@@ -46,7 +46,7 @@ public class courseBasicInformationController {
     @ApiOperation("按当前用户查询")
     @GetMapping("/currentUser/{currentUserId}")
     public DataResponses getByCurrentUser(@PathVariable int currentUserId) {
-        QueryWrapper<courseBasicInformation> QueryWrapper = new QueryWrapper<>();
+        QueryWrapper<CourseBasicInformation> QueryWrapper = new QueryWrapper<>();
         QueryWrapper.eq("teacher_id", currentUserId);
         QueryWrapper.orderByDesc("term_start");
         QueryWrapper.orderByAsc("term");
@@ -55,8 +55,8 @@ public class courseBasicInformationController {
 
     @ApiOperation("当前用户筛选")
     @PostMapping("/currentUser/{currentUserId}")
-    public DataResponses searchByCurrentUser(@PathVariable int currentUserId, @RequestBody courseBasicInformation searchTable) {
-        QueryWrapper<courseBasicInformation> QueryWrapper = new QueryWrapper<>();
+    public DataResponses searchByCurrentUser(@PathVariable int currentUserId, @RequestBody CourseBasicInformation searchTable) {
+        QueryWrapper<CourseBasicInformation> QueryWrapper = new QueryWrapper<>();
         QueryWrapper.eq("teacher_id", currentUserId);
         QueryWrapper.orderByDesc("term_start");
         QueryWrapper.orderByAsc("term");
@@ -86,7 +86,7 @@ public class courseBasicInformationController {
 
     @ApiOperation("按id修改")
     @PutMapping()
-    public DataResponses UpdateById(@RequestBody courseBasicInformation data) {
+    public DataResponses UpdateById(@RequestBody CourseBasicInformation data) {
         return new DataResponses(courseBasicInformationService.updateById(data));
     }
 
@@ -94,20 +94,20 @@ public class courseBasicInformationController {
     @GetMapping("/export/{id}")
     public void exportExcel(HttpServletResponse response, @PathVariable int id) throws IOException {
 
-        courseBasicInformation information = courseBasicInformationService.getById(id);
+        CourseBasicInformation information = courseBasicInformationService.getById(id);
         //导出文件的方法统一写入到export类中
         export.ExportCourseBasicInformationExcel(response, information);
     }
 
     @ApiOperation("添加")
     @PostMapping
-    public DataResponses write(@RequestBody courseBasicInformation pages) {
+    public DataResponses write(@RequestBody CourseBasicInformation pages) {
         return new DataResponses(courseBasicInformationService.save(pages));
     }
 
     @ApiOperation("删除")
     @DeleteMapping
-    public DataResponses delete(@RequestBody courseBasicInformation pages) {
+    public DataResponses delete(@RequestBody CourseBasicInformation pages) {
         return new DataResponses(courseBasicInformationService.removeById(pages));
     }
 
@@ -117,31 +117,31 @@ public class courseBasicInformationController {
 
     //课程目标
     @Autowired
-    private courseTargetMAPPER courseTarget;
+    private CourseTargetMAPPER courseTarget;
 
     @ApiOperation("获取该课程所有课程目标")
     @GetMapping("/courseTarget/{courseId}")
     public DataResponses getCourseTarget(@PathVariable int courseId) {
-        QueryWrapper<courseTarget> QueryWrapper = new QueryWrapper<>();
+        QueryWrapper<CourseTarget> QueryWrapper = new QueryWrapper<>();
         QueryWrapper.eq("course_id", courseId);
         return new DataResponses(true, courseTarget.selectList(QueryWrapper));
     }
 
     @ApiOperation("添加该课程课程目标")
     @PostMapping("/courseTarget")
-    public DataResponses addCourseTarget(@RequestBody courseTarget Data) {
+    public DataResponses addCourseTarget(@RequestBody CourseTarget Data) {
         return new DataResponses(true, courseTarget.insert(Data));
     }
 
     @ApiOperation("修改课程目标")
     @PutMapping("/courseTarget")
-    public DataResponses modifyCourseTarget(@RequestBody courseTarget Data) {
+    public DataResponses modifyCourseTarget(@RequestBody CourseTarget Data) {
         return new DataResponses(true, courseTarget.updateById(Data));
     }
 
     @ApiOperation("删除课程目标")
     @DeleteMapping("/courseTarget")
-    public DataResponses DeleteCourseTarget(@RequestBody courseTarget Data) {
+    public DataResponses DeleteCourseTarget(@RequestBody CourseTarget Data) {
         return new DataResponses(true, courseTarget.deleteById(Data));
     }
 

@@ -3,7 +3,7 @@ package com.example.object;
 import lombok.Data;
 
 @Data
-public class courseExamineChildMethods {
+public class CourseExamineChildMethods {
     private Integer id;
     //课程考核方式表中的id
     private int courseExamineMethodsId;

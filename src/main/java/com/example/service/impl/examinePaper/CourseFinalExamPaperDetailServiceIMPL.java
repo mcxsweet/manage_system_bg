@@ -4,15 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.mapper.courseBasicInformationMAPPER;
-import com.example.mapper.courseTargetMAPPER;
-import com.example.mapper.examinePaper.courseFinalExamPaperDetailMAPPER;
-import com.example.mapper.examinePaper.courseFinalExamPaperMAPPER;
-import com.example.object.courseBasicInformation;
-import com.example.object.courseTarget;
+import com.example.mapper.CourseBasicInformationMAPPER;
+import com.example.mapper.CourseExamineChildMethodsMAPPER;
+import com.example.mapper.CourseExamineMethodsMAPPER;
+import com.example.mapper.CourseTargetMAPPER;
+import com.example.mapper.examinePaper.CourseFinalExamPaperDetailMAPPER;
+import com.example.mapper.examinePaper.CourseFinalExamPaperMAPPER;
+import com.example.object.CourseBasicInformation;
+import com.example.object.CourseTarget;
 import com.example.object.finalExamine.courseFinalExamPaper;
 import com.example.object.finalExamine.courseFinalExamPaperDetail;
-import com.example.service.examinePaper.courseFinalExamPaperDetailSERVICE;
+import com.example.service.examinePaper.CourseFinalExamPaperDetailSERVICE;
 
 import com.spire.xls.FileFormat;
 import com.spire.xls.Workbook;
@@ -20,7 +22,6 @@ import org.apache.poi.hssf.usermodel.*;
 
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,16 +35,20 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class courseFinalExamPaperDetailServiceIMPL extends ServiceImpl<courseFinalExamPaperDetailMAPPER, courseFinalExamPaperDetail> implements courseFinalExamPaperDetailSERVICE {
+public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFinalExamPaperDetailMAPPER, courseFinalExamPaperDetail> implements CourseFinalExamPaperDetailSERVICE {
 
     @Autowired
-    private courseFinalExamPaperDetailMAPPER courseFinalExamPaperDetailMAPPER;
+    private CourseFinalExamPaperDetailMAPPER courseFinalExamPaperDetailMAPPER;
     @Autowired
-    private courseBasicInformationMAPPER courseBasicInformationMAPPER;
+    private CourseBasicInformationMAPPER courseBasicInformationMAPPER;
     @Autowired
-    private courseFinalExamPaperMAPPER courseFinalExamPaperMAPPER;
+    private CourseFinalExamPaperMAPPER courseFinalExamPaperMAPPER;
     @Autowired
-    private courseTargetMAPPER courseTargetMAPPER;
+    private CourseTargetMAPPER courseTargetMAPPER;
+    @Autowired
+    private CourseExamineMethodsMAPPER courseExamineMethodsMAPPER;
+    @Autowired
+    private CourseExamineChildMethodsMAPPER courseExamineChildMethodsMAPPER;
 
 
     @Override
@@ -59,15 +64,19 @@ public class courseFinalExamPaperDetailServiceIMPL extends ServiceImpl<courseFin
         HSSFWorkbook workbook = workbook2;
 
         HSSFSheet sheet = workbook.getSheetAt(0);
-        HSSFRow row0 = sheet.getRow(0);
 
+        //第一行
+        HSSFRow row0 = sheet.getRow(0);
         //第二行
         HSSFRow row = sheet.getRow(1);
         //第三行
         HSSFRow row3 = sheet.getRow(2);
-        HSSFCellStyle cellStyle3 = row3.getCell(2).getCellStyle();
+        //第四行
         HSSFRow row4 = sheet.getRow(3);
+        //单元格样式
+        HSSFCellStyle cellStyle3 = row3.getCell(2).getCellStyle();
         HSSFCellStyle cellStyle4 = row4.getCell(2).getCellStyle();
+
 
         //第一列（指标点和课程目标）
         //课程id
@@ -75,20 +84,21 @@ public class courseFinalExamPaperDetailServiceIMPL extends ServiceImpl<courseFin
         //第五行开始
         rowIndex = 4;
 
-        courseBasicInformation information = courseBasicInformationMAPPER.selectById(courseId);
+        //获取当前课程的指标点和课程目标（用于表格赋值）
+        CourseBasicInformation information = courseBasicInformationMAPPER.selectById(courseId);
         String indicatorPoints = information.getIndicatorPoints();
         //当前指标点
         JSONArray currentIndicatorPoints = JSON.parseArray(indicatorPoints);
-
-        QueryWrapper<courseTarget> queryWrapper2 = new QueryWrapper<>();
+        QueryWrapper<CourseTarget> queryWrapper2 = new QueryWrapper<>();
         queryWrapper2.eq("course_id", courseId);
         queryWrapper2.orderByAsc("target_name");
         //当前课程目标
-        List<courseTarget> courseTargets = courseTargetMAPPER.selectList(queryWrapper2);
+        List<CourseTarget> courseTargets = courseTargetMAPPER.selectList(queryWrapper2);
 
         //表格赋值指标点
         int indicateNum = 0;
         sheet.autoSizeColumn(0);
+        //行样式
         HSSFCellStyle cellStyle1 = sheet.getRow(4).getCell(0).getCellStyle();
         HSSFCellStyle cellStyle2 = sheet.getRow(6).getCell(0).getCellStyle();
         for (int i = 0; i < currentIndicatorPoints.size(); i++) {
@@ -99,10 +109,10 @@ public class courseFinalExamPaperDetailServiceIMPL extends ServiceImpl<courseFin
             rowIndex++;
             indicateNum++;
         }
-        //绘制空格
+        //绘制空行（隔开指标点和课程目标）
         rowIndex++;
         //表格赋值课程目标
-        for (courseTarget courseTarget : courseTargets) {
+        for (CourseTarget courseTarget : courseTargets) {
             HSSFRow row2 = sheet.createRow(rowIndex);
             row2.setRowStyle(cellStyle2);
             row2.createCell(0).setCellValue(courseTarget.getTargetName());
@@ -110,6 +120,8 @@ public class courseFinalExamPaperDetailServiceIMPL extends ServiceImpl<courseFin
             rowIndex++;
         }
 
+
+        //获取题型，小题，分值并且对其对应指标点和课程目标关系
         QueryWrapper<courseFinalExamPaper> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("exam_child_method_id", 36);//参数是前端输入的考核方式id
         queryWrapper.orderByAsc("id");
@@ -170,6 +182,8 @@ public class courseFinalExamPaperDetailServiceIMPL extends ServiceImpl<courseFin
             temp = columIndex;
 
         }
+
+        //合并标题单元格设置样式
         row0.createCell(columIndex).setCellStyle(cellStyle3);
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 2, columIndex));
         row0.getCell(2).setCellValue("试卷");

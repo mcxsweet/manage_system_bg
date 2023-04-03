@@ -4,7 +4,7 @@ import lombok.Data;
 
 //测试使用
 @Data
-public class courseAllInformation {
+public class CourseAllInformation {
     private Integer id;
     //课程名称
     private String courseName;

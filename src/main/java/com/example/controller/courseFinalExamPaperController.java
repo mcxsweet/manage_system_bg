@@ -3,13 +3,12 @@ package com.example.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.object.finalExamine.courseFinalExamPaper;
 import com.example.object.finalExamine.courseFinalExamPaperDetail;
-import com.example.service.impl.examinePaper.courseFinalExamPaperDetailServiceIMPL;
-import com.example.service.impl.examinePaper.courseFinalExamPaperServiceIMPL;
+import com.example.service.impl.examinePaper.CourseFinalExamPaperDetailServiceIMPL;
+import com.example.service.impl.examinePaper.CourseFinalExamPaperServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +25,7 @@ public class courseFinalExamPaperController {
 */
 
     @Autowired
-    private courseFinalExamPaperServiceIMPL courseFinalExamPaperService;
+    private CourseFinalExamPaperServiceIMPL courseFinalExamPaperService;
 
     @ApiOperation("查询所有期末考察项目")
     @GetMapping()
@@ -64,7 +63,7 @@ public class courseFinalExamPaperController {
         项目细明
     */
     @Autowired
-    private courseFinalExamPaperDetailServiceIMPL courseFinalExamPaperDetailService;
+    private CourseFinalExamPaperDetailServiceIMPL courseFinalExamPaperDetailService;
 
     @ApiOperation("查询所有期末考察项目细明")
     @GetMapping("/detail")
