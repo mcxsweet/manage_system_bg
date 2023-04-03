@@ -6,7 +6,6 @@ import com.example.object.finalExamine.courseFinalExamPaperDetail;
 import com.example.service.impl.examinePaper.courseFinalExamPaperDetailServiceIMPL;
 import com.example.service.impl.examinePaper.courseFinalExamPaperServiceIMPL;
 import com.example.utility.DataResponses;
-import com.itextpdf.text.DocumentException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,7 +107,7 @@ public class courseFinalExamPaperController {
 
     @ApiOperation("提供课程ID生成该课程考核方式和指标点，课程目标的对应关系")
     @GetMapping("/Table")
-    public ResponseEntity<byte[]> exportExcel(HttpServletResponse response) throws IOException, DocumentException {
+    public ResponseEntity<byte[]> exportExcel(HttpServletResponse response) throws IOException {
         return courseFinalExamPaperDetailService.ExportExamPaperRelationExcel(response);
     }
 
