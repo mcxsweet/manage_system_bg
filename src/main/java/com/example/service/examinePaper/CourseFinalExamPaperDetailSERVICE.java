@@ -8,5 +8,5 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public interface CourseFinalExamPaperDetailSERVICE extends IService<CourseFinalExamPaperDetail> {
-    ResponseEntity<byte[]> ExportExamPaperRelationExcel(HttpServletResponse response) throws IOException;
+    ResponseEntity<byte[]> ExportExamPaperRelationExcel(HttpServletResponse response,int courseId) throws IOException;
 }

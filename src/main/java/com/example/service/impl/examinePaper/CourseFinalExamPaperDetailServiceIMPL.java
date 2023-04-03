@@ -54,11 +54,11 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
 
 
     @Override
-    public ResponseEntity<byte[]> ExportExamPaperRelationExcel(HttpServletResponse response) throws IOException {
+    public ResponseEntity<byte[]> ExportExamPaperRelationExcel(HttpServletResponse response,int courseId) throws IOException {
 
         //行索引
         int rowIndex = 0;
-        File file = new File("src/main/resources/static/试卷和指标点对应关系.xls");
+        File file = new File("src/main/resources/static/workSpace.xls");
         FileInputStream fIP = new FileInputStream(file);
         //Get the workbook instance for XLS file
         HSSFWorkbook workbook2 = new HSSFWorkbook(fIP);
@@ -82,7 +82,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
 
         //第一列（指标点和课程目标）
         //课程id
-        int courseId = 1;
+//        int courseId = 1;
         //第五行开始
         rowIndex = 4;
 
