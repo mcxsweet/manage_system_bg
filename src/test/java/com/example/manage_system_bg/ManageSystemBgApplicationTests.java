@@ -1,6 +1,6 @@
 package com.example.manage_system_bg;
 
-import com.example.service.impl.examinePaper.courseFinalExamPaperDetailServiceIMPL;
+import com.example.service.impl.examinePaper.CourseFinalExamPaperDetailServiceIMPL;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +13,7 @@ class ManageSystemBgApplicationTests {
     }
 
     @Autowired
-    private courseFinalExamPaperDetailServiceIMPL courseFinalExamPaperDetailServiceIMPL;
+    private CourseFinalExamPaperDetailServiceIMPL courseFinalExamPaperDetailServiceIMPL;
 
 
 }
