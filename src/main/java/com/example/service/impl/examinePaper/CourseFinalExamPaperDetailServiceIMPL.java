@@ -11,9 +11,11 @@ import com.example.mapper.CourseTargetMAPPER;
 import com.example.mapper.examinePaper.CourseFinalExamPaperDetailMAPPER;
 import com.example.mapper.examinePaper.CourseFinalExamPaperMAPPER;
 import com.example.object.CourseBasicInformation;
+import com.example.object.CourseExamineChildMethods;
+import com.example.object.CourseExamineMethods;
 import com.example.object.CourseTarget;
-import com.example.object.finalExamine.courseFinalExamPaper;
-import com.example.object.finalExamine.courseFinalExamPaperDetail;
+import com.example.object.finalExamine.CourseFinalExamPaper;
+import com.example.object.finalExamine.CourseFinalExamPaperDetail;
 import com.example.service.examinePaper.CourseFinalExamPaperDetailSERVICE;
 
 import com.spire.xls.FileFormat;
@@ -35,7 +37,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFinalExamPaperDetailMAPPER, courseFinalExamPaperDetail> implements CourseFinalExamPaperDetailSERVICE {
+public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFinalExamPaperDetailMAPPER, CourseFinalExamPaperDetail> implements CourseFinalExamPaperDetailSERVICE {
 
     @Autowired
     private CourseFinalExamPaperDetailMAPPER courseFinalExamPaperDetailMAPPER;
@@ -80,7 +82,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
 
         //第一列（指标点和课程目标）
         //课程id
-        int courseId = 10;
+        int courseId = 1;
         //第五行开始
         rowIndex = 4;
 
@@ -120,26 +122,41 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
             rowIndex++;
         }
 
+        //获取期末试卷
+        QueryWrapper<CourseExamineMethods> queryWrapper3 = new QueryWrapper<>();
+        queryWrapper3.eq("course_id", courseId);
+        List<CourseExamineMethods> courseExamineMethods = courseExamineMethodsMAPPER.selectList(queryWrapper3);
+
+        int courseExamineMethodsId = 0;
+        for (CourseExamineMethods courseExamineMethods1 : courseExamineMethods) {
+            if (courseExamineMethods1.getExamineItem().contains("期末")) {
+                courseExamineMethodsId = courseExamineMethods1.getId();
+            }
+        }
+        QueryWrapper<CourseExamineChildMethods> queryWrapper4 = new QueryWrapper<>();
+        queryWrapper4.eq("course_examine_methods_id", courseExamineMethodsId);
+        queryWrapper4.like("examine_child_item", "试卷");
+        CourseExamineChildMethods courseExamineChildMethods = courseExamineChildMethodsMAPPER.selectOne(queryWrapper4);
 
         //获取题型，小题，分值并且对其对应指标点和课程目标关系
-        QueryWrapper<courseFinalExamPaper> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("exam_child_method_id", 36);//参数是前端输入的考核方式id
+        QueryWrapper<CourseFinalExamPaper> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("exam_child_method_id", courseExamineChildMethods.getId());//参数是前端输入的考核方式id
         queryWrapper.orderByAsc("id");
         //请求+遍历
-        List<courseFinalExamPaper> courseFinalExamPapers = courseFinalExamPaperMAPPER.selectList(queryWrapper);
+        List<CourseFinalExamPaper> courseFinalExamPapers = courseFinalExamPaperMAPPER.selectList(queryWrapper);
         int temp = 2;
         int columIndex = 2;
 
-        List<courseFinalExamPaperDetail> courseFinalExamPaperDetails;
-        for (courseFinalExamPaper courseFinalExamPaper : courseFinalExamPapers) {
+        List<CourseFinalExamPaperDetail> courseFinalExamPaperDetails;
+        for (CourseFinalExamPaper courseFinalExamPaper : courseFinalExamPapers) {
 
-            QueryWrapper<courseFinalExamPaperDetail> queryWrapper3 = new QueryWrapper<>();
-            queryWrapper3.orderByAsc("title_number");
-            queryWrapper3.eq("primary_id", courseFinalExamPaper.getId());
+            QueryWrapper<CourseFinalExamPaperDetail> queryWrapper5 = new QueryWrapper<>();
+            queryWrapper5.orderByAsc("title_number");
+            queryWrapper5.eq("primary_id", courseFinalExamPaper.getId());
 
-            courseFinalExamPaperDetails = courseFinalExamPaperDetailMAPPER.selectList(queryWrapper3);
+            courseFinalExamPaperDetails = courseFinalExamPaperDetailMAPPER.selectList(queryWrapper5);
 
-            for (courseFinalExamPaperDetail courseFinalExamPaperDetail : courseFinalExamPaperDetails) {
+            for (CourseFinalExamPaperDetail courseFinalExamPaperDetail : courseFinalExamPaperDetails) {
                 sheet.setColumnWidth(columIndex, 5 * 256);
                 row0.createCell(columIndex).setCellStyle(cellStyle3);
                 row.createCell(columIndex).setCellStyle(cellStyle3);
@@ -198,8 +215,156 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
         }
         row4.createCell(columIndex).setCellValue(sum);
         row4.getCell(columIndex).setCellStyle(cellStyle3);
+        columIndex++;
 
 
+        /*
+            ========================================================================
+         */
+        //（实验）表格部分
+        for (CourseExamineMethods courseExamineMethods1 : courseExamineMethods) {
+            if (courseExamineMethods1.getExamineItem().contains("实验")) {
+                courseExamineMethodsId = courseExamineMethods1.getId();
+            }
+        }
+        QueryWrapper<CourseExamineChildMethods> queryWrapper6 = new QueryWrapper<>();
+        queryWrapper6.eq("course_examine_methods_id", courseExamineMethodsId);
+        List<CourseExamineChildMethods> courseExamineChildMethods1 = courseExamineChildMethodsMAPPER.selectList(queryWrapper6);
+        temp = columIndex;
+        for (CourseExamineChildMethods courseExamineChildMethods2 : courseExamineChildMethods1) {
+            //设置弹性列宽
+            sheet.autoSizeColumn(columIndex);
+            row0.createCell(columIndex).setCellStyle(cellStyle3);
+            row.createCell(columIndex).setCellStyle(cellStyle3);
+            row3.createCell(columIndex).setCellStyle(cellStyle3);
+            row4.createCell(columIndex).setCellStyle(cellStyle4);
+
+            sheet.addMergedRegion(new CellRangeAddress(1, 2, columIndex, columIndex));
+
+            row.getCell(columIndex).setCellValue(courseExamineChildMethods2.getExamineChildItem());
+            row4.getCell(columIndex).setCellValue(courseExamineChildMethods2.getChildPercentage());
+
+            //表格赋值指标点
+            String indicatorPoints1 = courseExamineChildMethods2.getIndicatorPointsDetail();
+            JSONArray indicatorPointsArrary = JSON.parseArray(indicatorPoints1);
+            for (int i = 0; i < indicatorPointsArrary.size(); i++) {
+                for (int j = 4; j < rowIndex; j++) {
+                    HSSFRow rown = sheet.getRow(j);
+                    if (Objects.equals(rown.getCell(0).getStringCellValue(), indicatorPointsArrary.getString(i))) {
+                        rown.createCell(columIndex).setCellValue("√");
+                        rown.getCell(columIndex).setCellStyle(cellStyle2);
+                    }
+                }
+            }
+
+            //表格赋值课程目标
+            String courseTarget = courseExamineChildMethods2.getCourseTarget();
+            JSONArray courseTargetArrary = JSON.parseArray(courseTarget);
+            for (int i = 0; i < courseTargetArrary.size(); i++) {
+                for (int j = rowIndex - 4 - indicateNum; j < rowIndex; j++) {
+                    HSSFRow rown = sheet.getRow(j);
+                    if (Objects.equals(rown.getCell(0).getStringCellValue(), courseTargetArrary.getString(i))) {
+                        rown.createCell(columIndex).setCellValue("√");
+                        rown.getCell(columIndex).setCellStyle(cellStyle1);
+                    }
+                }
+            }
+
+
+            columIndex++;
+        }
+
+        //合并标题单元格设置样式
+        row0.createCell(columIndex).setCellStyle(cellStyle3);
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, temp, columIndex));
+        row0.getCell(temp).setCellValue("实验");
+
+        row3.createCell(columIndex).setCellStyle(cellStyle3);
+        sheet.addMergedRegion(new CellRangeAddress(1, 2, columIndex, columIndex));
+        row.createCell(columIndex).setCellValue("卷面总分");
+        row.getCell(columIndex).setCellStyle(cellStyle3);
+        sum = 0;
+        for (int i = temp; i < columIndex; i++) {
+            double parseInt = row4.getCell(i).getNumericCellValue();
+            sum += parseInt;
+        }
+        row4.createCell(columIndex).setCellValue(sum);
+        row4.getCell(columIndex).setCellStyle(cellStyle3);
+
+
+        /*
+            ========================================================================
+         */
+        //（平时）表格展示
+        columIndex++;
+        for (CourseExamineMethods courseExamineMethods1 : courseExamineMethods) {
+            if (courseExamineMethods1.getExamineItem().contains("平时")) {
+                courseExamineMethodsId = courseExamineMethods1.getId();
+            }
+        }
+        QueryWrapper<CourseExamineChildMethods> queryWrapper7 = new QueryWrapper<>();
+        queryWrapper7.eq("course_examine_methods_id", courseExamineMethodsId);
+        List<CourseExamineChildMethods> courseExamineChildMethods3 = courseExamineChildMethodsMAPPER.selectList(queryWrapper7);
+        temp = columIndex;
+        for (CourseExamineChildMethods courseExamineChildMethods2 : courseExamineChildMethods3) {
+            //设置弹性列宽
+            sheet.autoSizeColumn(columIndex);
+            row0.createCell(columIndex).setCellStyle(cellStyle3);
+            row.createCell(columIndex).setCellStyle(cellStyle3);
+            row3.createCell(columIndex).setCellStyle(cellStyle3);
+            row4.createCell(columIndex).setCellStyle(cellStyle4);
+
+            sheet.addMergedRegion(new CellRangeAddress(1, 2, columIndex, columIndex));
+
+            row.getCell(columIndex).setCellValue(courseExamineChildMethods2.getExamineChildItem());
+            row4.getCell(columIndex).setCellValue(courseExamineChildMethods2.getChildPercentage());
+            //表格赋值指标点
+            String indicatorPoints1 = courseExamineChildMethods2.getIndicatorPointsDetail();
+            JSONArray indicatorPointsArrary = JSON.parseArray(indicatorPoints1);
+            for (int i = 0; i < indicatorPointsArrary.size(); i++) {
+                for (int j = 4; j < rowIndex; j++) {
+                    HSSFRow rown = sheet.getRow(j);
+                    if (Objects.equals(rown.getCell(0).getStringCellValue(), indicatorPointsArrary.getString(i))) {
+                        rown.createCell(columIndex).setCellValue("√");
+                        rown.getCell(columIndex).setCellStyle(cellStyle2);
+                    }
+                }
+            }
+
+            //表格赋值课程目标
+            String courseTarget = courseExamineChildMethods2.getCourseTarget();
+            JSONArray courseTargetArrary = JSON.parseArray(courseTarget);
+            for (int i = 0; i < courseTargetArrary.size(); i++) {
+                for (int j = rowIndex - 4 - indicateNum; j < rowIndex; j++) {
+                    HSSFRow rown = sheet.getRow(j);
+                    if (Objects.equals(rown.getCell(0).getStringCellValue(), courseTargetArrary.getString(i))) {
+                        rown.createCell(columIndex).setCellValue("√");
+                        rown.getCell(columIndex).setCellStyle(cellStyle1);
+                    }
+                }
+            }
+
+            columIndex++;
+        }
+
+        //合并标题单元格设置样式
+        row0.createCell(columIndex).setCellStyle(cellStyle3);
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, temp, columIndex));
+        row0.getCell(temp).setCellValue("平时");
+
+        row3.createCell(columIndex).setCellStyle(cellStyle3);
+        sheet.addMergedRegion(new CellRangeAddress(1, 2, columIndex, columIndex));
+        row.createCell(columIndex).setCellValue("卷面总分");
+        row.getCell(columIndex).setCellStyle(cellStyle3);
+        sum = 0;
+        for (int i = temp; i < columIndex; i++) {
+            double parseInt = row4.getCell(i).getNumericCellValue();
+            sum += parseInt;
+        }
+        row4.createCell(columIndex).setCellValue(sum);
+        row4.getCell(columIndex).setCellStyle(cellStyle3);
+
+        //写入xls文件
         FileOutputStream fileOut = new FileOutputStream("workbook.xls");
         workbook.write(fileOut);
         fileOut.close();
@@ -219,6 +384,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
 
 
         /*
+            如果需要导出excel文件
             用于导出文件
          */
 //        response.reset();

@@ -3,7 +3,7 @@ package com.example.object.finalExamine;
 import lombok.Data;
 
 @Data
-public class courseFinalExamPaperDetail {
+public class CourseFinalExamPaperDetail {
    private Integer id;
    //外键链接courseFinalExamPaper表id
    private int primaryId;

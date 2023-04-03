@@ -1,8 +1,8 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.object.finalExamine.courseFinalExamPaper;
-import com.example.object.finalExamine.courseFinalExamPaperDetail;
+import com.example.object.finalExamine.CourseFinalExamPaper;
+import com.example.object.finalExamine.CourseFinalExamPaperDetail;
 import com.example.service.impl.examinePaper.CourseFinalExamPaperDetailServiceIMPL;
 import com.example.service.impl.examinePaper.CourseFinalExamPaperServiceIMPL;
 import com.example.utility.DataResponses;
@@ -36,20 +36,20 @@ public class courseFinalExamPaperController {
     @ApiOperation("提供考察评价方式表的id查询期末考察项目")
     @GetMapping("/{examChildMethodId}")
     public DataResponses getById(@PathVariable int examChildMethodId) {
-        QueryWrapper<courseFinalExamPaper> QueryWrapper = new QueryWrapper<>();
+        QueryWrapper<CourseFinalExamPaper> QueryWrapper = new QueryWrapper<>();
         QueryWrapper.eq("exam_child_method_id", examChildMethodId);
         return new DataResponses(true, courseFinalExamPaperService.list(QueryWrapper));
     }
 
     @ApiOperation("提供考察评价方式表的id添加期末考察项目")
     @PostMapping()
-    public DataResponses addById(@RequestBody courseFinalExamPaper information) {
+    public DataResponses addById(@RequestBody CourseFinalExamPaper information) {
         return new DataResponses(courseFinalExamPaperService.save(information));
     }
 
     @ApiOperation("提供id修改期末考察项目")
     @PutMapping()
-    public DataResponses modifyById(@RequestBody courseFinalExamPaper information) {
+    public DataResponses modifyById(@RequestBody CourseFinalExamPaper information) {
         return new DataResponses(courseFinalExamPaperService.updateById(information));
     }
 
@@ -75,7 +75,7 @@ public class courseFinalExamPaperController {
     @ApiOperation("提供期末试卷表的id查询详细期末考察项目")
     @GetMapping("/detail/{primaryId}")
     public DataResponses getDetailById(@PathVariable int primaryId) {
-        QueryWrapper<courseFinalExamPaperDetail> QueryWrapper = new QueryWrapper<>();
+        QueryWrapper<CourseFinalExamPaperDetail> QueryWrapper = new QueryWrapper<>();
         QueryWrapper.eq("primary_id", primaryId);
         QueryWrapper.orderByAsc("title_number");
         return new DataResponses(true, courseFinalExamPaperDetailService.list(QueryWrapper));
@@ -83,13 +83,13 @@ public class courseFinalExamPaperController {
 
     @ApiOperation("根据期末试卷表的id添加详细期末考察项目")
     @PostMapping("/detail")
-    public DataResponses addDetailById(@RequestBody courseFinalExamPaperDetail information) {
+    public DataResponses addDetailById(@RequestBody CourseFinalExamPaperDetail information) {
         return new DataResponses(courseFinalExamPaperDetailService.save(information));
     }
 
     @ApiOperation("提供期末试卷表的id更新详细期末考察项目")
     @PutMapping("/detail")
-    public DataResponses modifyDetailById(@RequestBody courseFinalExamPaperDetail information) {
+    public DataResponses modifyDetailById(@RequestBody CourseFinalExamPaperDetail information) {
         return new DataResponses(courseFinalExamPaperDetailService.updateById(information));
     }
 
