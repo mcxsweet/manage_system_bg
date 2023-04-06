@@ -18,6 +18,7 @@ import com.example.utility.export.export;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@CrossOrigin(origins = "*")
 @Api(tags = "课程信息")
 @RestController
 @RequestMapping("/courseInfo")

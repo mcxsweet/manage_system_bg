@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@CrossOrigin(origins = "*")
 @Api(tags = "期末试卷成绩细明")
 @RestController
 @RequestMapping("/courseExamPaper")

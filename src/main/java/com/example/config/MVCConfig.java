@@ -23,7 +23,9 @@ public class MVCConfig implements WebMvcConfigurer {
 //                表示取消对特定路径的拦截
                 .excludePathPatterns("/user/**")
                 //取消拦截swagger文档
-                .excludePathPatterns("/swagger-ui/**");
+                .excludePathPatterns("/swagger-ui/**")
+                //取消拦截文件导出
+                .excludePathPatterns("/courseExamPaper/Table/*");
 
         WebMvcConfigurer.super.addInterceptors(registry);
     }
