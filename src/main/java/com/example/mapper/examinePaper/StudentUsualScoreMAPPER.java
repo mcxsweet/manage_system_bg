@@ -12,7 +12,19 @@ import java.util.List;
 @Mapper
 public interface StudentUsualScoreMAPPER extends BaseMapper<StudentUsualScore> {
     //    在此出写拓展sql
-    @Select("Select student_information.id,student_information.student_number,student_information.student_name,student_information.class_name,student_information.course_id,student_usual_score.score, student_usual_score.id as usual_score_id from student_information left outer join student_usual_score on student_information.id = student_usual_score.student_id where student_information.course_id = #{courseId}")
+    @Select("Select student_information.id,\n" +
+            "       student_information.student_number,\n" +
+            "       student_information.student_name,\n" +
+            "       student_information.class_name,\n" +
+            "       student_information.course_id,\n" +
+            "       student_usual_score.attendance_score,\n" +
+            "       student_usual_score.work_score,\n" +
+            "       student_usual_score.quiz_score,\n" +
+            "       student_usual_score.mid_term_score,\n" +
+            "       student_usual_score.id as usual_score_id\n" +
+            "from student_information\n" +
+            "         left outer join student_usual_score on student_information.id = student_usual_score.student_id\n" +
+            "where student_information.course_id = #{courseId};")
     List<StudentScore> getAllStudent(@Param("courseId") int courseId);
 
 

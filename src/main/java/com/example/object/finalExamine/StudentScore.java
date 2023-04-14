@@ -14,7 +14,10 @@ public class StudentScore {
     //课程信息外键
     private String courseId;
     //成绩
-    private Integer score;
+    private String attendanceScore;
+    private String workScore;
+    private String quizScore;
+    private String midTermScore;
     //成绩表id
     private Integer usualScoreId;
 }

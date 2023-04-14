@@ -21,47 +21,52 @@ public class StudentInformationController {
     @Autowired
     private StudentUsualScoreServiceIMPL studentUsualScoreServiceIMPL;
 
+    @ApiOperation("获取当前课程老师设置的平时考核方式")
+    @GetMapping("/{courseId}/getMethods")
+    public DataResponses getUsualMethods(@PathVariable int courseId) {
+        return new DataResponses(true, studentUsualScoreServiceIMPL.getUsualExamMethods(courseId));
+    }
 
     @ApiOperation("获取当前课程全部学生平时成绩")
     @GetMapping("/{courseId}/getStudent")
     public DataResponses getAllStudent(@PathVariable int courseId) {
         return new DataResponses(true, studentUsualScoreServiceIMPL.getAllStudent(courseId));
     }
-//
-//    @ApiOperation("添加学生信息")
-//    @PostMapping("/addStudent")
-//    public DataResponses addStudent(@RequestBody StudentInformation student) {
-//        return new DataResponses(true, studentInformationServiceIMPL.save(student));
-//    }
-//
-//    @ApiOperation("添加学生平时成绩")
-//    @PostMapping("/addUsualScore")
-//    public DataResponses addUsualScore(@RequestBody StudentUsualScore score) {
-//        return new DataResponses(true, studentUsualScoreServiceIMPL.save(score));
-//    }
-//
-//    @ApiOperation("删除学生信息")
-//    @DeleteMapping("/deleteStudent")
-//    public DataResponses deleteStudent(@RequestBody StudentInformation student) {
-//        return new DataResponses(true, studentInformationServiceIMPL.removeById(student.getId()));
-//    }
-//
-//    @ApiOperation("删除学生平时成绩")
-//    @DeleteMapping("/deleteStudent")
-//    public DataResponses deleteUsualscore(@RequestBody StudentUsualScore score) {
-//        return new DataResponses(true, studentUsualScoreServiceIMPL.removeById(score.getId()));
-//    }
-//
-//    @ApiOperation("修改学生信息")
-//    @PutMapping("/updateStudent")
-//    public DataResponses updateStudent(@RequestBody StudentInformation student) {
-//        return new DataResponses(true, studentInformationServiceIMPL.updateById(student));
-//    }
-//
-//    @ApiOperation("修改学生信息")
-//    @PutMapping("/updateStudent")
-//    public DataResponses updateUsualSocre(@RequestBody StudentUsualScore score) {
-//        return new DataResponses(true, studentUsualScoreServiceIMPL.updateById(score));
-//    }
+
+    @ApiOperation("添加学生信息")
+    @PostMapping("/addStudent")
+    public DataResponses addStudent(@RequestBody StudentInformation student) {
+        return new DataResponses(true, studentInformationServiceIMPL.save(student));
+    }
+
+    @ApiOperation("添加学生平时成绩")
+    @PostMapping("/addUsualScore")
+    public DataResponses addUsualScore(@RequestBody StudentUsualScore score) {
+        return new DataResponses(true, studentUsualScoreServiceIMPL.save(score));
+    }
+
+    @ApiOperation("删除学生信息")
+    @DeleteMapping("/deleteStudent")
+    public DataResponses deleteStudent(@RequestBody StudentInformation student) {
+        return new DataResponses(true, studentInformationServiceIMPL.removeById(student.getId()));
+    }
+
+    @ApiOperation("删除学生平时成绩")
+    @DeleteMapping("/deleteStudentUsualScore")
+    public DataResponses deleteUsualscore(@RequestBody StudentUsualScore score) {
+        return new DataResponses(true, studentUsualScoreServiceIMPL.removeById(score.getId()));
+    }
+
+    @ApiOperation("修改学生信息")
+    @PutMapping("/updateStudent")
+    public DataResponses updateStudent(@RequestBody StudentInformation student) {
+        return new DataResponses(true, studentInformationServiceIMPL.updateById(student));
+    }
+
+    @ApiOperation("修改学生平时成绩")
+    @PutMapping("/updateStudentUsualScore")
+    public DataResponses updateUsualSocre(@RequestBody StudentUsualScore score) {
+        return new DataResponses(true, studentUsualScoreServiceIMPL.updateById(score));
+    }
 
 }
