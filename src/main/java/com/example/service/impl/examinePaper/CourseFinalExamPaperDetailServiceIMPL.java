@@ -59,6 +59,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
         //行索引
         int rowIndex = 0;
         File file = new File("src/main/resources/static/workSpace.xls");
+//        File file = new File("./workSpace.xls");
         FileInputStream fIP = new FileInputStream(file);
         //Get the workbook instance for XLS file
         HSSFWorkbook workbook2 = new HSSFWorkbook(fIP);

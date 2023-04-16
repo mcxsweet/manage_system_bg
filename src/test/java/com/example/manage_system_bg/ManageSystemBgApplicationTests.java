@@ -24,26 +24,26 @@ class ManageSystemBgApplicationTests {
 
     @Test
     void contextLoads() throws BiffException, IOException {
-        Workbook workbook = Workbook.getWorkbook(new File("/home/user/Documents/项目/Manage_system_bg/src/main/resources/static/课程达成度评价管理系统教师账号.xls"));
-        Sheet sheet = workbook.getSheet(0);
-        for (int i = 2; i < sheet.getRows(); i++) {
-            // 获取第一列的第 i 行信息 sheet.getCell(列，行)，下标从0开始
-            int id = Integer.parseInt(sheet.getCell(0, i).getContents());
-            // 获取第二列的第 i 行信息
-            String teacherName = sheet.getCell(1, i).getContents();
-            String department = sheet.getCell(2, i).getContents();
-            String name = sheet.getCell(3, i).getContents();
-            String password = sheet.getCell(4, i).getContents();
+//        Workbook workbook = Workbook.getWorkbook(new File(""));
+//        Sheet sheet = workbook.getSheet(0);
+//        for (int i = 2; i < sheet.getRows(); i++) {
+//            // 获取第一列的第 i 行信息 sheet.getCell(列，行)，下标从0开始
+//            int id = Integer.parseInt(sheet.getCell(0, i).getContents());
+//            // 获取第二列的第 i 行信息
+//            String teacherName = sheet.getCell(1, i).getContents();
+//            String department = sheet.getCell(2, i).getContents();
+//            String name = sheet.getCell(3, i).getContents();
+//            String password = sheet.getCell(4, i).getContents();
+//
+//            User user = new User();
+//            user.setName(name);
+//            user.setPassword(password);
+//            user.setDepartment(department);
+//            user.setTeacherName(teacherName);
+//
+//            userMAPPER.insert(user);
 
-            User user = new User();
-            user.setName(name);
-            user.setPassword(password);
-            user.setDepartment(department);
-            user.setTeacherName(teacherName);
-
-            userMAPPER.insert(user);
-
-        }
+//        }
     }
 
 
