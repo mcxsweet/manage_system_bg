@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.object.finalExamine.StudentUsualScore;
 import com.example.service.impl.examinePaper.StudentInformationServiceIMPL;
@@ -36,7 +37,9 @@ public class StudentInformationController {
     @ApiOperation("添加学生信息")
     @PostMapping("/addStudent")
     public DataResponses addStudent(@RequestBody StudentInformation student) {
-        return new DataResponses(true, studentInformationServiceIMPL.save(student));
+        QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("student_number",student.getStudentNumber());
+        return new DataResponses(true, studentInformationServiceIMPL.save(student),studentInformationServiceIMPL.getOne(queryWrapper).getId().toString());
     }
 
     @ApiOperation("添加学生平时成绩")
