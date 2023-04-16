@@ -44,7 +44,7 @@ CREATE TABLE `course_basic_information` (
   PRIMARY KEY (`id`),
   KEY `课程基本信息表与用户表id关联` (`teacher_id`),
   CONSTRAINT `课程基本信息表与用户表id关联` FOREIGN KEY (`teacher_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -84,7 +84,7 @@ CREATE TABLE `course_examine_child_methods` (
 
 LOCK TABLES `course_examine_child_methods` WRITE;
 /*!40000 ALTER TABLE `course_examine_child_methods` DISABLE KEYS */;
-INSERT INTO `course_examine_child_methods` VALUES (16,20,'考勤',34,100,'[\"课程目标1\"]','[\"指标点1.2\"]'),(17,20,'课题提问',29,100,'[\"课程目标1\"]','[]'),(21,20,'作业',47,100,'[\"课程目标1\",\"课程目标2\",\"课程目标3\"]','[\"指标点1.1\",\"指标点1.2\"]'),(25,20,'期中测试',27,100,'[\"课程目标1\"]','[\"指标点1.1\"]'),(26,24,'实验项目完成分',24,100,'[\"课程目标1\",\"课程目标2\"]','[]'),(27,24,'大报告',23,100,'[\"课程目标1\",\"课程目标2\"]','[]'),(28,24,'试卷',29,100,'[\"课程目标2\"]','[\"指标点1.1\",\"指标点1.2\"]'),(31,3,'考勤',17,100,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(32,3,'课题提问',11,100,'[\"课程目标1\"]','[\"指标点1.2\"]'),(33,25,'考勤',13,100,'[]','[\"指标点1.1\",\"指标点5.2\",\"指标点2.1\"]'),(34,25,'课题提问',11,100,'[]','[\"指标点1.1\"]'),(35,25,'考勤',50,100,'[]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(36,26,'试卷',100,100,'[\"课程目标1\",\"课程目标2\",\"课程目标3\"]','[\"指标点1.1\",\"指标点1.2\"]'),(37,5,'考勤',33,100,'[]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(38,27,'试卷',22,100,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\"]'),(41,28,'作业',17,100,'[\"课程目标1\"]','[]'),(42,29,'实验报告',16,100,'[\"课程目标1\"]','[]');
+INSERT INTO `course_examine_child_methods` VALUES (16,20,'考勤',34,100,'[\"课程目标1\"]','[\"指标点1.2\"]'),(17,20,'课题提问',29,100,'[\"课程目标1\"]','[]'),(21,20,'作业',47,100,'[\"课程目标1\",\"课程目标2\",\"课程目标3\"]','[\"指标点1.1\",\"指标点1.2\"]'),(26,24,'实验项目完成分',24,100,'[\"课程目标1\",\"课程目标2\"]','[]'),(27,24,'大报告',23,100,'[\"课程目标1\",\"课程目标2\"]','[]'),(28,24,'试卷',29,100,'[\"课程目标2\"]','[\"指标点1.1\",\"指标点1.2\"]'),(31,3,'考勤',17,100,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(32,3,'课题提问',11,100,'[\"课程目标1\"]','[\"指标点1.2\"]'),(33,25,'考勤',13,100,'[]','[\"指标点1.1\",\"指标点5.2\",\"指标点2.1\"]'),(34,25,'课题提问',11,100,'[]','[\"指标点1.1\"]'),(35,25,'考勤',50,100,'[]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(36,26,'试卷',100,100,'[\"课程目标1\",\"课程目标2\",\"课程目标3\"]','[\"指标点1.1\",\"指标点1.2\"]'),(37,5,'考勤',33,100,'[]','[\"指标点1.1\",\"指标点1.2\",\"指标点5.2\"]'),(38,27,'试卷',22,100,'[\"课程目标1\"]','[\"指标点1.1\",\"指标点1.2\"]'),(41,28,'作业',17,100,'[\"课程目标1\"]','[]'),(42,29,'实验报告',16,100,'[\"课程目标1\"]','[]');
 /*!40000 ALTER TABLE `course_examine_child_methods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -209,6 +209,32 @@ INSERT INTO `course_target` VALUES (4,6,'c语言程序设计','课程目标1','a
 UNLOCK TABLES;
 
 --
+-- Table structure for table `indicator_outline`
+--
+
+DROP TABLE IF EXISTS `indicator_outline`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `indicator_outline` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `major` text NOT NULL,
+  `name` text NOT NULL,
+  `content` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `indicator_outline`
+--
+
+LOCK TABLES `indicator_outline` WRITE;
+/*!40000 ALTER TABLE `indicator_outline` DISABLE KEYS */;
+INSERT INTO `indicator_outline` VALUES (1,'电子信息与工程','工程知识','能够将数学、自然科 学、工程基础和电子信息专业知识 用于解决复杂工程问题'),(2,'电子信息与工程','问题分析','能够应用数学、自然 科学和电子信息领域工程科学的 基本原理，识别、表达、并通过文 献研究分析复杂工程问题，以获得 有效结论'),(3,'电子信息与工程','设计/开发解决方案','能够设计针对电子信息领域复杂工程问题的解决方案');
+/*!40000 ALTER TABLE `indicator_outline` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `indicators`
 --
 
@@ -217,10 +243,13 @@ DROP TABLE IF EXISTS `indicators`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `indicators` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `indicator_index` int(11) NOT NULL,
   `indicator_name` varchar(20) NOT NULL,
   `indicator_content` text NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `indicator_name` (`indicator_name`)
+  UNIQUE KEY `indicator_name` (`indicator_name`),
+  KEY `指标点索引外键` (`indicator_index`),
+  CONSTRAINT `指标点索引外键` FOREIGN KEY (`indicator_index`) REFERENCES `indicator_outline` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -230,7 +259,7 @@ CREATE TABLE `indicators` (
 
 LOCK TABLES `indicators` WRITE;
 /*!40000 ALTER TABLE `indicators` DISABLE KEYS */;
-INSERT INTO `indicators` VALUES (1,'指标点1.1','掌握数学、自然科学、工程基础和电子信息专业知识的基本概念，并将其运用到复杂工程问题的适当表述之中'),(2,'指标点1.2','针对一个复杂系统或者过程选择恰当的数学模型，对模型正确性进行严谨的推理，并能正确求解'),(3,'指标点5.2','能够针对复杂工程问题，选择与使用电 子信息领域的恰当技术手段和现代工程工 具进行分析、计算和设计'),(4,'指标点2.1','能运用数学、自然科学和电子信息领域的 基本原理，识别和判断电子信息领域复杂工程问题的关键环节');
+INSERT INTO `indicators` VALUES (1,1,'指标点1.1','掌握数学、自然科学、工程基础和电子信息专业知识的基本概念，并将其运用到复杂工程问题的适当表述之中'),(2,1,'指标点1.2','针对一个复杂系统或者过程选择恰当的数学模型，对模型正确性进行严谨的推理，并能正确求解'),(3,1,'指标点5.2','能够针对复杂工程问题，选择与使用电 子信息领域的恰当技术手段和现代工程工 具进行分析、计算和设计'),(4,1,'指标点2.1','能运用数学、自然科学和电子信息领域的 基本原理，识别和判断电子信息领域复杂工程问题的关键环节');
 /*!40000 ALTER TABLE `indicators` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -250,7 +279,7 @@ CREATE TABLE `student_information` (
   PRIMARY KEY (`id`),
   KEY `课程信息和学生信息关联` (`course_id`),
   CONSTRAINT `课程信息和学生信息关联` FOREIGN KEY (`course_id`) REFERENCES `course_basic_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -259,7 +288,7 @@ CREATE TABLE `student_information` (
 
 LOCK TABLES `student_information` WRITE;
 /*!40000 ALTER TABLE `student_information` DISABLE KEYS */;
-INSERT INTO `student_information` VALUES (1,'20171151052','王璇\r','计科2020',10),(2,'20201151002\r','陈明鹤\r','电子信息工程2020',10);
+INSERT INTO `student_information` VALUES (1,'20171151052','王璇凯','计科2020',10),(2,'20201151002\r','陈明鹤子','电子信息工程2020',10),(3,'20201152056','ygw','计科2020',10),(33,'20201152088','张三','计科2020',10),(34,'231','123','123',10),(35,'231','123','123',10),(36,'23121','123','123',10),(38,'1231','1231','123',10),(39,'454354535','afad','1313',10);
 /*!40000 ALTER TABLE `student_information` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -274,10 +303,14 @@ CREATE TABLE `student_usual_score` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_id` int(11) NOT NULL,
   `score` int(3) NOT NULL DEFAULT '0',
+  `attendance_score` varchar(100) DEFAULT NULL,
+  `work_score` varchar(100) DEFAULT NULL,
+  `quiz_score` varchar(100) DEFAULT NULL,
+  `mid_term_score` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `学生平时成绩表关联学生信息表` (`student_id`),
   CONSTRAINT `学生平时成绩表关联学生信息表` FOREIGN KEY (`student_id`) REFERENCES `student_information` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -286,7 +319,7 @@ CREATE TABLE `student_usual_score` (
 
 LOCK TABLES `student_usual_score` WRITE;
 /*!40000 ALTER TABLE `student_usual_score` DISABLE KEYS */;
-INSERT INTO `student_usual_score` VALUES (1,1,100);
+INSERT INTO `student_usual_score` VALUES (1,1,100,'40','21223123','101231232',''),(2,2,90,'1213121','32132','10231',''),(3,3,0,'','123','',NULL),(4,33,0,'123','121231231','123',NULL),(6,38,0,'123','13','1231',''),(7,39,0,'12313132','123','131',''),(8,35,0,'1231',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `student_usual_score` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -299,11 +332,13 @@ DROP TABLE IF EXISTS `user`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(10) NOT NULL,
-  `password` varchar(20) DEFAULT '123456',
+  `name` varchar(30) NOT NULL,
+  `teacher_name` varchar(10) NOT NULL,
+  `password` varchar(20) DEFAULT '000000',
   `is_admin` int(1) DEFAULT '0',
+  `department` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=139 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -312,7 +347,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin','123',1),(3,'admin2','123',1);
+INSERT INTO `user` VALUES (1,'admin','23','123',1,'test'),(3,'admin2','123','123',1,'test'),(94,'bx15288187317','白雪','000000',0,'计算机科学与工程系'),(95,'cy13529049079','曹涌','000000',0,'数据科学与工程系'),(96,'df13908715148','代飞','000000',0,'数据科学与工程系'),(97,'dzq15287167686','戴正权','000000',0,'信息与智能工程系'),(98,'dje15287113619','董建娥','000000',0,'信息与智能工程系'),(99,'dyy13577046004','董跃宇','000000',0,'数据科学与工程系'),(100,'fxy13518704805','付小勇','000000',0,'计算机科学与工程系'),(101,'gh18208721391','高皜','000000',0,'信息与智能工程系'),(102,'gr13629436290','郭冉','000000',0,'计算机科学与工程系'),(103,'hx13888008509','何鑫','000000',0,'计算机科学与工程系'),(104,'hjp13888425274','贺金平','000000',0,'计算机科学与工程系'),(105,'hkr13700687538','胡坤融','000000',0,'数据科学与工程系'),(106,'hb15808868790','黄苾','000000',0,'计算机科学与工程系'),(107,'hyx18208830702','黄宇翔','000000',0,'数据科学与工程系'),(108,'kwl13700618673','寇卫利','000000',0,'计算机科学与工程系'),(109,'ljq13698778010','李俊萩','000000',0,'信息与智能工程系'),(110,'ls15887279593','李莎','000000',0,'信息与智能工程系'),(111,'lh15987128885','林宏','000000',0,'数据科学与工程系'),(112,'ln13888838980','鲁宁','000000',0,'计算机科学与工程系'),(113,'ly13518756770','鲁莹','000000',0,'信息与智能工程系'),(114,'ldj15608809968','吕丹桔','000000',0,'信息与智能工程系'),(115,'ms13116958088','苗晟','000000',0,'数据科学与工程系'),(116,'qzp13987606761','强振平','000000',0,'计算机科学与工程系'),(117,'qmm13529036061','秦明明','000000',0,'信息与智能工程系'),(118,'rj15925116762','荣剑','000000',0,'信息与智能工程系'),(119,'syk15808796485','孙永科','000000',0,'数据科学与工程系'),(120,'wh13888331410','王欢','000000',0,'计算机科学与工程系'),(121,'wxl13577067397','王晓林','000000',0,'计算机科学与工程系'),(122,'wxr13700692383','王晓锐','000000',0,'数据科学与工程系'),(123,'xlw15825293953','邢丽伟','000000',0,'计算机科学与工程系'),(124,'xh18987955169','幸宏','000000',0,'计算机科学与工程系'),(125,'xf13698763596','熊飞','000000',0,'数据科学与工程系'),(126,'xqy13608849821','徐全元','000000',0,'信息与智能工程系'),(127,'xwh13888832080','徐伟恒','000000',0,'信息与智能工程系'),(128,'ypy15198952752','杨鹏宇','000000',0,'计算机科学与工程系'),(129,'yww15987148114','杨微微','000000',0,'教务办'),(130,'yyy15912514075','禹玥昀','000000',0,'信息与智能工程系'),(131,'zhw13759472154','张宏伟','000000',0,'计算机科学与工程系'),(132,'zhx13398854044','张宏翔','000000',0,'信息与智能工程系'),(133,'zqh13888193733','张晴晖','000000',0,'信息与智能工程系'),(134,'zf13888300900','赵璠','000000',0,'信息与智能工程系'),(135,'zx13888673236','赵喜','000000',0,'计算机科学与工程系'),(136,'zyl15825298876','赵毅力','000000',0,'计算机科学与工程系'),(137,'zyj15987138789','赵友杰','000000',0,'数据科学与工程系'),(138,'zlh15288473403','钟丽辉','000000',0,'信息与智能工程系');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -325,4 +360,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-06 15:18:23
+-- Dump completed on 2023-04-16 15:21:34
