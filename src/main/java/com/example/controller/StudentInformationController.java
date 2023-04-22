@@ -9,7 +9,11 @@ import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @CrossOrigin(origins = "*")
@@ -38,8 +42,8 @@ public class StudentInformationController {
     @PostMapping("/addStudent")
     public DataResponses addStudent(@RequestBody StudentInformation student) {
         QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("student_number",student.getStudentNumber());
-        return new DataResponses(true, studentInformationServiceIMPL.save(student),studentInformationServiceIMPL.getOne(queryWrapper).getId().toString());
+        queryWrapper.eq("student_number", student.getStudentNumber());
+        return new DataResponses(true, studentInformationServiceIMPL.save(student), studentInformationServiceIMPL.getOne(queryWrapper).getId().toString());
     }
 
     @ApiOperation("添加学生平时成绩")
@@ -70,6 +74,24 @@ public class StudentInformationController {
     @PutMapping("/updateStudentUsualScore")
     public DataResponses updateUsualSocre(@RequestBody StudentUsualScore score) {
         return new DataResponses(true, studentUsualScoreServiceIMPL.updateById(score));
+    }
+
+    /**
+     * 导出学生平时成绩表格
+     */
+    @ApiOperation("导出平时成绩表格")
+    @GetMapping("/{courseId}/studentUsualScoreExcl")
+    public ResponseEntity<byte[]> studentUsualScoreExcl(@PathVariable int courseId) throws IOException {
+        return studentUsualScoreServiceIMPL.exportStudentUsualScore(courseId);
+    }
+
+    /**
+     * 导入学生平时成绩表格
+     */
+    @ApiOperation("导入学生平时成绩表格")
+    @PostMapping("/{courseId}/studentUsualScoreExcl")
+    public DataResponses inputStudentUsualScoreExcl(@RequestParam("file") MultipartFile file, @PathVariable String courseId) {
+        return studentUsualScoreServiceIMPL.inputStudentUsualScore(file, courseId);
     }
 
 }
