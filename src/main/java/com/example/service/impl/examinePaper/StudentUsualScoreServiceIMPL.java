@@ -89,7 +89,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
         return strings;
     }
 
-    //学生成绩列表导出
+    //学生成绩表格导出
     @Override
     public ResponseEntity<byte[]> exportStudentUsualScore(int courseId) throws IOException {
         //行列索引
@@ -201,6 +201,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 .body(bytes);
     }
 
+    //学生平时成绩导入
     @Override
     public DataResponses inputStudentUsualScore(MultipartFile file, String courseId) {
         try {

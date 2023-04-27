@@ -3,6 +3,7 @@ package com.example.manage_system_bg;
 import com.example.mapper.UserMAPPER;
 import com.example.object.User;
 import com.example.service.impl.examinePaper.CourseFinalExamPaperDetailServiceIMPL;
+import com.example.service.impl.examinePaper.StudentFinalScoreServiceIMPL;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
@@ -17,7 +18,7 @@ import java.io.IOException;
 class ManageSystemBgApplicationTests {
 
     @Autowired
-    private CourseFinalExamPaperDetailServiceIMPL courseFinalExamPaperDetailServiceIMPL;
+    private StudentFinalScoreServiceIMPL studentFinalScoreServiceIMPL;
 
     @Autowired
     private UserMAPPER userMAPPER;
@@ -46,7 +47,10 @@ class ManageSystemBgApplicationTests {
 //        }
     }
 
-
+    @Test
+    void studentFinalScoreTest(){
+        studentFinalScoreServiceIMPL.getFinalExamPaper(10);
+    }
 
 
 }

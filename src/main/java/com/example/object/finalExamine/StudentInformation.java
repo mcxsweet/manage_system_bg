@@ -4,15 +4,14 @@ import lombok.Data;
 
 @Data
 public class StudentInformation {
-    private Integer id;
+    protected Integer id;
     //学号
-    private String studentNumber;
+    protected String studentNumber;
     //姓名
-    private String studentName;
+    protected String studentName;
     //班级
-    private String className;
+    protected String className;
     //课程信息外键
-    private String courseId;
-
+    protected String courseId;
 }
 

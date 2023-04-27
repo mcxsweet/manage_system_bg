@@ -3,6 +3,7 @@ package com.example.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.object.finalExamine.StudentUsualScore;
+import com.example.service.impl.examinePaper.StudentFinalScoreServiceIMPL;
 import com.example.service.impl.examinePaper.StudentInformationServiceIMPL;
 import com.example.service.impl.examinePaper.StudentUsualScoreServiceIMPL;
 import com.example.utility.DataResponses;
@@ -25,7 +26,14 @@ public class StudentInformationController {
     private StudentInformationServiceIMPL studentInformationServiceIMPL;
     @Autowired
     private StudentUsualScoreServiceIMPL studentUsualScoreServiceIMPL;
+    @Autowired
+    private StudentFinalScoreServiceIMPL studentFinalScoreServiceIMPL;
 
+    /**
+     * 平时成绩管理
+     * @param courseId
+     * @return
+     */
     @ApiOperation("获取当前课程老师设置的平时考核方式")
     @GetMapping("/{courseId}/getMethods")
     public DataResponses getUsualMethods(@PathVariable int courseId) {
@@ -33,11 +41,33 @@ public class StudentInformationController {
     }
 
     @ApiOperation("获取当前课程全部学生平时成绩")
-    @GetMapping("/{courseId}/getStudent")
+    @GetMapping("/{courseId}/getUsualStudent")
     public DataResponses getAllStudent(@PathVariable int courseId) {
         return new DataResponses(true, studentUsualScoreServiceIMPL.getAllStudent(courseId));
     }
 
+    /**
+     * 期末成绩管理
+     * @param courseId
+     * @return
+     */
+    @ApiOperation("获取当前课程期末试卷")
+    @GetMapping("/{courseId}/getFinalExamPaper")
+    public DataResponses getFinalExamPaper(@PathVariable int courseId) {
+        return studentFinalScoreServiceIMPL.getFinalExamPaper(courseId);
+    }
+
+    @ApiOperation("获取当前课程全部学生期末试卷成绩")
+    @GetMapping("/{courseId}/getFinalScoreStudent")
+    public DataResponses getStudentExamScore(@PathVariable int courseId) {
+        return studentFinalScoreServiceIMPL.getAllStudent(10);
+    }
+
+    /**
+     * 普通增删改查
+     * @param student
+     * @return
+     */
     @ApiOperation("添加学生信息")
     @PostMapping("/addStudent")
     public DataResponses addStudent(@RequestBody StudentInformation student) {
@@ -76,6 +106,7 @@ public class StudentInformationController {
         return new DataResponses(true, studentUsualScoreServiceIMPL.updateById(score));
     }
 
+
     /**
      * 导出学生平时成绩表格
      */
@@ -93,5 +124,9 @@ public class StudentInformationController {
     public DataResponses inputStudentUsualScoreExcl(@RequestParam("file") MultipartFile file, @PathVariable String courseId) {
         return studentUsualScoreServiceIMPL.inputStudentUsualScore(file, courseId);
     }
+
+    /**
+     * 导入学生期末成绩表格
+     */
 
 }

@@ -14,6 +14,10 @@ public class DataExtend {
         this.data = data;
     }
 
+    public DataExtend(String message) {
+        this.message = message;
+    }
+
     public String getMessage() {
         return message;
     }
