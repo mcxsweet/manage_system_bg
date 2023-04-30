@@ -1,9 +1,11 @@
 package com.example.utility.export;
 
 import com.example.object.CourseBasicInformation;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.formula.functions.T;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.servlet.http.HttpServletResponse;
@@ -90,4 +92,57 @@ public class export {
         outputStream.close();
     }
 
+    //合并单元格时单元格样式设置
+    public static void reloadCellStyle(CellRangeAddress mergedRegion, Sheet sheet, CellStyle style) {
+        for (int i = mergedRegion.getFirstRow(); i <= mergedRegion.getLastRow(); i++) {
+            Row row = sheet.getRow(i);
+            for (int j = mergedRegion.getFirstColumn(); j <= mergedRegion.getLastColumn(); j++) {
+                Cell cell = row.getCell(j);
+                if (cell != null) {
+                    cell.setCellStyle(style);
+                }
+            }
+        }
+    }
+
+    //json字符串转二维数组
+    public static String[][] stringTo2DArray(String input) {
+        try {
+            if (input == null) {
+                return null;
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(input);
+
+            int rowCount = jsonNode.size();
+            int columnCount = jsonNode.get(0).size();
+
+            String[][] array = new String[rowCount][columnCount];
+            for (int i = 0; i < rowCount; i++) {
+                JsonNode row = jsonNode.get(i);
+                for (int j = 0; j < columnCount; j++) {
+                    array[i][j] = row.get(j).asText();
+                }
+            }
+
+            return array;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    //单元格赋值且带样式
+    public static void valueToCell(Sheet sheet, int row, int colum, String value, CellStyle style) {
+        Row sheetRow = null;
+        if (sheet.getRow(row) == null) {
+            sheetRow = sheet.createRow(row);
+            sheetRow.setRowStyle(style);
+        }
+        sheetRow = sheet.getRow(row);
+        Cell cell = sheetRow.createCell(colum);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
 }
