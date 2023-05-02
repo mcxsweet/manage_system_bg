@@ -167,31 +167,31 @@ public class courseBasicInformationController {
     private IndicatorsMAPPER indicators;
 
     @ApiOperation("查询全部指标点")
-    @GetMapping("indicators")
+    @GetMapping("/indicators")
     public DataResponses getAllIndicators() {
         return new DataResponses(true, indicators.selectList(null));
     }
 
     @ApiOperation("添加指标点")
-    @PostMapping("indicators")
+    @PostMapping("/indicators")
     public DataResponses insertIndicators(@RequestBody Indicators item) {
         return new DataResponses(indicators.insert(item));
     }
 
     @ApiOperation("删除指标点")
-    @DeleteMapping("indicators")
+    @DeleteMapping("/indicators")
     public DataResponses removeIndicators(@RequestBody Indicators item) {
         return new DataResponses(indicators.deleteById(item));
     }
 
     @ApiOperation("修改指标点")
-    @PutMapping("indicators")
+    @PutMapping("/indicators")
     public DataResponses PutIndicators(@RequestBody Indicators item) {
         return new DataResponses(indicators.updateById(item));
     }
 
     @ApiOperation("教学大纲和指标点PDF上传")
-    @PostMapping("teachingPDF")
+    @PostMapping("/teachingPDF")
     public DataResponses teachingPDF(@RequestParam("file") @NotNull MultipartFile file,
                                      @RequestParam int courseId,
                                      @RequestParam String type) {
