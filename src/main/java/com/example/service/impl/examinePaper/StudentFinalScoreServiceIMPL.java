@@ -19,8 +19,6 @@ import com.example.object.finalExamine.*;
 import com.example.service.examinePaper.StudentFinalScoreSERVICE;
 import com.example.utility.DataExtend;
 import com.example.utility.DataResponses;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -255,14 +253,26 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq("student_number", formatter.formatCellValue(row.getCell(0)));
                 queryWrapper.eq("course_id", courseId);
-                Integer id = studentInformationMAPPER.selectOne(queryWrapper).getId();
+                StudentInformation information = studentInformationMAPPER.selectOne(queryWrapper);
 
                 StudentInformation student = new StudentInformation();
                 student.setStudentName(formatter.formatCellValue(row.getCell(1)));
                 student.setClassName(formatter.formatCellValue(row.getCell(2)));
-                student.setId(id);
 
-                studentInformationMAPPER.updateById(student);
+                Integer id = 0;
+                if (information == null) {
+                    student.setStudentNumber(formatter.formatCellValue(row.getCell(0)));
+                    student.setCourseId(String.valueOf(courseId));
+
+                    studentInformationMAPPER.insert(student);
+                    id = studentInformationMAPPER.selectOne(queryWrapper).getId();
+                }else {
+                    id = information.getId();
+                    student.setId(id);
+
+                    studentInformationMAPPER.updateById(student);
+                }
+
 
                 DataResponses result = getFinalExamPaper(courseId);
                 List<DataExtend> finalExamPaper = (List<DataExtend>) result.getData();
@@ -287,12 +297,12 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 score.setScoreDetails(s);
 
                 QueryWrapper<StudentFinalScore> queryWrapper2 = new QueryWrapper<>();
-                queryWrapper2.eq("student_id",id);
+                queryWrapper2.eq("student_id", id);
 
-                if (studentFinalScoreMAPPER.getOneStudent(id).getFinalScoreId() == null){
+                if (studentFinalScoreMAPPER.getOneStudent(id).getFinalScoreId() == null) {
                     studentFinalScoreMAPPER.insert(score);
-                }else {
-                    studentFinalScoreMAPPER.update(score,queryWrapper2);
+                } else {
+                    studentFinalScoreMAPPER.update(score, queryWrapper2);
                 }
             }
 

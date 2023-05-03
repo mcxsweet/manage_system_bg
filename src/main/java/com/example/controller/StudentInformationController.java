@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.object.finalExamine.StudentFinalScore;
 import com.example.object.finalExamine.StudentInformation;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @CrossOrigin(origins = "*")
@@ -32,6 +34,7 @@ public class StudentInformationController {
 
     /**
      * 平时成绩管理
+     *
      * @param courseId
      * @return
      */
@@ -49,6 +52,7 @@ public class StudentInformationController {
 
     /**
      * 期末成绩管理
+     *
      * @param courseId
      * @return
      */
@@ -66,6 +70,7 @@ public class StudentInformationController {
 
     /**
      * 普通增删改查
+     *
      * @param student
      * @return
      */
@@ -80,7 +85,10 @@ public class StudentInformationController {
     @ApiOperation("添加学生平时成绩")
     @PostMapping("/addUsualScore")
     public DataResponses addUsualScore(@RequestBody StudentUsualScore score) {
-        return new DataResponses(true, studentUsualScoreServiceIMPL.save(score));
+        StudentUsualScore studentUsualScore = new StudentUsualScore();
+        studentUsualScore.setStudentId(score.getStudentId());
+        studentUsualScore.setScoreDetails(score.getScoreDetails());
+        return new DataResponses(true, studentUsualScoreServiceIMPL.save(studentUsualScore));
     }
 
     @ApiOperation("添加学生期末成绩")
@@ -108,7 +116,7 @@ public class StudentInformationController {
     @DeleteMapping("/deleteStudentFinalScore")
     public DataResponses deleteFinalscore(@RequestBody StudentFinalScore score) {
         QueryWrapper<StudentFinalScore> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("final_score_id",score.getFinalScoreId());
+        queryWrapper.eq("final_score_id", score.getFinalScoreId());
         return new DataResponses(true, studentFinalScoreServiceIMPL.remove(queryWrapper));
     }
 
@@ -121,7 +129,13 @@ public class StudentInformationController {
     @ApiOperation("修改学生平时成绩")
     @PutMapping("/updateStudentUsualScore")
     public DataResponses updateUsualSocre(@RequestBody StudentUsualScore score) {
-        return new DataResponses(true, studentUsualScoreServiceIMPL.updateById(score));
+        StudentUsualScore studentUsualScore = new StudentUsualScore();
+        studentUsualScore.setUsualScoreId(score.getUsualScoreId());
+        studentUsualScore.setStudentId(score.getStudentId());
+        studentUsualScore.setScoreDetails(score.getScoreDetails());
+        QueryWrapper<StudentUsualScore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("usual_score_id", studentUsualScore.getUsualScoreId());
+        return new DataResponses(true, studentUsualScoreServiceIMPL.update(studentUsualScore,queryWrapper));
     }
 
     @ApiOperation("修改学生期末成绩")
@@ -132,8 +146,8 @@ public class StudentInformationController {
         studentFinalScore.setStudentId(score.getStudentId());
         studentFinalScore.setScoreDetails(score.getScoreDetails());
         QueryWrapper<StudentFinalScore> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("final_score_id",studentFinalScore.getFinalScoreId());
-        return new DataResponses(true, studentFinalScoreServiceIMPL.update(studentFinalScore,queryWrapper));
+        queryWrapper.eq("final_score_id", studentFinalScore.getFinalScoreId());
+        return new DataResponses(true, studentFinalScoreServiceIMPL.update(studentFinalScore, queryWrapper));
     }
 
 
