@@ -7,6 +7,7 @@ import com.example.object.CourseBasicInformation;
 import com.example.object.CourseTarget;
 import com.example.object.Indicators;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
+import com.example.service.impl.IndicatorsServiceIMPL;
 import com.example.utility.DataResponses;
 import com.example.utility.export.export;
 import com.sun.istack.internal.NotNull;
@@ -165,11 +166,19 @@ public class courseBasicInformationController {
 
     @Autowired
     private IndicatorsMAPPER indicators;
+    @Autowired
+    private IndicatorsServiceIMPL indicatorsServiceIMPL;
 
     @ApiOperation("查询全部指标点")
     @GetMapping("/indicators")
     public DataResponses getAllIndicators() {
         return new DataResponses(true, indicators.selectList(null));
+    }
+
+    @ApiOperation("指标点PDF")
+    @GetMapping("/{major}/indicatorsPDF")
+    public ResponseEntity<byte[]> IndicatorsPDF(@PathVariable String major) {
+        return indicatorsServiceIMPL.IndicatorsPDF(major);
     }
 
     @ApiOperation("添加指标点")

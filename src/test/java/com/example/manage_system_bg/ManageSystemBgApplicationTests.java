@@ -2,6 +2,7 @@ package com.example.manage_system_bg;
 
 import com.example.mapper.UserMAPPER;
 import com.example.object.User;
+import com.example.service.impl.IndicatorsServiceIMPL;
 import com.example.service.impl.examinePaper.CourseFinalExamPaperDetailServiceIMPL;
 import com.example.service.impl.examinePaper.StudentFinalScoreServiceIMPL;
 import jxl.Sheet;
@@ -18,7 +19,7 @@ import java.io.IOException;
 class ManageSystemBgApplicationTests {
 
     @Autowired
-    private StudentFinalScoreServiceIMPL studentFinalScoreServiceIMPL;
+    private IndicatorsServiceIMPL impl;
 
     @Autowired
     private UserMAPPER userMAPPER;
@@ -46,11 +47,5 @@ class ManageSystemBgApplicationTests {
 
 //        }
     }
-
-    @Test
-    void studentFinalScoreTest(){
-        studentFinalScoreServiceIMPL.getFinalExamPaper(10);
-    }
-
 
 }
