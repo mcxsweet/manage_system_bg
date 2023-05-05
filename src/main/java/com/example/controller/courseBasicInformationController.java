@@ -10,11 +10,11 @@ import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.service.impl.IndicatorsServiceIMPL;
 import com.example.utility.DataResponses;
 import com.example.utility.export.export;
-import com.sun.istack.internal.NotNull;
+//import com.sun.istack.internal.NotNull;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,9 +34,6 @@ import java.nio.file.Paths;
 @RestController
 @RequestMapping("/courseInfo")
 public class courseBasicInformationController {
-
-    @Value("${file.path}")
-    String filePath;
 
     @ApiOperation("检查登录接口")
     @PostMapping("/checkSubmit")
@@ -201,7 +198,7 @@ public class courseBasicInformationController {
 
     @ApiOperation("教学大纲和指标点PDF上传")
     @PostMapping("/teachingPDF")
-    public DataResponses teachingPDF(@RequestParam("file") @NotNull MultipartFile file,
+    public DataResponses teachingPDF(@RequestParam("file") MultipartFile file,
                                      @RequestParam int courseId,
                                      @RequestParam String type) {
         DataResponses res = new DataResponses(false, "上传失败");
@@ -214,6 +211,9 @@ public class courseBasicInformationController {
                 res.setMessage("只能上传pdf文件");
                 return res;
             }
+            File directory = new File("");//参数为空
+            String filePath = directory.getCanonicalPath() ;
+
             String filename = type + "_" + courseId + ".pdf";
             String filePath_ = filePath + type;
             File fileRealPath = new File(filePath_);
@@ -236,6 +236,9 @@ public class courseBasicInformationController {
     @GetMapping("/file/{type}/{filename:.*\\.pdf}")
     public ResponseEntity<byte[]> getFile(@PathVariable String type, @PathVariable String filename) throws IOException {
         HttpHeaders headers = new HttpHeaders();
+        File directory = new File("");//参数为空
+        String filePath = directory.getCanonicalPath() ;
+
         Path path = Paths.get(filePath + type+'/'+ filename);
         File file = path.toFile();
         if (!file.exists()) {

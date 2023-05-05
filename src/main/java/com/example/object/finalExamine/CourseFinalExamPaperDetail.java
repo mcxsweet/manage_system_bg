@@ -8,7 +8,7 @@ public class CourseFinalExamPaperDetail {
    //外键链接courseFinalExamPaper表id
    private int primaryId;
    //题号
-   private String titleNumber;
+   private int titleNumber;
    private int score;
    //对应指标点
    private String indicatorPoints;

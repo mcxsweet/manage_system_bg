@@ -86,7 +86,7 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
             queryWrapper4.eq("primary_id", id);
             queryWrapper4.orderByAsc("title_number");
             List<CourseFinalExamPaperDetail> courseFinalExamPaperDetails = courseFinalExamPaperDetailMAPPER.selectList(queryWrapper4);
-            List<String> strings2 = new ArrayList<>();
+            List<Integer> strings2 = new ArrayList<>();
             for (CourseFinalExamPaperDetail courseFinalExamPaperDetail : courseFinalExamPaperDetails) {
                 strings2.add(courseFinalExamPaperDetail.getTitleNumber());
             }
@@ -205,14 +205,14 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
         DataResponses responses = getAllStudent(courseId);
         List<StudentFinalScore> allStudent = (List<StudentFinalScore>) responses.getData();
         for (StudentFinalScore studentFinalScore : allStudent) {
-            String[][] strings = export.stringTo2DArray(studentFinalScore.getScoreDetails());
+            List<List<String>> lists = export.stringTo2DArray(studentFinalScore.getScoreDetails());
             export.valueToCell(sheet, rowIndex, 0, studentFinalScore.getStudentNumber(), style);
             export.valueToCell(sheet, rowIndex, 1, studentFinalScore.getStudentName(), style);
             export.valueToCell(sheet, rowIndex, 2, studentFinalScore.getClassName(), style);
 
             int index = 3;
-            if (strings != null) {
-                for (String[] row : strings) {
+            if (lists != null) {
+                for (List<String> row : lists) {
                     for (String value : row) {
                         if (!Objects.equals(value, "null")) {
                             export.valueToCell(sheet, rowIndex, index, value, style);

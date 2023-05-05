@@ -1,15 +1,16 @@
 package com.example.utility.export;
 
 import com.example.object.CourseBasicInformation;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.List;
 
 public class export {
 
@@ -106,26 +107,13 @@ public class export {
     }
 
     //json字符串转二维数组
-    public static String[][] stringTo2DArray(String input) {
+    public static List<List<String>> stringTo2DArray(String input) {
         try {
             if (input == null) {
                 return null;
             }
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(input);
-
-            int rowCount = jsonNode.size();
-            int columnCount = jsonNode.get(0).size();
-
-            String[][] array = new String[rowCount][columnCount];
-            for (int i = 0; i < rowCount; i++) {
-                JsonNode row = jsonNode.get(i);
-                for (int j = 0; j < columnCount; j++) {
-                    array[i][j] = row.get(j).asText();
-                }
-            }
-
-            return array;
+            return objectMapper.readValue(input, new TypeReference<List<List<String>>>() {});
         } catch (Exception e) {
             e.printStackTrace();
         }
