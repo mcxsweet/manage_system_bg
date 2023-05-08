@@ -81,10 +81,10 @@ public class courseBasicInformationController {
         if (searchTable.getTermStart() != null) {
             QueryWrapper.eq("term_start", searchTable.getTermStart());
         }
-        if (searchTable.getTermEnd() != null){
+        if (searchTable.getTermEnd() != null) {
             QueryWrapper.eq("term_end", searchTable.getTermEnd());
         }
-        if (searchTable.getTerm()!=0){
+        if (searchTable.getTerm() != 0) {
             QueryWrapper.eq("term", searchTable.getTerm());
         }
         return new DataResponses(true, courseBasicInformationService.list(QueryWrapper));
@@ -212,10 +212,10 @@ public class courseBasicInformationController {
                 return res;
             }
             File directory = new File("");//参数为空
-            String filePath = directory.getCanonicalPath() ;
+            String filePath = directory.getCanonicalPath();
 
             String filename = type + "_" + courseId + ".pdf";
-            String filePath_ = filePath + type;
+            String filePath_ = filePath + "/" + type;
             File fileRealPath = new File(filePath_);
             //路径不存在则创建
             if (!fileRealPath.exists()) {
@@ -223,7 +223,7 @@ public class courseBasicInformationController {
                     return res;
                 }
             }
-            File result = new File(filePath_ + "/"+ filename);
+            File result = new File(filePath_ + "/" + filename);
             file.transferTo(result);
             res = new DataResponses(true, filename);
         } catch (IOException e) {
@@ -237,9 +237,9 @@ public class courseBasicInformationController {
     public ResponseEntity<byte[]> getFile(@PathVariable String type, @PathVariable String filename) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         File directory = new File("");//参数为空
-        String filePath = directory.getCanonicalPath() ;
+        String filePath = directory.getCanonicalPath();
 
-        Path path = Paths.get(filePath + type+'/'+ filename);
+        Path path = Paths.get(filePath + '/' + type + '/' + filename);
         File file = path.toFile();
         if (!file.exists()) {
             headers.setContentType(MediaType.APPLICATION_JSON);
