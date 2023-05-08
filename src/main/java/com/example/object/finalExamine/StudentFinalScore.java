@@ -8,7 +8,7 @@ public class StudentFinalScore extends StudentInformation{
     //学生id
     private Integer studentId;
     //总成绩
-    private Integer score;
+    private double score;
 
     //题型和分值
     private String scoreDetails;

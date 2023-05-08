@@ -101,6 +101,7 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
     @Override
     public DataResponses getAllStudent(int courseId) {
         int[] emptyArray = new int[0];
+        refreshStudentScore(courseId);
         List<StudentFinalScore> allStudent = studentFinalScoreMAPPER.getAllStudent(courseId);
         for (StudentFinalScore studentFinalScore : allStudent) {
             if (studentFinalScore.getScoreDetails() == null) {
@@ -110,6 +111,33 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
             }
         }
         return new DataResponses(true, allStudent);
+    }
+
+    //学生期末成绩生成刷新
+    @Override
+    public void refreshStudentScore(int courseId) {
+        List<StudentFinalScore> allStudent = studentFinalScoreMAPPER.getAllStudent(courseId);
+        for (StudentFinalScore score : allStudent) {
+            if (score.getFinalScoreId() != null) {
+                StudentFinalScore finalScore = new StudentFinalScore();
+                finalScore.setFinalScoreId(score.getFinalScoreId());
+                finalScore.setStudentId(score.getId());
+                finalScore.setScoreDetails(score.getScoreDetails());
+
+                double sum = 0;
+                List<List<String>> lists = export.stringTo2DArray(score.getScoreDetails());
+                for (List<String> list : lists) {
+                    for (String s : list){
+                        sum += Double.parseDouble(s);
+                    }
+                }
+                finalScore.setScore(sum);
+
+                QueryWrapper<StudentFinalScore> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("final_score_id", finalScore.getFinalScoreId());
+                studentFinalScoreMAPPER.update(finalScore, queryWrapper);
+            }
+        }
     }
 
     //导出学生期末成绩
@@ -266,7 +294,7 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
 
                     studentInformationMAPPER.insert(student);
                     id = studentInformationMAPPER.selectOne(queryWrapper).getId();
-                }else {
+                } else {
                     id = information.getId();
                     student.setId(id);
 
@@ -304,12 +332,12 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 } else {
                     studentFinalScoreMAPPER.update(score, queryWrapper2);
                 }
+                refreshStudentScore(courseId);
             }
 
         } catch (IOException ignored) {
         }
         return new DataResponses(true);
     }
-
 
 }

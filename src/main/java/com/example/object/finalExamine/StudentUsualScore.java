@@ -8,7 +8,7 @@ public class StudentUsualScore extends StudentInformation{
     //学生id
     private Integer studentId;
     //成绩
-    private Integer score;
+    private double score;
 
     private String scoreDetails;
 

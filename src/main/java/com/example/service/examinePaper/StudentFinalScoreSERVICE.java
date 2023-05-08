@@ -13,6 +13,9 @@ public interface StudentFinalScoreSERVICE extends IService<StudentFinalScore> {
 
     DataResponses getAllStudent(int courseId);
 
+    //学生期末成绩生成刷新
+    void refreshStudentScore(int course);
+
     //导出学生期末成绩
     ResponseEntity<byte[]> exportStudentFinalScore(int courseId) throws IOException;
 

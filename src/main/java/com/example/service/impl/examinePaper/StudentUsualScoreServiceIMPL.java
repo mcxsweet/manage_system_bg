@@ -99,10 +99,10 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 usualScore.setScoreDetails(score.getScoreDetails());
                 usualScore.setStudentId(score.getId());
 
-                int sum = 0;
+                double sum = 0;
                 JSONArray objects = JSONArray.parseArray(score.getScoreDetails());
                 for (Object object : objects) {
-                    sum += Integer.parseInt((String) object);
+                    sum += Double.parseDouble((String) object);
                 }
                 usualScore.setScore(sum);
 
