@@ -17,6 +17,9 @@ public interface StudentUsualScoreSERVICE extends IService<StudentUsualScore> {
 
     List<String> getUsualExamMethods(int courseID);
 
+    //学生平时总成绩设置和刷新
+    void refreshStudentScore(int courseId);
+
     ResponseEntity<byte[]> exportStudentUsualScore(int courseId) throws IOException;
 
     DataResponses inputStudentUsualScore(MultipartFile file, String courseId) throws IOException;

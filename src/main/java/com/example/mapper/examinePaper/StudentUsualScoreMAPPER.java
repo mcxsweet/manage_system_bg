@@ -17,7 +17,8 @@ public interface StudentUsualScoreMAPPER extends BaseMapper<StudentUsualScore> {
             "       student_information.class_name,\n" +
             "       student_information.course_id,\n" +
             "       student_usual_score.score_details,\n" +
-            "       student_usual_score.usual_score_id\n" +
+            "       student_usual_score.usual_score_id,\n" +
+            "       student_usual_score.score\n" +
             "from student_information\n" +
             "         left outer join student_usual_score on student_information.id = student_usual_score.student_id\n" +
             "where student_information.course_id = #{courseId};")

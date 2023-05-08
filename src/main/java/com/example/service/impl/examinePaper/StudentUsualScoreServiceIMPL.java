@@ -10,7 +10,6 @@ import com.example.mapper.examinePaper.StudentInformationMAPPER;
 import com.example.mapper.examinePaper.StudentUsualScoreMAPPER;
 import com.example.object.CourseExamineChildMethods;
 import com.example.object.CourseExamineMethods;
-import com.example.object.finalExamine.StudentFinalScore;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.object.finalExamine.StudentUsualScore;
 import com.example.service.examinePaper.StudentUsualScoreSERVICE;
@@ -51,6 +50,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
     @Override
     public List<StudentUsualScore> getAllStudent(int courseId) {
         int[] emptyArray = new int[0];
+        refreshStudentScore(courseId);
         List<StudentUsualScore> allStudent = studentUsualScoreMAPPER.getAllStudent(courseId);
         for (StudentUsualScore studentUsualScore : allStudent) {
             if (studentUsualScore.getScoreDetails() == null) {
@@ -86,6 +86,32 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
             strings.add(courseExamineChildMethods1.getExamineChildItem());
         }
         return strings;
+    }
+
+    //学生平时总成绩设置和刷新
+    @Override
+    public void refreshStudentScore(int courseId) {
+        List<StudentUsualScore> allStudent = studentUsualScoreMAPPER.getAllStudent(courseId);
+        for (StudentUsualScore score : allStudent) {
+            if (score.getUsualScoreId() != null) {
+                StudentUsualScore usualScore = new StudentUsualScore();
+                usualScore.setUsualScoreId(score.getUsualScoreId());
+                usualScore.setScoreDetails(score.getScoreDetails());
+                usualScore.setStudentId(score.getId());
+
+                int sum = 0;
+                JSONArray objects = JSONArray.parseArray(score.getScoreDetails());
+                for (Object object : objects) {
+                    sum += Integer.parseInt((String) object);
+                }
+                usualScore.setScore(sum);
+
+                QueryWrapper<StudentUsualScore> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("usual_score_id", usualScore.getUsualScoreId());
+                studentUsualScoreMAPPER.update(usualScore, queryWrapper);
+
+            }
+        }
     }
 
     //学生成绩表格导出
@@ -248,6 +274,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 } else {
                     studentUsualScoreMAPPER.update(studentUsualScore, queryWrapper2);
                 }
+                refreshStudentScore((Integer.parseInt(courseId)));
             }
         } catch (IOException ignored) {
         }

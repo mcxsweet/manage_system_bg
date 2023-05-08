@@ -254,5 +254,4 @@ public class courseBasicInformationController {
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 
-
 }
