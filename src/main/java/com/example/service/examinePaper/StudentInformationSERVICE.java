@@ -1,9 +1,15 @@
 package com.example.service.examinePaper;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.object.finalExamine.StudentComprehensiveScore;
 import com.example.object.finalExamine.StudentInformation;
 
+import java.util.List;
+
 public interface StudentInformationSERVICE extends IService<StudentInformation> {
-    //mapper中添加的方法在此处声明
-    //也可以通过@Override重写方法
+    //获取学生综合成绩
+    List<StudentComprehensiveScore> getComprehensiveScore(int courseId);
+
+    //生成和刷新综合成绩
+    void refreshScore(int courseId);
 }

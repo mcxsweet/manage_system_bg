@@ -6,6 +6,7 @@ import com.example.object.finalExamine.StudentUsualScore;
 import com.example.service.impl.IndicatorsServiceIMPL;
 import com.example.service.impl.examinePaper.CourseFinalExamPaperDetailServiceIMPL;
 import com.example.service.impl.examinePaper.StudentFinalScoreServiceIMPL;
+import com.example.service.impl.examinePaper.StudentInformationServiceIMPL;
 import com.example.service.impl.examinePaper.StudentUsualScoreServiceIMPL;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -21,14 +22,14 @@ import java.io.IOException;
 class ManageSystemBgApplicationTests {
 
     @Autowired
-    private StudentUsualScoreServiceIMPL impl;
+    private StudentInformationServiceIMPL impl;
 
     @Autowired
     private UserMAPPER userMAPPER;
 
     @Test
     void contextLoads() throws BiffException, IOException {
-        impl.refreshStudentScore(10);
+        impl.refreshScore(12);
     }
 
 }

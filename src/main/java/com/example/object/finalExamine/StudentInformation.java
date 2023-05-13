@@ -14,7 +14,6 @@ public class StudentInformation {
     //课程信息外键
     protected String courseId;
 
-
     public StudentInformation(String studentNumber, String studentName, String className, String courseId) {
         this.studentNumber = studentNumber;
         this.studentName = studentName;

@@ -68,6 +68,16 @@ public class StudentInformationController {
     }
 
     /**
+     * 综合成绩管理
+     */
+    @ApiOperation("获取当前课程全部学生期末试卷成绩")
+    @GetMapping("/{courseId}/getComprehensiveScore")
+    public DataResponses getComprehensiveScore(@PathVariable int courseId) {
+        return new DataResponses(true,studentInformationServiceIMPL.getComprehensiveScore(courseId));
+    }
+
+
+    /**
      * 普通增删改查
      *
      * @param student
