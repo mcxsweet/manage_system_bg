@@ -29,5 +29,36 @@ public interface StudentInformationMAPPER extends BaseMapper<StudentInformation>
 
 
     @Update("update student_information set comprehensive_score = #{score} where id = #{studentId};")
-    void UpdateComprehensiveScore(double score,int studentId);
+    void UpdateComprehensiveScore(double score, int studentId);
+
+    @Select("select count(id) from student_information where course_id = #{courseId};")
+    int count(int courseId);
+
+    @Select("select max(comprehensive_score) from student_information where course_id = #{courseId};")
+    double max(int courseId);
+
+    @Select("select min(comprehensive_score) from student_information where course_id = #{courseId};")
+    double min(int courseId);
+
+    @Select("select count(id) from student_information where course_id = #{courseId} && comprehensive_score >= 90;")
+    int superior(int courseId);
+
+    @Select("select count(id) from student_information where course_id = #{courseId} && comprehensive_score < 90 && comprehensive_score >= 80;")
+    int great(int courseId);
+
+    @Select("select count(id) from student_information where course_id = #{courseId} && comprehensive_score < 80 && comprehensive_score >= 70;")
+    int good(int courseId);
+
+    @Select("select count(id) from student_information where course_id = #{courseId} && comprehensive_score < 70 && comprehensive_score >= 60;")
+    int pass(int courseId);
+
+    @Select("select count(id) from student_information where course_id = #{courseId} && comprehensive_score >= 60;")
+    int passNum(int courseId);
+
+    @Select("select count(id) from student_information where course_id = #{courseId} && comprehensive_score < 60;")
+    int failed(int courseId);
+
+    @Select("select avg(comprehensive_score) from student_information where course_id;")
+    double average(int courseId);
+
 }

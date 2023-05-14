@@ -8,12 +8,14 @@ import com.example.mapper.CourseBasicInformationMAPPER;
 import com.example.mapper.CourseExamineChildMethodsMAPPER;
 import com.example.mapper.CourseExamineMethodsMAPPER;
 import com.example.mapper.CourseTargetMAPPER;
+import com.example.mapper.comprehensiveAnalyse.CourseTargetAnalyseMAPPER;
 import com.example.mapper.examinePaper.CourseFinalExamPaperDetailMAPPER;
 import com.example.mapper.examinePaper.CourseFinalExamPaperMAPPER;
 import com.example.object.CourseBasicInformation;
 import com.example.object.CourseExamineChildMethods;
 import com.example.object.CourseExamineMethods;
 import com.example.object.CourseTarget;
+import com.example.object.comprehensiveAnalyse.CourseTargetAnalyse;
 import com.example.object.finalExamine.CourseFinalExamPaper;
 import com.example.object.finalExamine.CourseFinalExamPaperDetail;
 import com.example.service.examinePaper.CourseFinalExamPaperDetailSERVICE;
@@ -33,8 +35,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.example.utility.export.export;
+
 
 @Service
 public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFinalExamPaperDetailMAPPER, CourseFinalExamPaperDetail> implements CourseFinalExamPaperDetailSERVICE {
@@ -52,15 +58,18 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
     @Autowired
     private CourseExamineChildMethodsMAPPER courseExamineChildMethodsMAPPER;
 
+    @Autowired
+    private CourseTargetAnalyseMAPPER courseTargetAnalyseMAPPER;
 
+    //试卷小题和指标点课程目标之间的关系
     @Override
-    public ResponseEntity<byte[]> ExportExamPaperRelationExcel(HttpServletResponse response, int courseId) throws IOException {
+    public ResponseEntity<byte[]> ExportExamPaperRelationExcel(HttpServletResponse response, int courseId, int type) throws IOException {
 
         //行索引
         int rowIndex = 0;
-        File directory = new File("");//参数为空
-        String filePath = directory.getCanonicalPath() ;
-        File file = new File(filePath+"/workSpace.xls");
+        File directory = new File("");
+        String filePath = directory.getCanonicalPath();
+        File file = new File(filePath + "/workSpace.xls");
 
         FileInputStream fIP = new FileInputStream(file);
         //Get the workbook instance for XLS file
@@ -115,6 +124,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
             indicateNum++;
         }
         //绘制空行（隔开指标点和课程目标）
+        sheet.createRow(rowIndex);
         rowIndex++;
 
         //表格赋值课程目标
@@ -132,7 +142,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
         QueryWrapper<CourseExamineMethods> queryWrapper3 = new QueryWrapper<>();
         queryWrapper3.eq("course_id", courseId);
         List<CourseExamineMethods> courseExamineMethods = courseExamineMethodsMAPPER.selectList(queryWrapper3);
-        if(courseExamineMethods == null){
+        if (courseExamineMethods == null) {
             return null;
         }
 
@@ -140,6 +150,11 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
         int columIndex = 2;
         int temp = 2;
         int sum = 0;
+
+        /*
+            ========================================================================
+         */
+        //（试卷）表格部分
         for (CourseExamineMethods courseExamineMethods1 : courseExamineMethods) {
             if (courseExamineMethods1.getExamineItem().contains("期末")) {
                 courseExamineMethodsId = courseExamineMethods1.getId();
@@ -155,7 +170,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                 queryWrapper.orderByAsc("id");
                 //请求+遍历
                 List<CourseFinalExamPaper> courseFinalExamPapers = courseFinalExamPaperMAPPER.selectList(queryWrapper);
-                if(courseFinalExamPapers == null){
+                if (courseFinalExamPapers == null) {
                     return null;
                 }
                 List<CourseFinalExamPaperDetail> courseFinalExamPaperDetails;
@@ -194,7 +209,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                         String courseTarget = courseFinalExamPaperDetail.getCourseTarget();
                         JSONArray courseTargetArrary = JSON.parseArray(courseTarget);
                         for (int i = 0; i < courseTargetArrary.size(); i++) {
-                            for (int j = rowIndex - 3 - indicateNum; j < rowIndex; j++) {
+                            for (int j = rowIndex - targetNum; j < rowIndex; j++) {
                                 HSSFRow rown = sheet.getRow(j);
                                 if (Objects.equals(rown.getCell(0).getStringCellValue(), courseTargetArrary.getString(i))) {
                                     rown.createCell(columIndex).setCellValue("√");
@@ -216,6 +231,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                 row0.getCell(2).setCellValue("试卷");
                 row3.createCell(columIndex).setCellStyle(cellStyle3);
                 sheet.addMergedRegion(new CellRangeAddress(1, 2, columIndex, columIndex));
+
                 row.createCell(columIndex).setCellValue("卷面总分");
                 row.getCell(columIndex).setCellStyle(cellStyle3);
                 for (int i = 2; i < columIndex; i++) {
@@ -224,6 +240,65 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                 }
                 row4.createCell(columIndex).setCellValue(sum);
                 row4.getCell(columIndex).setCellStyle(cellStyle3);
+
+                //生成关系矩阵
+                int result = 0;
+                for (int i = 4; i < rowIndex - targetNum - 1; i++) {
+                    HSSFRow rown = sheet.getRow(i);
+                    List<Boolean> list = new ArrayList<>();
+                    for (int j = 2; j < columIndex; j++) {
+                        if (rown.getCell(j) != null) {
+                            list.add(true);
+                            result += sheet.getRow(3).getCell(j).getNumericCellValue();
+                        } else {
+                            list.add(false);
+                        }
+                    }
+                    String s = JSON.toJSONString(list);
+                    CourseTargetAnalyse targetAnalyse = new CourseTargetAnalyse();
+                    targetAnalyse.setCourseId(courseId);
+                    targetAnalyse.setTargetName(rown.getCell(0).getStringCellValue());
+                    targetAnalyse.setValue(result);
+                    targetAnalyse.setMatrix(s);
+
+                    QueryWrapper<CourseTargetAnalyse> queryWrapper1 = new QueryWrapper<>();
+                    queryWrapper1.eq("course_id",courseId);
+                    queryWrapper1.eq("target_name",targetAnalyse.getTargetName());
+                    if (courseTargetAnalyseMAPPER.update(targetAnalyse,queryWrapper1) != 1){
+                        courseTargetAnalyseMAPPER.insert(targetAnalyse);
+                    }
+                    export.valueToCell(sheet, i, columIndex, String.valueOf(result), cellStyle3);
+                    result = 0;
+                }
+
+                for (int i = rowIndex - targetNum; i < rowIndex; i++) {
+                    HSSFRow rown = sheet.getRow(i);
+                    List<Boolean> list = new ArrayList<>();
+                    for (int j = 2; j < columIndex; j++) {
+                        if (rown.getCell(j) != null) {
+                            list.add(true);
+                            result += sheet.getRow(3).getCell(j).getNumericCellValue();
+                        } else {
+                            list.add(false);
+                        }
+                    }
+                    String s = JSON.toJSONString(list);
+                    CourseTargetAnalyse targetAnalyse = new CourseTargetAnalyse();
+                    targetAnalyse.setCourseId(courseId);
+                    targetAnalyse.setTargetName(rown.getCell(0).getStringCellValue());
+                    targetAnalyse.setValue(result);
+                    targetAnalyse.setMatrix(s);
+
+                    QueryWrapper<CourseTargetAnalyse> queryWrapper1 = new QueryWrapper<>();
+                    queryWrapper1.eq("course_id",courseId);
+                    queryWrapper1.eq("target_name",targetAnalyse.getTargetName());
+                    if (courseTargetAnalyseMAPPER.update(targetAnalyse,queryWrapper1) != 1){
+                        courseTargetAnalyseMAPPER.insert(targetAnalyse);
+                    }
+                    export.valueToCell(sheet, i, columIndex, String.valueOf(result), cellStyle3);
+                    result = 0;
+                }
+
                 columIndex++;
 
             }
@@ -271,7 +346,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                     String courseTarget = courseExamineChildMethods2.getCourseTarget();
                     JSONArray courseTargetArrary = JSON.parseArray(courseTarget);
                     for (int i = 0; i < courseTargetArrary.size(); i++) {
-                        for (int j = rowIndex - 3 - indicateNum; j < rowIndex; j++) {
+                        for (int j = rowIndex - targetNum; j < rowIndex; j++) {
                             HSSFRow rown = sheet.getRow(j);
                             if (Objects.equals(rown.getCell(0).getStringCellValue(), courseTargetArrary.getString(i))) {
                                 rown.createCell(columIndex).setCellValue("√");
@@ -345,7 +420,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                     String courseTarget = courseExamineChildMethods2.getCourseTarget();
                     JSONArray courseTargetArrary = JSON.parseArray(courseTarget);
                     for (int i = 0; i < courseTargetArrary.size(); i++) {
-                        for (int j = rowIndex - 3 - indicateNum; j < rowIndex; j++) {
+                        for (int j = rowIndex - targetNum; j < rowIndex; j++) {
                             HSSFRow rown = sheet.getRow(j);
                             if (Objects.equals(rown.getCell(0).getStringCellValue(), courseTargetArrary.getString(i))) {
                                 rown.createCell(columIndex).setCellValue("√");
@@ -391,37 +466,21 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
         workbookn.getConverterSetting().setSheetFitToWidth(true);
         // 将 XLS 文件转换为 PDF 文件
         workbookn.saveToFile("workbook.pdf", FileFormat.PDF);
-        //导出部分
         // 将 PDF 文件读入字节数组
-        byte[] pdfBytes = Files.readAllBytes(Paths.get("workbook.pdf"));
-
-
-        /*
-            如果需要导出excel文件
-            用于导出文件
-         */
-//        response.reset();
-//        response.setContentType("application/vnd.ms-excel");
-//        response.setHeader("Content-disposition", "attachment;filename=template.xls");
-
-//        response.setContentType("application/pdf");
-//        response.setHeader("Content-Disposition", "attachment; filename=output.pdf");
-//        OutputStream outputStream = response.getOutputStream();
-
-//导出excel
-//        workbook.write(outputStream);
-
-//        outputStream.write(pdfBytes);
-//        outputStream.flush();
-//        outputStream.close();
-
-//        ByteArrayResource resource = new ByteArrayResource(pdfBytes);
+        byte[] Bytes = null;
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.pdf");
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+        if (type == 1) {
+            Bytes = Files.readAllBytes(Paths.get("workbook.pdf"));
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.pdf");
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+        } else if (type == 2) {
+            Bytes = Files.readAllBytes(Paths.get("workbook.xls"));
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+        }
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(pdfBytes);
+                .body(Bytes);
     }
 }

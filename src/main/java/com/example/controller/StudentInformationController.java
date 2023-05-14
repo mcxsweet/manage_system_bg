@@ -76,6 +76,12 @@ public class StudentInformationController {
         return new DataResponses(true,studentInformationServiceIMPL.getComprehensiveScore(courseId));
     }
 
+    @ApiOperation("导出综合成绩分析表")
+    @GetMapping("/{courseId}/exportComprehensiveScore")
+    public ResponseEntity<byte[]> exportComprehensiveScore(@PathVariable int courseId) {
+        return studentInformationServiceIMPL.exportComprehensiveScore(courseId);
+    }
+
 
     /**
      * 普通增删改查

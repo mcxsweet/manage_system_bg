@@ -113,7 +113,8 @@ public class export {
                 return null;
             }
             ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(input, new TypeReference<List<List<String>>>() {});
+            return objectMapper.readValue(input, new TypeReference<List<List<String>>>() {
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,5 +133,21 @@ public class export {
         Cell cell = sheetRow.createCell(colum);
         cell.setCellValue(value);
         cell.setCellStyle(style);
+    }
+
+    public static double doubleFormat(double a, int i) {
+        String str = "";
+        switch (i) {
+            case 1:
+                str = String.format("%.1f", a);
+                break;
+            case 2:
+                str = String.format("%.2f", a);
+                break;
+            case 4:
+                str = String.format("%.4f", a);
+                break;
+        }
+        return Double.parseDouble(str);
     }
 }

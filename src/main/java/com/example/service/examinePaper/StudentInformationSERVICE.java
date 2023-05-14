@@ -12,4 +12,7 @@ public interface StudentInformationSERVICE extends IService<StudentInformation> 
 
     //生成和刷新综合成绩
     void refreshScore(int courseId);
+
+    //课程成绩分析
+    void analyse(int courseId);
 }

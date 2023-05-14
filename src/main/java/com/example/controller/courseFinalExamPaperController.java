@@ -105,9 +105,9 @@ public class courseFinalExamPaperController {
         相关的表格展示
      */
     @ApiOperation("提供课程ID生成该课程考核方式和指标点，课程目标的对应关系")
-    @GetMapping("/Table/{courseId}")
-    public ResponseEntity<byte[]> exportExcel(HttpServletResponse response,@PathVariable int courseId) throws IOException {
-        return courseFinalExamPaperDetailService.ExportExamPaperRelationExcel(response,courseId);
+    @GetMapping("/{courseId}/{type}/Table")
+    public ResponseEntity<byte[]> exportExcel(HttpServletResponse response,@PathVariable int courseId,@PathVariable int type) throws IOException {
+        return courseFinalExamPaperDetailService.ExportExamPaperRelationExcel(response,courseId,type);
     }
 
 }

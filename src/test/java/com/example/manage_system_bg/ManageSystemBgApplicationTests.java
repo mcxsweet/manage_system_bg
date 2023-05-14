@@ -29,7 +29,7 @@ class ManageSystemBgApplicationTests {
 
     @Test
     void contextLoads() throws BiffException, IOException {
-        impl.refreshScore(12);
+        impl.analyse(10);
     }
 
 }
