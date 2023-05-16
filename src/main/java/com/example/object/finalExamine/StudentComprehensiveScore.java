@@ -21,5 +21,7 @@ public class StudentComprehensiveScore {
     private double usualScore;
     private double finalScore;
 
+    //test
+    private String ExamScore;
 }
 

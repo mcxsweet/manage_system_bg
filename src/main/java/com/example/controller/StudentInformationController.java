@@ -77,11 +77,22 @@ public class StudentInformationController {
     }
 
     @ApiOperation("导出综合成绩分析表")
+    @GetMapping("/{courseId}/exportComprehensiveScoreAnalyse")
+    public ResponseEntity<byte[]> exportComprehensiveScoreAnalyse(@PathVariable int courseId) {
+        return studentInformationServiceIMPL.exportComprehensiveScoreAnalyse(courseId);
+    }
+
+    @ApiOperation("导出综合成绩")
     @GetMapping("/{courseId}/exportComprehensiveScore")
     public ResponseEntity<byte[]> exportComprehensiveScore(@PathVariable int courseId) {
         return studentInformationServiceIMPL.exportComprehensiveScore(courseId);
     }
 
+    @ApiOperation("导出达成度分析表")
+    @GetMapping("/{courseId}/exportDegreeOfAchievement")
+    public ResponseEntity<byte[]> exportDegreeOfAchievement(@PathVariable int courseId) {
+        return studentInformationServiceIMPL.exportDegreeOfAchievement(courseId);
+    }
 
     /**
      * 普通增删改查

@@ -128,6 +128,9 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 List<List<String>> lists = export.stringTo2DArray(score.getScoreDetails());
                 for (List<String> list : lists) {
                     for (String s : list){
+                        if (Objects.equals(s, "")){
+                            s = "0";
+                        }
                         sum += Double.parseDouble(s);
                     }
                 }

@@ -124,7 +124,7 @@ public class export {
 
     //单元格赋值且带样式
     public static void valueToCell(Sheet sheet, int row, int colum, String value, CellStyle style) {
-        Row sheetRow = null;
+        Row sheetRow;
         if (sheet.getRow(row) == null) {
             sheetRow = sheet.createRow(row);
             sheetRow.setRowStyle(style);
@@ -134,7 +134,6 @@ public class export {
         cell.setCellValue(value);
         cell.setCellStyle(style);
     }
-
     public static double doubleFormat(double a, int i) {
         String str = "";
         switch (i) {

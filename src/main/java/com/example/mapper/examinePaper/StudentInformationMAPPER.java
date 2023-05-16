@@ -20,7 +20,8 @@ public interface StudentInformationMAPPER extends BaseMapper<StudentInformation>
             "       student_information.course_id,\n" +
             "       student_information.comprehensive_score,\n" +
             "       student_usual_score.score as usualScore,\n" +
-            "       student_final_score.score as finalScore\n" +
+            "       student_final_score.score as finalScore,\n" +
+            "       student_final_score.score_details as ExamScore\n" +
             "from student_information\n" +
             "         left outer join student_usual_score on student_information.id = student_usual_score.student_id\n" +
             "         left outer join student_final_score on student_information.id = student_final_score.student_id\n" +
@@ -58,7 +59,7 @@ public interface StudentInformationMAPPER extends BaseMapper<StudentInformation>
     @Select("select count(id) from student_information where course_id = #{courseId} && comprehensive_score < 60;")
     int failed(int courseId);
 
-    @Select("select avg(comprehensive_score) from student_information where course_id;")
+    @Select("select avg(comprehensive_score) from student_information where course_id = #{courseId};")
     double average(int courseId);
 
 }

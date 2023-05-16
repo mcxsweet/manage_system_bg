@@ -1,12 +1,17 @@
 package com.example.service.impl.examinePaper;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.mapper.CourseBasicInformationMAPPER;
 import com.example.mapper.CourseExamineMethodsMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseScoreAnalyseMAPPER;
+import com.example.mapper.comprehensiveAnalyse.CourseTargetAnalyseMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
+import com.example.object.CourseBasicInformation;
 import com.example.object.CourseExamineMethods;
 import com.example.object.comprehensiveAnalyse.CourseScoreAnalyse;
+import com.example.object.comprehensiveAnalyse.CourseTargetAnalyse;
 import com.example.object.finalExamine.StudentComprehensiveScore;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.service.examinePaper.StudentInformationSERVICE;
@@ -21,11 +26,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformationMAPPER, StudentInformation> implements StudentInformationSERVICE {
@@ -39,6 +47,11 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
     @Autowired
     private CourseScoreAnalyseMAPPER courseScoreAnalyseMAPPER;
 
+    @Autowired
+    private CourseTargetAnalyseMAPPER courseTargetAnalyseMAPPER;
+
+    @Autowired
+    private CourseBasicInformationMAPPER courseBasicInformationMAPPER;
 
     //获取学生综合成绩
     @Override
@@ -47,6 +60,218 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
         analyse(courseId);
         return studentInformationMAPPER.getComprehensiveScore(courseId);
     }
+
+    //导出学生综合成绩XLS
+    @Override
+    public ResponseEntity<byte[]> exportComprehensiveScore(int courseId) {
+        try {
+            Workbook workbook = new HSSFWorkbook();
+            Sheet sheet = workbook.createSheet();
+
+            //单元格样式
+            CellStyle style = workbook.createCellStyle();
+            style.setBorderBottom(BorderStyle.THIN);
+            style.setBorderTop(BorderStyle.THIN);
+            style.setBorderRight(BorderStyle.THIN);
+            style.setBorderLeft(BorderStyle.THIN);
+            style.setAlignment(HorizontalAlignment.CENTER);
+            style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            Row row1 = sheet.createRow(0);
+
+            export.valueToCell(sheet, 1, 0, "学号", style);
+            sheet.setColumnWidth(0, 20 * 256);
+            export.valueToCell(sheet, 1, 1, "姓名", style);
+            export.valueToCell(sheet, 1, 2, "班级", style);
+            sheet.setColumnWidth(2, 20 * 256);
+            export.valueToCell(sheet, 1, 3, "平时成绩", style);
+            export.valueToCell(sheet, 1, 4, "期末成绩", style);
+            export.valueToCell(sheet, 1, 5, "总成绩", style);
+
+            List<StudentComprehensiveScore> comprehensiveScore = studentInformationMAPPER.getComprehensiveScore(courseId);
+
+            int rowIndex = 2;
+            for (StudentComprehensiveScore score : comprehensiveScore) {
+                export.valueToCell(sheet, rowIndex, 0, score.getStudentNumber(), style);
+                export.valueToCell(sheet, rowIndex, 1, score.getStudentName(), style);
+                export.valueToCell(sheet, rowIndex, 2, score.getClassName(), style);
+                export.valueToCell(sheet, rowIndex, 3, String.valueOf(score.getUsualScore()), style);
+                export.valueToCell(sheet, rowIndex, 4, String.valueOf(score.getFinalScore()), style);
+                export.valueToCell(sheet, rowIndex, 5, String.valueOf(score.getComprehensiveScore()), style);
+                rowIndex++;
+            }
+
+            //标题
+            CellRangeAddress mergedRegion = new CellRangeAddress(0, 0, 0, 5);
+            sheet.addMergedRegion(mergedRegion);
+            CourseBasicInformation courseBasicInformation = courseBasicInformationMAPPER.selectById(courseId);
+            String s = courseBasicInformation.getCourseName() + " ( " + courseBasicInformation.getTermStart() + " - " + courseBasicInformation.getTermEnd() + "." + courseBasicInformation.getTerm() + " ) " + "\t" + courseBasicInformation.getClassName() + "\t" + courseBasicInformation.getClassroomTeacher();
+            row1.createCell(0).setCellValue(s);
+            export.reloadCellStyle(mergedRegion, sheet, style);
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            workbook.write(byteArrayOutputStream);
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(bytes);
+        } catch (IOException ignored) {
+        }
+        return null;
+    }
+
+    //导出达成度分析表
+    @Override
+    public ResponseEntity<byte[]> exportDegreeOfAchievement(int courseId) {
+        try {
+            Workbook workbook = new HSSFWorkbook();
+            Sheet sheet = workbook.createSheet();
+            DataFormatter formatter = new DataFormatter();
+
+            //单元格样式
+            CellStyle style = workbook.createCellStyle();
+            style.setBorderBottom(BorderStyle.THIN);
+            style.setBorderTop(BorderStyle.THIN);
+            style.setBorderRight(BorderStyle.THIN);
+            style.setBorderLeft(BorderStyle.THIN);
+            style.setAlignment(HorizontalAlignment.CENTER);
+            style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            Row row1 = sheet.createRow(0);
+
+            export.valueToCell(sheet, 1, 0, "学号", style);
+            sheet.setColumnWidth(0, 20 * 256);
+            export.valueToCell(sheet, 1, 1, "姓名", style);
+            export.valueToCell(sheet, 1, 2, "班级", style);
+            sheet.setColumnWidth(2, 20 * 256);
+            export.valueToCell(sheet, 1, 3, "平时成绩", style);
+            export.valueToCell(sheet, 1, 4, "期末成绩", style);
+            export.valueToCell(sheet, 1, 5, "总成绩", style);
+            export.valueToCell(sheet, 1, 6, "平时观测点达成度", style);
+            sheet.setColumnWidth(6, 20 * 256);
+
+            QueryWrapper<CourseTargetAnalyse> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("course_id", courseId);
+            queryWrapper.like("target_name", "课程目标");
+            int columIndex = 7;
+            List<CourseTargetAnalyse> courseTargetAnalyses = courseTargetAnalyseMAPPER.selectList(queryWrapper);
+            for (CourseTargetAnalyse targetAnalyse : courseTargetAnalyses) {
+                int temp = columIndex;
+                Row row = sheet.getRow(0);
+                row.createCell(columIndex).setCellValue(targetAnalyse.getTargetName());
+                export.valueToCell(sheet, 1, columIndex, "试卷", style);
+
+                row.createCell(++columIndex);
+                export.valueToCell(sheet, 1, columIndex, "试卷观测点达成度", style);
+                sheet.setColumnWidth(columIndex, 20 * 256);
+
+                row.createCell(++columIndex);
+                export.valueToCell(sheet, 1, columIndex, "课程目标达成度", style);
+                sheet.setColumnWidth(columIndex, 20 * 256);
+
+                CellRangeAddress mergedRegion = new CellRangeAddress(0, 0, temp, columIndex);
+                sheet.addMergedRegion(mergedRegion);
+                export.reloadCellStyle(mergedRegion, sheet, style);
+
+                columIndex++;
+                temp = columIndex;
+            }
+
+
+            List<StudentComprehensiveScore> comprehensiveScore = studentInformationMAPPER.getComprehensiveScore(courseId);
+
+            int rowIndex = 2;
+            double usualAchievementAVG = 0;
+            for (StudentComprehensiveScore score : comprehensiveScore) {
+                export.valueToCell(sheet, rowIndex, 0, score.getStudentNumber(), style);
+                export.valueToCell(sheet, rowIndex, 1, score.getStudentName(), style);
+                export.valueToCell(sheet, rowIndex, 2, score.getClassName(), style);
+                export.valueToCell(sheet, rowIndex, 3, String.valueOf(score.getUsualScore()), style);
+                export.valueToCell(sheet, rowIndex, 4, String.valueOf(score.getFinalScore()), style);
+                export.valueToCell(sheet, rowIndex, 5, String.valueOf(score.getComprehensiveScore()), style);
+
+                //平时观测点达成度
+                double usualAchievement = export.doubleFormat(score.getUsualScore() * 0.01, 4);
+                export.valueToCell(sheet, rowIndex, 6, String.valueOf(usualAchievement), style);
+                usualAchievementAVG += usualAchievement;
+
+                List<Double> ints = new ArrayList<>();
+                List<List<String>> lists = export.stringTo2DArray(score.getExamScore());
+                if (lists != null) {
+                    for (List<String> l : lists) {
+                        for (String s : l) {
+                            if (Objects.equals(s, "")) {
+                                ints.add(0.0);
+                            } else {
+                                double i = Double.parseDouble(s);
+                                ints.add(i);
+                            }
+                        }
+                    }
+                }
+                double result = 0;
+                int i = 7;
+                for (CourseTargetAnalyse targetAnalyse : courseTargetAnalyses) {
+                    JSONArray objects = JSONArray.parseArray(targetAnalyse.getMatrix());
+
+                    for (int j = 0; j < objects.size(); j++) {
+                        if (Boolean.parseBoolean(objects.get(j).toString())) {
+                            result += ints.get(j);
+                        }
+                    }
+
+                    double achievement = export.doubleFormat(result / targetAnalyse.getValue(),4);
+
+                    export.valueToCell(sheet, rowIndex, i, String.valueOf(result), style);
+                    export.valueToCell(sheet, rowIndex, i + 1, String.valueOf(achievement), style);
+
+                    i += 3;
+                }
+
+
+                rowIndex++;
+            }
+
+            //标题
+            CellRangeAddress mergedRegion = new CellRangeAddress(0, 0, 0, 5);
+            sheet.addMergedRegion(mergedRegion);
+            CourseBasicInformation courseBasicInformation = courseBasicInformationMAPPER.selectById(courseId);
+            String s = courseBasicInformation.getCourseName() + " ( " + courseBasicInformation.getTermStart() + " - " + courseBasicInformation.getTermEnd() + "." + courseBasicInformation.getTerm() + " ) " + "\t" + courseBasicInformation.getClassName() + "\t" + courseBasicInformation.getClassroomTeacher();
+            row1.createCell(0).setCellValue(s);
+            export.reloadCellStyle(mergedRegion, sheet, style);
+
+            export.valueToCell(sheet, rowIndex, 0, "平均值", style);
+            double v1 = export.doubleFormat(courseTargetAnalyseMAPPER.getUsualScoreAVG(courseId), 2);
+            export.valueToCell(sheet, rowIndex, 3, String.valueOf(v1), style);
+            double v2 = export.doubleFormat(courseTargetAnalyseMAPPER.getFinalScoreAVG(courseId), 2);
+            export.valueToCell(sheet, rowIndex, 4, String.valueOf(v2), style);
+            double v3 = export.doubleFormat(courseTargetAnalyseMAPPER.getComprehensiveAverage(courseId), 2);
+            export.valueToCell(sheet, rowIndex, 5, String.valueOf(v3), style);
+            double v4 = export.doubleFormat(usualAchievementAVG / (rowIndex - 3), 2);
+            export.valueToCell(sheet, rowIndex, 6, String.valueOf(v4), style);
+
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            workbook.write(byteArrayOutputStream);
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
+            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(bytes);
+        } catch (IOException ignored) {
+        }
+        return null;
+    }
+
 
     //生成和刷新综合成绩
     @Override
@@ -77,7 +302,8 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
     }
 
     //导出成绩分析PDF
-    public ResponseEntity<byte[]> exportComprehensiveScore(int courseId) {
+    @Override
+    public ResponseEntity<byte[]> exportComprehensiveScoreAnalyse(int courseId) {
         analyse(courseId);
         try {
             Workbook workbook = new HSSFWorkbook();
@@ -99,54 +325,54 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             style2.setBorderLeft(BorderStyle.THIN);
 
             QueryWrapper<CourseScoreAnalyse> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("course_id",courseId);
+            queryWrapper.eq("course_id", courseId);
             CourseScoreAnalyse scoreAnalyse = courseScoreAnalyseMAPPER.selectOne(queryWrapper);
 
-            export.valueToCell(sheet,1,1,"分数段",style2);
-            export.valueToCell(sheet,1,2,"优",style2);
-            export.valueToCell(sheet,2,2,">= 90",style2);
-            export.valueToCell(sheet,3,2,scoreAnalyse.getSuperior().toString(),style2);
-            export.valueToCell(sheet,4,2,String.valueOf(export.doubleFormat(scoreAnalyse.getSuperior() * 1.0 / scoreAnalyse.getStudentNum(),4) * 100),style2);
+            export.valueToCell(sheet, 1, 1, "分数段", style2);
+            export.valueToCell(sheet, 1, 2, "优", style2);
+            export.valueToCell(sheet, 2, 2, ">= 90", style2);
+            export.valueToCell(sheet, 3, 2, scoreAnalyse.getSuperior().toString(), style2);
+            export.valueToCell(sheet, 4, 2, String.valueOf(export.doubleFormat(scoreAnalyse.getSuperior() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
 
-            export.valueToCell(sheet,1,3,"良",style2);
-            export.valueToCell(sheet,2,3,"80-89",style2);
-            export.valueToCell(sheet,3,3,scoreAnalyse.getGreat().toString(),style2);
-            export.valueToCell(sheet,4,3,String.valueOf(export.doubleFormat(scoreAnalyse.getGreat() * 1.0 / scoreAnalyse.getStudentNum(),4) * 100),style2);
+            export.valueToCell(sheet, 1, 3, "良", style2);
+            export.valueToCell(sheet, 2, 3, "80-89", style2);
+            export.valueToCell(sheet, 3, 3, scoreAnalyse.getGreat().toString(), style2);
+            export.valueToCell(sheet, 4, 3, String.valueOf(export.doubleFormat(scoreAnalyse.getGreat() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
 
-            export.valueToCell(sheet,1,4,"中",style2);
-            export.valueToCell(sheet,2,4,"70-79",style2);
-            export.valueToCell(sheet,3,4,scoreAnalyse.getGood().toString(),style2);
-            export.valueToCell(sheet,4,4,String.valueOf(export.doubleFormat(scoreAnalyse.getGood() * 1.0 / scoreAnalyse.getStudentNum(),4) * 100),style2);
+            export.valueToCell(sheet, 1, 4, "中", style2);
+            export.valueToCell(sheet, 2, 4, "70-79", style2);
+            export.valueToCell(sheet, 3, 4, scoreAnalyse.getGood().toString(), style2);
+            export.valueToCell(sheet, 4, 4, String.valueOf(export.doubleFormat(scoreAnalyse.getGood() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
 
-            export.valueToCell(sheet,1,5,"及格",style2);
-            export.valueToCell(sheet,2,5,"60-69",style2);
-            export.valueToCell(sheet,3,5,scoreAnalyse.getPass().toString(),style2);
-            export.valueToCell(sheet,4,5,String.valueOf(export.doubleFormat(scoreAnalyse.getPass() * 1.0 / scoreAnalyse.getStudentNum(),4) * 100),style2);
+            export.valueToCell(sheet, 1, 5, "及格", style2);
+            export.valueToCell(sheet, 2, 5, "60-69", style2);
+            export.valueToCell(sheet, 3, 5, scoreAnalyse.getPass().toString(), style2);
+            export.valueToCell(sheet, 4, 5, String.valueOf(export.doubleFormat(scoreAnalyse.getPass() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
 
-            export.valueToCell(sheet,1,6,"不及格",style2);
-            export.valueToCell(sheet,2,6,"< 60",style2);
-            export.valueToCell(sheet,3,6,scoreAnalyse.getFailed().toString(),style2);
-            export.valueToCell(sheet,4,6,String.valueOf(export.doubleFormat(scoreAnalyse.getFailed() * 1.0 / scoreAnalyse.getStudentNum(),4) * 100),style2);
+            export.valueToCell(sheet, 1, 6, "不及格", style2);
+            export.valueToCell(sheet, 2, 6, "< 60", style2);
+            export.valueToCell(sheet, 3, 6, scoreAnalyse.getFailed().toString(), style2);
+            export.valueToCell(sheet, 4, 6, String.valueOf(export.doubleFormat(scoreAnalyse.getFailed() * 1.0 / scoreAnalyse.getStudentNum(), 4) * 100), style2);
 
-            export.valueToCell(sheet,3,1,"人数",style2);
-            export.valueToCell(sheet,4,1,"比例",style2);
-            export.valueToCell(sheet,5,1,"最高分",style2);
-            export.valueToCell(sheet,5,2,String.valueOf(scoreAnalyse.getMaxScore()),style2);
-            export.valueToCell(sheet,5,3,"最低分",style2);
-            export.valueToCell(sheet,5,4,String.valueOf(scoreAnalyse.getMinScore()),style2);
-            export.valueToCell(sheet,5,5,"平均分",style2);
-            export.valueToCell(sheet,5,6,String.valueOf(scoreAnalyse.getAverageScore()),style2);
-            export.valueToCell(sheet,6,1,"及格率",style2);
-            export.valueToCell(sheet,6,2,String.valueOf(scoreAnalyse.getPassRate()),style2);
+            export.valueToCell(sheet, 3, 1, "人数", style2);
+            export.valueToCell(sheet, 4, 1, "比例", style2);
+            export.valueToCell(sheet, 5, 1, "最高分", style2);
+            export.valueToCell(sheet, 5, 2, String.valueOf(scoreAnalyse.getMaxScore()), style2);
+            export.valueToCell(sheet, 5, 3, "最低分", style2);
+            export.valueToCell(sheet, 5, 4, String.valueOf(scoreAnalyse.getMinScore()), style2);
+            export.valueToCell(sheet, 5, 5, "平均分", style2);
+            export.valueToCell(sheet, 5, 6, String.valueOf(scoreAnalyse.getAverageScore()), style2);
+            export.valueToCell(sheet, 6, 1, "及格率", style2);
+            export.valueToCell(sheet, 6, 2, String.valueOf(scoreAnalyse.getPassRate()), style2);
 
             CellRangeAddress mergedRegion = new CellRangeAddress(1, 6, 0, 0);
             sheet.addMergedRegion(mergedRegion);
-            export.valueToCell(sheet,1,0,"综合成绩",style);
+            export.valueToCell(sheet, 1, 0, "综合成绩", style);
             export.reloadCellStyle(mergedRegion, sheet, style);
 
             mergedRegion = new CellRangeAddress(0, 0, 0, 6);
             sheet.addMergedRegion(mergedRegion);
-            export.valueToCell(sheet,0,0,"课程成绩分析",style);
+            export.valueToCell(sheet, 0, 0, "课程成绩分析", style);
             export.reloadCellStyle(mergedRegion, sheet, style);
 
             FileOutputStream fileOut = new FileOutputStream("workbook.xls");
