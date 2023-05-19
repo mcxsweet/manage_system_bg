@@ -1,17 +1,22 @@
 package com.example.service.impl.examinePaper;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.CourseBasicInformationMAPPER;
 import com.example.mapper.CourseExamineMethodsMAPPER;
+import com.example.mapper.comprehensiveAnalyse.CourseAchievementAnalyseMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseScoreAnalyseMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseTargetAnalyseMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
 import com.example.object.CourseBasicInformation;
 import com.example.object.CourseExamineMethods;
+import com.example.object.comprehensiveAnalyse.CourseAchievementAnalyse;
 import com.example.object.comprehensiveAnalyse.CourseScoreAnalyse;
 import com.example.object.comprehensiveAnalyse.CourseTargetAnalyse;
+import com.example.object.comprehensiveAnalyse.KeyValue;
 import com.example.object.finalExamine.StudentComprehensiveScore;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.service.examinePaper.StudentInformationSERVICE;
@@ -52,6 +57,9 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
     @Autowired
     private CourseBasicInformationMAPPER courseBasicInformationMAPPER;
+
+    @Autowired
+    private CourseAchievementAnalyseMAPPER courseAchievementAnalyseMAPPER;
 
     //获取学生综合成绩
     @Override
@@ -127,7 +135,7 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
     //导出达成度分析表
     @Override
-    public ResponseEntity<byte[]> exportDegreeOfAchievement(int courseId) {
+    public ResponseEntity<byte[]> exportDegreeOfAchievement(int courseId,int type) {
         try {
             Workbook workbook = new HSSFWorkbook();
             Sheet sheet = workbook.createSheet();
@@ -158,6 +166,7 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             QueryWrapper<CourseTargetAnalyse> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("course_id", courseId);
             queryWrapper.like("target_name", "课程目标");
+            queryWrapper.orderByAsc("target_name");
             int columIndex = 7;
             List<CourseTargetAnalyse> courseTargetAnalyses = courseTargetAnalyseMAPPER.selectList(queryWrapper);
             for (CourseTargetAnalyse targetAnalyse : courseTargetAnalyses) {
@@ -182,8 +191,20 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
                 temp = columIndex;
             }
 
-
+            //获取基本数据
             List<StudentComprehensiveScore> comprehensiveScore = studentInformationMAPPER.getComprehensiveScore(courseId);
+            QueryWrapper<CourseExamineMethods> queryWrapper2 = new QueryWrapper<>();
+            queryWrapper2.eq("course_id", courseId);
+            queryWrapper2.orderByAsc("examine_item");
+            List<CourseExamineMethods> courseExamineMethods = courseExamineMethodsMAPPER.selectList(queryWrapper2);
+            double percentage1 = 0;
+            double percentage2 = 0;
+            double percentage3 = 0;
+            for (CourseExamineMethods methods : courseExamineMethods) {
+                if (methods.getExamineItem().contains("实验")) percentage1 = methods.getPercentage() * 0.01;
+                if (methods.getExamineItem().contains("平时")) percentage2 = methods.getPercentage() * 0.01;
+                if (methods.getExamineItem().contains("期末")) percentage3 = methods.getPercentage() * 0.01;
+            }
 
             int rowIndex = 2;
             double usualAchievementAVG = 0;
@@ -214,21 +235,24 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
                         }
                     }
                 }
-                double result = 0;
                 int i = 7;
                 for (CourseTargetAnalyse targetAnalyse : courseTargetAnalyses) {
                     JSONArray objects = JSONArray.parseArray(targetAnalyse.getMatrix());
-
+                    double result = 0;
                     for (int j = 0; j < objects.size(); j++) {
                         if (Boolean.parseBoolean(objects.get(j).toString())) {
                             result += ints.get(j);
                         }
                     }
+                    double achievement = export.doubleFormat(result / targetAnalyse.getValue(), 4);
+                    double targetAchievement = export.doubleFormat(usualAchievement * percentage2 + achievement * percentage3, 4);
 
-                    double achievement = export.doubleFormat(result / targetAnalyse.getValue(),4);
-
+                    //试卷分值对应
                     export.valueToCell(sheet, rowIndex, i, String.valueOf(result), style);
+                    //试卷观测点达成度
                     export.valueToCell(sheet, rowIndex, i + 1, String.valueOf(achievement), style);
+                    //课程目标达成度
+                    export.valueToCell(sheet, rowIndex, i + 2, String.valueOf(targetAchievement), style);
 
                     i += 3;
                 }
@@ -255,18 +279,79 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             double v4 = export.doubleFormat(usualAchievementAVG / (rowIndex - 3), 2);
             export.valueToCell(sheet, rowIndex, 6, String.valueOf(v4), style);
 
+            //求平均值
+            for (int i = 7; i < columIndex; i++) {
+                double result = 0;
+                int index = 0;
+                for (int j = 2; j < rowIndex; j++) {
+                    String s1 = formatter.formatCellValue(sheet.getRow(j).getCell(i));
+                    if (!Objects.equals(s1, "")) {
+                        double v = Double.parseDouble(s1);
+                        result += v;
+                    }
+                    index++;
+                }
+                result = result / index;
+                double v = export.doubleFormat(result, 4);
+                export.valueToCell(sheet, rowIndex, i, String.valueOf(v), style);
+            }
 
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            workbook.write(byteArrayOutputStream);
-            byte[] bytes = byteArrayOutputStream.toByteArray();
+            //这代码狗见了都摇头
+            //持久化存储分析数据
+            List<List<Object>> analyseData = new ArrayList<>();
+            for (int i = 9; i < columIndex; i += 3) {
+                List<Object> list = new ArrayList<>();
 
+                int index = 1;
+                for (int j = 2; j < rowIndex; j++) {
+                    KeyValue value = new KeyValue();
+                    value.setIndex(index);
+                    value.setValue(Double.parseDouble(sheet.getRow(j).getCell(i).getStringCellValue()));
+
+                    list.add(value);
+                    index++;
+                }
+                analyseData.add(list);
+            }
+            String s1 = JSON.toJSONString(analyseData);
+            CourseAchievementAnalyse courseAchievementAnalyse = new CourseAchievementAnalyse();
+            courseAchievementAnalyse.setCourseId(courseId);
+            courseAchievementAnalyse.setValue(s1);
+
+            QueryWrapper<CourseAchievementAnalyse> queryWrapper1 = new QueryWrapper<>();
+            queryWrapper1.eq("course_id", courseId);
+            if (courseAchievementAnalyseMAPPER.update(courseAchievementAnalyse, queryWrapper1) != 1) {
+                courseAchievementAnalyseMAPPER.insert(courseAchievementAnalyse);
+            }
+
+            FileOutputStream fileOut = new FileOutputStream("workbook.xls");
+            workbook.write(fileOut);
+            fileOut.close();
+
+            // 加载 XLS 文件
+            com.spire.xls.Workbook workbookn = new com.spire.xls.Workbook();
+            workbookn.loadFromFile("workbook.xls");
+            //设置转换后的PDGF页面高度适应工作表的内容大小
+            workbookn.getConverterSetting().setSheetFitToPage(true);
+            //设置转换后PDF的页面宽度适应工作表的内容宽度
+            workbookn.getConverterSetting().setSheetFitToWidth(true);
+            // 将 XLS 文件转换为 PDF 文件
+            workbookn.saveToFile("workbook.pdf", FileFormat.PDF);
+            // 将 PDF 文件读入字节数组
+            byte[] Bytes = null;
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
-
+            if (type == 1) {
+                Bytes = Files.readAllBytes(Paths.get("workbook.pdf"));
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.pdf");
+                headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+            } else if (type == 2) {
+                Bytes = Files.readAllBytes(Paths.get("workbook.xls"));
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
+                headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+            }
             return ResponseEntity.ok()
                     .headers(headers)
-                    .body(bytes);
+                    .body(Bytes);
         } catch (IOException ignored) {
         }
         return null;

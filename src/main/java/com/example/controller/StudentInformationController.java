@@ -1,7 +1,8 @@
 package com.example.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.comprehensiveAnalyse.CourseAchievementAnalyseMAPPER;
+import com.example.object.comprehensiveAnalyse.CourseAchievementAnalyse;
 import com.example.object.finalExamine.StudentFinalScore;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.object.finalExamine.StudentUsualScore;
@@ -30,6 +31,8 @@ public class StudentInformationController {
     private StudentUsualScoreServiceIMPL studentUsualScoreServiceIMPL;
     @Autowired
     private StudentFinalScoreServiceIMPL studentFinalScoreServiceIMPL;
+    @Autowired
+    private CourseAchievementAnalyseMAPPER courseAchievementAnalyseMAPPER;
 
     /**
      * 平时成绩管理
@@ -89,9 +92,17 @@ public class StudentInformationController {
     }
 
     @ApiOperation("导出达成度分析表")
-    @GetMapping("/{courseId}/exportDegreeOfAchievement")
-    public ResponseEntity<byte[]> exportDegreeOfAchievement(@PathVariable int courseId) {
-        return studentInformationServiceIMPL.exportDegreeOfAchievement(courseId);
+    @GetMapping("/{courseId}/{type}/exportDegreeOfAchievement")
+    public ResponseEntity<byte[]> exportDegreeOfAchievement(@PathVariable int courseId,@PathVariable int type) {
+        return studentInformationServiceIMPL.exportDegreeOfAchievement(courseId,type);
+    }
+
+    @ApiOperation("获取前端散点图数据")
+    @GetMapping("/{courseId}/scatterData")
+    public Object test(@PathVariable int courseId) {
+        QueryWrapper<CourseAchievementAnalyse> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("course_id", courseId);
+        return courseAchievementAnalyseMAPPER.selectOne(queryWrapper1);
     }
 
     /**

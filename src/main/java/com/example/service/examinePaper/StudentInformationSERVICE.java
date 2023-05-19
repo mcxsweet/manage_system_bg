@@ -15,7 +15,7 @@ public interface StudentInformationSERVICE extends IService<StudentInformation> 
     ResponseEntity<byte[]> exportComprehensiveScore(int courseId);
 
     //导出达成度分析表
-    ResponseEntity<byte[]> exportDegreeOfAchievement(int courseId);
+    ResponseEntity<byte[]> exportDegreeOfAchievement(int courseId,int type);
 
     //生成和刷新综合成绩
     void refreshScore(int courseId);
