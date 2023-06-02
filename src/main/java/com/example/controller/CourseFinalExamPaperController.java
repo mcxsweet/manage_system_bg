@@ -19,7 +19,7 @@ import java.io.IOException;
 @Api(tags = "期末试卷成绩细明")
 @RestController
 @RequestMapping("/courseExamPaper")
-public class courseFinalExamPaperController {
+public class CourseFinalExamPaperController {
 
 /*
     期末考察项目
@@ -72,7 +72,6 @@ public class courseFinalExamPaperController {
         return new DataResponses(true, courseFinalExamPaperDetailService.list());
     }
 
-
     @ApiOperation("提供期末试卷表的id查询详细期末考察项目")
     @GetMapping("/detail/{primaryId}")
     public DataResponses getDetailById(@PathVariable int primaryId) {
@@ -99,7 +98,6 @@ public class courseFinalExamPaperController {
     public DataResponses deleteDetailById(@RequestBody String id) {
         return new DataResponses(courseFinalExamPaperDetailService.removeById(id));
     }
-
 
     /*
         相关的表格展示

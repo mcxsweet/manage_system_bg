@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags="考核与评价方式")
 @RestController
 @RequestMapping("/courseExam")
-public class courseExamineMethodsController {
+public class CourseExamineMethodsController {
     //课程考核项目
     @Autowired
     private CourseExamineMethodsServiceIMPL courseExamineMethodsService;

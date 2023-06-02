@@ -357,7 +357,6 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
         return null;
     }
 
-
     //生成和刷新综合成绩
     @Override
     public void refreshScore(int courseId) {

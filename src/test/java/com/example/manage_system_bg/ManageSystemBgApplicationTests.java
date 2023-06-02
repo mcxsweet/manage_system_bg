@@ -1,5 +1,8 @@
 package com.example.manage_system_bg;
 
+import org.apache.poi.xwpf.usermodel.*;
+
+import java.io.FileOutputStream;
 import com.example.mapper.UserMAPPER;
 import com.example.object.User;
 import com.example.object.finalExamine.StudentUsualScore;
@@ -12,11 +15,14 @@ import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
 import org.junit.jupiter.api.Test;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 
 @SpringBootTest
 class ManageSystemBgApplicationTests {
@@ -29,7 +35,7 @@ class ManageSystemBgApplicationTests {
 
     @Test
     void contextLoads() throws BiffException, IOException {
-        impl.analyse(10);
+
     }
 
 }
