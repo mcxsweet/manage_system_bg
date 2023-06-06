@@ -10,4 +10,6 @@ public interface UserSERVICE extends IService<User> {
     DataResponses loginCheck(User user, HttpServletResponse response);
     //mapper中添加的方法在此处声明
     //也可以通过@Override重写方法
+
+    DataResponses login(User user);
 }

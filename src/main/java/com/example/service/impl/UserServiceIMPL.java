@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.UserMAPPER;
@@ -41,6 +42,24 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
         response.addCookie(cookie);
         user2.setPassword("");
         return new DataResponses(true,user2,"登录成功");
+    }
+
+    @Override
+    public DataResponses login(User user) {
+        QueryWrapper<User> QueryWrapper = new QueryWrapper<>();
+        QueryWrapper.eq("name",user.getName());
+        User user2 = userMAPPER.selectOne(QueryWrapper);
+        if (user2 == null) {
+            return new DataResponses(false,"用户不存在");
+        }
+        if (!user2.getPassword().equals(user.getPassword())) {
+            return new DataResponses(false,"密码错误");
+        }
+        StpUtil.login(user2.getId());
+        user2.setPassword("");
+        StpUtil.getSession().set(String.valueOf(user2.getId()),user2);
+        //此处只是为了前端不过多修改，实际可不用返回用户信息
+        return new DataResponses(true,user2, "登录成功");
     }
 
 
