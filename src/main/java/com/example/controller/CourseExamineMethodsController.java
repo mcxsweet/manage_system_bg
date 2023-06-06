@@ -60,7 +60,10 @@ public class CourseExamineMethodsController {
     @ApiOperation("提供考核项目id添加子考核项目")
     @PostMapping("/courseExamineChildMethods")
     public DataResponses addCourseExamineChildMethods(@RequestBody CourseExamineChildMethods item) {
-        return new DataResponses(courseExamineChildMethodsService.save(item));
+        QueryWrapper<CourseExamineChildMethods> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("course_examine_methods_id",item.getCourseExamineMethodsId());
+        queryWrapper.eq("examine_child_item",item.getExamineChildItem());
+        return new DataResponses(courseExamineChildMethodsService.save(item),courseExamineChildMethodsService.getOne(queryWrapper).getId());
     }
 
     //提供考试项目id删除考核项目

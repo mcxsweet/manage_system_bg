@@ -66,11 +66,11 @@ public class CourseFinalExamPaperController {
     @Autowired
     private CourseFinalExamPaperDetailServiceIMPL courseFinalExamPaperDetailService;
 
-    @ApiOperation("查询所有期末考察项目细明")
-    @GetMapping("/detail")
-    public DataResponses getAllDetail() {
-        return new DataResponses(true, courseFinalExamPaperDetailService.list());
-    }
+//    @ApiOperation("查询所有期末考察项目细明")
+//    @GetMapping("/detail")
+//    public DataResponses getAllDetail() {
+//        return new DataResponses(true, courseFinalExamPaperDetailService.list());
+//    }
 
     @ApiOperation("提供期末试卷表的id查询详细期末考察项目")
     @GetMapping("/detail/{primaryId}")

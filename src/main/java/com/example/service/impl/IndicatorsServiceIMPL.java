@@ -81,7 +81,7 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
             export.valueToCell(sheet, 1, 2, "实现课程（开出课程）", style2);
 
             QueryWrapper<IndicatorOutline> queryWrapper = new QueryWrapper<>();
-            queryWrapper.orderByAsc("name");
+            queryWrapper.orderByAsc("id");
             List<IndicatorOutline> indicatorOutlines = indicatorOutlineMAPPER.selectList(queryWrapper);
             int temp = rowIndex;
             for (IndicatorOutline outline : indicatorOutlines) {
