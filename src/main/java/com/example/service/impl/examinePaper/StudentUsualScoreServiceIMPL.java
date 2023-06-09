@@ -22,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
@@ -222,6 +223,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
 
     //学生平时成绩导入
     @Override
+    @Transactional
     public DataResponses inputStudentUsualScore(MultipartFile file, String courseId) {
         try {
             HSSFWorkbook workbook = new HSSFWorkbook(file.getInputStream());
@@ -276,8 +278,10 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 }
                 refreshStudentScore((Integer.parseInt(courseId)));
             }
-        } catch (IOException ignored) {
+            return new DataResponses(true,"导入成功");
+
+        } catch (IOException exception) {
+            return new DataResponses(false,"导入失败，表格数据有缺失");
         }
-        return new DataResponses(true);
     }
 }

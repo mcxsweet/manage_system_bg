@@ -10,5 +10,15 @@ public class User {
     private String password;
     private int isAdmin;
     private String department;
+
+    /**
+     * 关于isAdmin的说明
+     * 0    普通教师
+     * 1    系主任
+     * 2    学院
+     * 3    普通教师 系主任
+     * 4    普通教师 学院
+     * 5    系主任 学院
+     */
 }
 

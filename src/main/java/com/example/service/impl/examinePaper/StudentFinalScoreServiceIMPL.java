@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.example.utility.export.export;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -271,6 +272,7 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
 
     //学生期末成绩导入
     @Override
+    @Transactional
     public DataResponses inputStudentFinalScore(MultipartFile file, int courseId) {
         try {
             Workbook workbook = new HSSFWorkbook(file.getInputStream());
@@ -337,10 +339,11 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 }
                 refreshStudentScore(courseId);
             }
+            return new DataResponses(true,"导入成功");
 
-        } catch (IOException ignored) {
+        } catch (IOException exception) {
+            return new DataResponses(false,"导入失败，表格数据有缺失");
         }
-        return new DataResponses(true);
     }
 
 }
