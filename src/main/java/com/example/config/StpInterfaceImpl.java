@@ -1,6 +1,8 @@
 package com.example.config;
 
 import cn.dev33.satoken.stp.StpInterface;
+import cn.dev33.satoken.stp.StpUtil;
+import com.example.object.User;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,8 +19,8 @@ public class StpInterfaceImpl implements StpInterface {
     public List<String> getRoleList(Object loginId, String loginType) {
         // 本list仅做模拟，实际要根据具体业务逻辑来查询角色
         List<String> list = new ArrayList<>();
-        list.add("admin");
-        list.add("super-admin");
+        User user = (User) StpUtil.getSession().get(StpUtil.getLoginIdAsString());
+        list.add(String.valueOf(user.getIsAdmin()));
         return list;
     }
 }

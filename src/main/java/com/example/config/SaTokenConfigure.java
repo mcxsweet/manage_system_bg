@@ -41,8 +41,8 @@ public class SaTokenConfigure implements WebMvcConfigurer {
                     .notMatch("/swagger-ui/**")              //取消拦截swagger文档
                     .notMatch("/courseExamPaper/Table/*")    //取消拦截文件导出
                     .check(r -> StpUtil.checkLogin());       // 要执行的校验动作，可以写完整的 lambda 表达式
-            // 根据路由划分模块，不同模块不同鉴权 此处只是模拟
-            SaRouter.match("/admin/**", r -> StpUtil.checkRole("1"));
+            // 根据路由划分模块，不同模块不同鉴权
+            SaRouter.match("/user/choiceRole", r -> StpUtil.checkRoleOr("3","4","5","6"));
         })).addPathPatterns("/**");
     }
 }
