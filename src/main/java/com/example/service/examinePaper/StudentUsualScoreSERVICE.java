@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.object.finalExamine.StudentUsualScore;
 import com.example.utility.DataResponses;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
@@ -22,5 +23,7 @@ public interface StudentUsualScoreSERVICE extends IService<StudentUsualScore> {
 
     ResponseEntity<byte[]> exportStudentUsualScore(int courseId) throws IOException;
 
+    @Transactional
     DataResponses inputStudentUsualScore(MultipartFile file, String courseId) throws IOException;
+
 }

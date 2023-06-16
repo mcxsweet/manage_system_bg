@@ -34,6 +34,18 @@ public class StudentInformationController {
     @Autowired
     private CourseAchievementAnalyseMAPPER courseAchievementAnalyseMAPPER;
 
+
+    /**
+     * 导入一个课程的学生成绩信息
+     */
+    @ApiOperation("导入学生平时成绩表格")
+    @PostMapping("/{courseId}/studentInfo")
+    public DataResponses inputStudentInfo(@RequestParam("file") MultipartFile file, @PathVariable String courseId) {
+        return studentInformationServiceIMPL.inputStudentInfo(file, courseId);
+    }
+
+
+
     /**
      * 平时成绩管理
      *

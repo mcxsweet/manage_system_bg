@@ -278,10 +278,10 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 }
                 refreshStudentScore((Integer.parseInt(courseId)));
             }
-            return new DataResponses(true,"导入成功");
+            return new DataResponses(true, "导入成功");
 
         } catch (IOException exception) {
-            return new DataResponses(false,"导入失败，表格数据有缺失");
+            return new DataResponses(false, "导入失败，表格数据有缺失");
         }
     }
 }

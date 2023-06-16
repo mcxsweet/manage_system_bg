@@ -2,7 +2,6 @@ package com.example.service.impl.examinePaper;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.CourseBasicInformationMAPPER;
@@ -20,8 +19,10 @@ import com.example.object.comprehensiveAnalyse.KeyValue;
 import com.example.object.finalExamine.StudentComprehensiveScore;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.service.examinePaper.StudentInformationSERVICE;
+import com.example.utility.DataResponses;
 import com.example.utility.export.export;
 import com.spire.xls.FileFormat;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -30,6 +31,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -60,6 +63,75 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
     @Autowired
     private CourseAchievementAnalyseMAPPER courseAchievementAnalyseMAPPER;
+
+    //学生信息导入
+    @Override
+    @Transactional
+    public DataResponses inputStudentInfo(MultipartFile file, String courseId) {
+        try {
+            HSSFWorkbook workbook = new HSSFWorkbook(file.getInputStream());
+            HSSFSheet sheet = workbook.getSheetAt(0);
+
+            DataFormatter formatter = new DataFormatter();
+
+            int StudentNumber = 0;
+            int StudentName = 0;
+            int ClassName = 0;
+            int i = 0;
+            Row row1 = sheet.getRow(0);
+            while (true) {
+                String s = formatter.formatCellValue(row1.getCell(i));
+                if (Objects.equals(s, "")){
+                    break;
+                }
+                switch (s) {
+                    case "学号":
+                        StudentNumber = i;
+                        break;
+                    case "姓名":
+                        StudentName = i;
+                        break;
+                    case "班级":
+                        ClassName = i;
+                        break;
+                }
+                i++;
+            }
+
+            //遍历行
+            for (int rowIndex = 1; rowIndex < sheet.getLastRowNum() + 1; rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+
+                QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("student_number", formatter.formatCellValue(row.getCell(StudentNumber)));
+                queryWrapper.eq("course_id", courseId);
+                StudentInformation information = studentInformationMAPPER.selectOne(queryWrapper);
+
+                StudentInformation student = new StudentInformation();
+                student.setStudentName(formatter.formatCellValue(row.getCell(StudentName)));
+                student.setClassName(formatter.formatCellValue(row.getCell(ClassName)));
+
+                Integer id = 0;
+                if (information == null) {
+                    student.setStudentNumber(formatter.formatCellValue(row.getCell(0)));
+                    student.setCourseId(courseId);
+
+                    studentInformationMAPPER.insert(student);
+                    id = studentInformationMAPPER.selectOne(queryWrapper).getId();
+                } else {
+                    id = information.getId();
+                    student.setId(id);
+
+                    studentInformationMAPPER.updateById(student);
+                }
+            }
+            return new DataResponses(true, "导入成功");
+
+        } catch (IOException exception) {
+            return new DataResponses(false, "导入失败，表格数据有缺失");
+        }
+    }
+
 
     //获取学生综合成绩
     @Override

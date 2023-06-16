@@ -3,11 +3,18 @@ package com.example.service.examinePaper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.object.finalExamine.StudentComprehensiveScore;
 import com.example.object.finalExamine.StudentInformation;
+import com.example.utility.DataResponses;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface StudentInformationSERVICE extends IService<StudentInformation> {
+    //学生信息导入
+    @Transactional
+    DataResponses inputStudentInfo(MultipartFile file, String courseId);
+
     //获取学生综合成绩
     List<StudentComprehensiveScore> getComprehensiveScore(int courseId);
 
