@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.object.LoginDTO;
 import com.example.object.User;
 import com.example.utility.DataResponses;
 
@@ -11,5 +12,5 @@ public interface UserSERVICE extends IService<User> {
     //mapper中添加的方法在此处声明
     //也可以通过@Override重写方法
 
-    DataResponses login(User user);
+    DataResponses login(LoginDTO user);
 }
