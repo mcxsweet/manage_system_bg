@@ -3,9 +3,11 @@ package com.example.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.mapper.CourseTargetMAPPER;
 import com.example.mapper.IndicatorsMAPPER;
+import com.example.mapper.courseSurvey.CourseAttainmentSurveyMAPPER;
 import com.example.object.CourseBasicInformation;
 import com.example.object.CourseTarget;
 import com.example.object.Indicators;
+import com.example.object.courseSurvey.CourseAttainmentSurvey;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.service.impl.IndicatorsServiceIMPL;
 import com.example.utility.DataResponses;
@@ -130,6 +132,10 @@ public class CourseBasicInformationController {
     @Autowired
     private CourseTargetMAPPER courseTarget;
 
+    //课程目标调查问卷
+    @Autowired
+    private CourseAttainmentSurveyMAPPER courseAttainmentSurveyMAPPER;
+
     @ApiOperation("获取该课程所有课程目标")
     @GetMapping("/courseTarget/{courseId}")
     public DataResponses getCourseTarget(@PathVariable int courseId) {
@@ -141,7 +147,16 @@ public class CourseBasicInformationController {
     @ApiOperation("添加该课程课程目标")
     @PostMapping("/courseTarget")
     public DataResponses addCourseTarget(@RequestBody CourseTarget Data) {
-        return new DataResponses(true, courseTarget.insert(Data));
+        courseTarget.insert(Data);
+        QueryWrapper<CourseTarget> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("course_id",Data.getCourseId());
+        queryWrapper.eq("target_name",Data.getTargetName());
+        CourseTarget courseTarget = this.courseTarget.selectOne(queryWrapper);
+
+        CourseAttainmentSurvey courseAttainmentSurvey = new CourseAttainmentSurvey();
+        courseAttainmentSurvey.setCourseTargetId(courseTarget.getId());
+        courseAttainmentSurveyMAPPER.insert(courseAttainmentSurvey);
+        return new DataResponses(true);
     }
 
     @ApiOperation("修改课程目标")
