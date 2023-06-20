@@ -23,7 +23,7 @@ public class AnalysisReportController {
     @ApiOperation("导出分析报告")
     @GetMapping
     public ResponseEntity<byte[]> getAnalysisReport() {
-        return analysisReportServiceIMPL.getReport(1,1);
+        return analysisReportServiceIMPL.getReport(12,1);
     }
 
 }
