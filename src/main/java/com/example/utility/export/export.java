@@ -134,6 +134,7 @@ public class export {
         cell.setCellValue(value);
         cell.setCellStyle(style);
     }
+
     public static double doubleFormat(double a, int i) {
         String str = "";
         switch (i) {

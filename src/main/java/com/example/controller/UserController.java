@@ -40,8 +40,6 @@ public class UserController {
         } else {
             map.put("identity", "1");
         }
-
-
         return new DataResponses(true, map);
     }
 
