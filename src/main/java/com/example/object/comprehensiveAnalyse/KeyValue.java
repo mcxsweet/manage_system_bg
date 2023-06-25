@@ -6,6 +6,4 @@ import lombok.Data;
 public class KeyValue {
     private int index;
     private double value;
-
-
 }

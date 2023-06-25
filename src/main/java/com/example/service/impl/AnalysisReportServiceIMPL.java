@@ -5,15 +5,32 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.mapper.CourseExamineChildMethodsMAPPER;
 import com.example.mapper.CourseExamineMethodsMAPPER;
 import com.example.mapper.CourseTargetMAPPER;
+import com.example.mapper.comprehensiveAnalyse.CourseAchievementAnalyseMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseScoreAnalyseMAPPER;
+import com.example.mapper.comprehensiveAnalyse.CourseTargetAnalyseMAPPER;
+import com.example.mapper.examinePaper.CourseFinalExamPaperDetailMAPPER;
+import com.example.mapper.examinePaper.CourseFinalExamPaperMAPPER;
+import com.example.mapper.examinePaper.StudentFinalScoreMAPPER;
+import com.example.mapper.examinePaper.StudentUsualScoreMAPPER;
 import com.example.object.CourseBasicInformation;
 import com.example.object.CourseExamineChildMethods;
 import com.example.object.CourseExamineMethods;
 import com.example.object.CourseTarget;
+import com.example.object.comprehensiveAnalyse.CourseAchievementAnalyse;
 import com.example.object.comprehensiveAnalyse.CourseScoreAnalyse;
+import com.example.object.comprehensiveAnalyse.CourseTargetAnalyse;
+import com.example.object.comprehensiveAnalyse.KeyValue;
+import com.example.object.finalExamine.CourseFinalExamPaper;
+import com.example.object.finalExamine.CourseFinalExamPaperDetail;
+import com.example.object.finalExamine.StudentFinalScore;
+import com.example.object.finalExamine.StudentUsualScore;
 import com.example.utility.export.export;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spire.doc.FileFormat;
 import com.spire.doc.documents.*;
+import com.spire.doc.fields.DocPicture;
+import com.spire.xls.*;
+import com.spire.xls.core.IChartTrendLine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,6 +38,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +47,8 @@ import java.util.List;
 import com.spire.doc.*;
 import com.spire.doc.documents.HorizontalAlignment;
 import com.spire.doc.documents.VerticalAlignment;
+
+import javax.imageio.ImageIO;
 
 @Service
 public class AnalysisReportServiceIMPL {
@@ -42,6 +62,18 @@ public class AnalysisReportServiceIMPL {
     private CourseExamineChildMethodsMAPPER courseExamineChildMethodsMAPPER;
     @Autowired
     private CourseScoreAnalyseMAPPER courseScoreAnalyseMAPPER;
+    @Autowired
+    private CourseFinalExamPaperMAPPER courseFinalExamPaperMAPPER;
+    @Autowired
+    private CourseFinalExamPaperDetailMAPPER courseFinalExamPaperDetailMAPPER;
+    @Autowired
+    private CourseAchievementAnalyseMAPPER courseAchievementAnalyseMAPPER;
+    @Autowired
+    private StudentUsualScoreMAPPER studentUsualScoreMAPPER;
+    @Autowired
+    private StudentFinalScoreMAPPER studentFinalScoreMAPPER;
+    @Autowired
+    private CourseTargetAnalyseMAPPER courseTargetAnalyseMAPPER;
 
 
     //在word文档中生成表格
@@ -108,6 +140,69 @@ public class AnalysisReportServiceIMPL {
         if (center) {
             para.getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
         }
+    }
+
+    //在word文档使用excel中生成图表
+    private byte[] generateCharts(JSONArray jsonArray, int index) {
+        try {
+            //先在xls中生成图表
+            Workbook workbook = new Workbook();
+            Worksheet sheet = workbook.getWorksheets().get(0);
+
+            //设置列宽,工作表名
+            sheet.getCellRange("A1:B1").setColumnWidth(15f);
+
+            //添加图表数据源
+            int i = 1;
+            for (Object item : jsonArray) {
+                i++;
+                KeyValue value = new ObjectMapper().convertValue(item, KeyValue.class);
+                sheet.getCellRange("A" + i).setValue(String.valueOf(value.getValue()));
+                sheet.getCellRange("B" + i).setValue(String.valueOf(value.getIndex()));
+            }
+
+            sheet.setName("散点图");
+
+            //创建散点图
+            Chart chart = sheet.getCharts().add(ExcelChartType.ScatterMarkers);
+            chart.setDataRange(sheet.getCellRange("B2:B" + i));
+            chart.setSeriesDataFromRange(false);
+
+            //添加图表标题、系列标签
+            chart.setChartTitle("课程目标" + index + "达成情况");
+            chart.getChartTitleArea().isBold(true);
+            chart.getChartTitleArea().setSize(12);
+            chart.getSeries().get(0).setCategoryLabels(sheet.getCellRange("B2:B" + i));
+            chart.getSeries().get(0).setValues(sheet.getCellRange("A2:A" + i));
+
+            //添加趋势线
+            IChartTrendLine trendLine = chart.getSeries().get(0).getTrendLines().add(TrendLineType.Linear);
+            trendLine.setName("趋势线");
+
+            //添加坐标轴名称
+            chart.getPrimaryValueAxis().setTitle("成绩达成情况");
+            chart.getPrimaryCategoryAxis().setTitle("学生人数");
+
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            BufferedImage image = workbook.saveChartAsImage(workbook.getWorksheets().get(0), 0);
+            ImageIO.write(image, "PNG", outStream);
+            byte[] bytes = outStream.toByteArray();
+
+            return bytes;
+        } catch (Exception exception) {
+            return null;
+        }
+    }
+
+    //在word文档中插入图表
+    private void insertChart(Document document, byte[] bytes, Section section) {
+        DocPicture picture = new DocPicture(document);
+        picture.loadImage(bytes);
+
+        Paragraph para = section.addParagraph();
+        para.getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
+        para.getChildObjects().insert(0, picture);
+
     }
 
     //表格内容居中
@@ -387,8 +482,7 @@ public class AnalysisReportServiceIMPL {
             section2.addParagraph();
             CourseBasicInformation courseBasicInformation = courseBasicInformationServiceIMPL.getById(courseId);
             Table table = generateTable(section2, 3, 4);
-            // 合并单元格
-//            table.applyHorizontalMerge(2, 3, 5);
+            cellCenter(table);
             table.get(0, 0).addParagraph().appendText("课程名称");
             table.get(0, 1).addParagraph().appendText(courseBasicInformation.getCourseName());
             table.get(0, 2).addParagraph().appendText("课程代码");
@@ -412,6 +506,7 @@ public class AnalysisReportServiceIMPL {
 
             addText(section2, "一、课程目标", "title2Style", false);
             addText(section2, "（1）课程目标", "title2Style", false);
+            section2.addParagraph();
             addText(section2, "本课程的课程目标如下：", "contentStyle", false);
             for (CourseTarget target : courseTargets) {
                 String targetName = target.getTargetName();
@@ -422,10 +517,9 @@ public class AnalysisReportServiceIMPL {
 
 
             addText(section2, "（2）课程目标对毕业要求的支撑", "title2Style", false);
-            section2.addParagraph();
             Table table2 = generateTable(section2, courseTargets.size() + 1, 3);
             table2.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
-
+            cellCenter(table2);
             table2.get(0, 0).addParagraph().appendText("课程目标");
             table2.get(0, 1).addParagraph().appendText("支撑权重");
             table2.get(0, 2).addParagraph().appendText("毕业要求指标点");
@@ -494,6 +588,7 @@ public class AnalysisReportServiceIMPL {
 
             Table table3 = generateTable(section2, rowNum + 1, 4);
             table3.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
+            cellCenter(table3);
             table3.get(0, 0).addParagraph().appendText("考核项目");
             table3.get(0, 1).addParagraph().appendText("项目百分比");
             table3.get(0, 2).addParagraph().appendText("考核子项目");
@@ -517,12 +612,13 @@ public class AnalysisReportServiceIMPL {
             }
 
             //计分方法与对应的课程目标
-            Section section3 = document.addSection();
-            addText(section3, "计分方法与对应的课程目标", "contentStyle", false);
+//            Section section3 = document.addSection();
+            addText(section2, "计分方法与对应的课程目标", "contentStyle", false);
 
             rowNum = courseTargets.size() * courseExamineMethods.size();
-            Table table4 = generateTable(section3, rowNum + 1, 4);
+            Table table4 = generateTable(section2, rowNum + 1, 4);
             table4.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
+            cellCenter(table4);
             table4.get(0, 0).addParagraph().appendText("课程教学目标");
             table4.get(0, 1).addParagraph().appendText("预设的学习任务");
             table4.get(0, 2).addParagraph().appendText("观测点");
@@ -534,10 +630,284 @@ public class AnalysisReportServiceIMPL {
                 table4.get(rowIndex, 0).addParagraph().appendText(courseTarget.getTargetName());
                 for (CourseExamineMethods courseExamineMethod : courseExamineMethods) {
                     table4.get(rowIndex, 1).addParagraph().appendText(courseExamineMethod.getExamineItem());
+
+                    QueryWrapper<CourseExamineChildMethods> queryWrapper1 = new QueryWrapper<>();
+                    queryWrapper1.eq("course_examine_methods_id", courseExamineMethod.getId());
+                    List<CourseExamineChildMethods> courseExamineChildMethods1 = courseExamineChildMethodsMAPPER.selectList(queryWrapper1);
+
+                    String s = "";
+                    int n = 0;
+                    if (courseExamineMethod.getExamineItem().contains("平时")) {
+                        for (CourseExamineChildMethods item : courseExamineChildMethods1) {
+                            //判断是否含有该课程目标
+                            JSONArray jsonArray = JSONArray.parseArray(item.getCourseTarget());
+                            for (Object o : jsonArray) {
+                                if (courseTarget.getTargetName().contains(o.toString())) {
+                                    s += item.getExamineChildItem() + " ";
+                                    n += item.getChildPercentage();
+                                }
+                            }
+                        }
+                        table4.get(rowIndex, 2).addParagraph().appendText(s);
+                        table4.get(rowIndex, 3).addParagraph().appendText(String.valueOf(n));
+
+                    } else if (courseExamineMethod.getExamineItem().contains("期末")) {
+                        for (CourseExamineChildMethods item : courseExamineChildMethods1) {
+                            if (item.getExamineChildItem().contains("试卷")) {
+                                QueryWrapper<CourseFinalExamPaper> queryWrapper3 = new QueryWrapper<>();
+                                queryWrapper3.eq("exam_child_method_id", item.getId());
+                                List<CourseFinalExamPaper> courseFinalExamPapers = courseFinalExamPaperMAPPER.selectList(queryWrapper3);
+
+                                String itemName;
+                                for (CourseFinalExamPaper item2 : courseFinalExamPapers) {
+                                    itemName = item2.getItemName();
+
+                                    QueryWrapper<CourseFinalExamPaperDetail> queryWrapper4 = new QueryWrapper<>();
+                                    queryWrapper4.eq("primary_id", item2.getId());
+                                    List<CourseFinalExamPaperDetail> courseFinalExamPaperDetails = courseFinalExamPaperDetailMAPPER.selectList(queryWrapper4);
+
+                                    for (CourseFinalExamPaperDetail item3 : courseFinalExamPaperDetails) {
+                                        JSONArray jsonArray = JSONArray.parseArray(item3.getCourseTarget());
+                                        for (Object o : jsonArray) {
+                                            if (courseTarget.getTargetName().contains(o.toString())) {
+                                                itemName += item3.getTitleNumber() + " ";
+                                                n += item3.getScore();
+                                            }
+                                        }
+                                    }
+                                    table4.get(rowIndex, 2).addParagraph().appendText(itemName);
+                                }
+                                table4.get(rowIndex, 3).addParagraph().appendText(String.valueOf(n));
+                                n = 0;
+                            }
+                        }
+                    }
+
+
                     rowIndex++;
                 }
                 table4.applyVerticalMerge(0, temp, rowIndex - 1);
             }
+
+            //评价标准
+            addText(section2, "（3）评分标准", "title2Style", false);
+            Table table5 = generateTable(section2, 10, 3);
+            table5.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
+            table5.get(0, 0).addParagraph().appendText("考核方式");
+            table5.get(0, 1).addParagraph().appendText("评价标准");
+            table5.get(0, 2).addParagraph().appendText("得分");
+
+            addText(section2, "（4）考核成绩情况", "title2Style", false);
+            addText(section2, "学生考核成绩见附件，无考核成绩调整情况。", "contentStyle", false);
+            nullRow(section2, 3);
+
+            addText(section2, "三、课程目标达成情况分析", "title2Style", false);
+            nullRow(section2, 1);
+            addText(section2, "（1）评分标准", "title2Style", false);
+            section2.addParagraph();
+            addText(section2, "\t依据" + courseBasicInformation.getClassName() + "班《" + courseBasicInformation.getCourseName() + "》原始考试成绩中学生个体所对应的各观测点数据分析，可得各课程目标考试成绩达成情况散点分布：", "contentStyle", false);
+
+
+            //获取绘制表格所需的数据
+            QueryWrapper<CourseAchievementAnalyse> queryWrapper5 = new QueryWrapper<>();
+            queryWrapper5.eq("course_id", courseId);
+            CourseAchievementAnalyse courseAchievementAnalyse = courseAchievementAnalyseMAPPER.selectOne(queryWrapper5);
+
+            //绘制图表
+            JSONArray jsonArray = JSONArray.parseArray(courseAchievementAnalyse.getValue());
+            for (int j = 0; j < jsonArray.size(); j++) {
+
+                JSONArray jsonArray1 = JSONArray.parseArray(jsonArray.get(j).toString());
+                byte[] bytes = generateCharts(jsonArray1, j + 1);
+
+                insertChart(document, bytes, section2);
+                nullRow(section2, 2);
+            }
+
+            Section section3 = document.addSection();
+            addText(section3, "（2）课程目标达成情况", "title2Style", false);
+            section3.addParagraph();
+            addText(section3, "本课程各目标评价结果如下：", "contentStyle", false);
+
+            rowNum = courseTargets.size() * courseExamineMethods.size();
+            Table table6 = generateTable(section3, rowNum + 1, 7);
+            table6.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
+            cellCenter(table6);
+            table6.get(0, 0).addParagraph().appendText("课程教学目标");
+            table6.get(0, 1).addParagraph().appendText("预设的学习任务");
+            table6.get(0, 2).addParagraph().appendText("观测点");
+            table6.get(0, 3).addParagraph().appendText("标准计分");
+            table6.get(0, 4).addParagraph().appendText("学生所得平均分");
+            table6.get(0, 5).addParagraph().appendText("观测点达成度");
+            table6.get(0, 6).addParagraph().appendText("课程目标达成度");
+
+            rowIndex = 1;
+
+            List<StudentUsualScore> studentUsualScores = studentUsualScoreMAPPER.getAllStudent(courseId);
+            List<StudentFinalScore> studentFinalScores = studentFinalScoreMAPPER.getAllStudent(courseId);
+
+            QueryWrapper<CourseTargetAnalyse> queryWrapper6 = new QueryWrapper<>();
+            queryWrapper6.eq("course_id", courseId);
+            List<CourseTargetAnalyse> courseTargetAnalyses = courseTargetAnalyseMAPPER.selectList(queryWrapper6);
+
+            for (CourseTarget courseTarget : courseTargets) {
+                int temp = rowIndex;
+                table6.get(rowIndex, 0).addParagraph().appendText(courseTarget.getTargetName());
+
+                CourseTargetAnalyse currentTarget = null;
+                for (CourseTargetAnalyse item : courseTargetAnalyses) {
+                    if (item.getTargetName().equals(courseTarget.getTargetName())) {
+                        currentTarget = item;
+                    }
+                }
+                double usualAchievement = 0;
+                double finalAchievement = 0;
+
+                for (CourseExamineMethods courseExamineMethod : courseExamineMethods) {
+                    table6.get(rowIndex, 1).addParagraph().appendText(courseExamineMethod.getExamineItem());
+
+                    QueryWrapper<CourseExamineChildMethods> queryWrapper1 = new QueryWrapper<>();
+                    queryWrapper1.eq("course_examine_methods_id", courseExamineMethod.getId());
+                    List<CourseExamineChildMethods> courseExamineChildMethods1 = courseExamineChildMethodsMAPPER.selectList(queryWrapper1);
+
+                    String s = "";
+                    int n = 0;
+                    if (courseExamineMethod.getExamineItem().contains("平时")) {
+                        boolean[] boolArray = new boolean[courseExamineChildMethods1.size()];
+
+                        int childMethodsIndex = 0;
+                        for (CourseExamineChildMethods item : courseExamineChildMethods1) {
+                            //判断是否含有该课程目标
+                            boolean isHave = false;
+                            JSONArray jsonArray2 = JSONArray.parseArray(item.getCourseTarget());
+                            for (Object o : jsonArray2) {
+                                if (courseTarget.getTargetName().contains(o.toString())) {
+                                    //标准计分
+                                    s += item.getExamineChildItem() + " ";
+                                    isHave = true;
+                                    n += item.getChildPercentage();
+                                }
+                            }
+                            //构建关系数组
+                            boolArray[childMethodsIndex] = isHave;
+                            childMethodsIndex++;
+                        }
+
+                        double sum = 0;
+                        for (StudentUsualScore items : studentUsualScores) {
+                            JSONArray jsonArray1 = JSONArray.parseArray(items.getScoreDetails());
+                            for (int j = 0; j < jsonArray1.size(); j++) {
+                                if (boolArray[j]) {
+                                    sum += Double.parseDouble(jsonArray1.get(j).toString());
+                                }
+                            }
+
+                        }
+                        double v = export.doubleFormat(sum / studentUsualScores.size(), 2);
+                        double v2 = export.doubleFormat(v / n, 2);
+                        usualAchievement = v2 * courseExamineMethod.getPercentage() * 0.01;
+
+                        table6.get(rowIndex, 2).addParagraph().appendText(s);
+                        table6.get(rowIndex, 3).addParagraph().appendText(String.valueOf(n));
+                        table6.get(rowIndex, 4).addParagraph().appendText(String.valueOf(v));
+                        table6.get(rowIndex, 5).addParagraph().appendText(String.valueOf(v2));
+
+                    } else if (courseExamineMethod.getExamineItem().contains("期末")) {
+                        for (CourseExamineChildMethods item : courseExamineChildMethods1) {
+                            if (item.getExamineChildItem().contains("试卷")) {
+                                QueryWrapper<CourseFinalExamPaper> queryWrapper3 = new QueryWrapper<>();
+                                queryWrapper3.eq("exam_child_method_id", item.getId());
+                                List<CourseFinalExamPaper> courseFinalExamPapers = courseFinalExamPaperMAPPER.selectList(queryWrapper3);
+
+                                String itemName;
+                                for (CourseFinalExamPaper item2 : courseFinalExamPapers) {
+                                    itemName = item2.getItemName();
+
+                                    QueryWrapper<CourseFinalExamPaperDetail> queryWrapper4 = new QueryWrapper<>();
+                                    queryWrapper4.eq("primary_id", item2.getId());
+                                    List<CourseFinalExamPaperDetail> courseFinalExamPaperDetails = courseFinalExamPaperDetailMAPPER.selectList(queryWrapper4);
+
+                                    for (CourseFinalExamPaperDetail item3 : courseFinalExamPaperDetails) {
+                                        JSONArray jsonArray3 = JSONArray.parseArray(item3.getCourseTarget());
+                                        for (Object o : jsonArray3) {
+                                            if (courseTarget.getTargetName().contains(o.toString())) {
+                                                itemName += item3.getTitleNumber() + " ";
+                                                n += item3.getScore();
+                                            }
+                                        }
+                                    }
+                                    table6.get(rowIndex, 2).addParagraph().appendText(itemName);
+                                }
+
+                                double sum = 0;
+                                String matrix = currentTarget.getMatrix();
+                                JSONArray jsonArray1 = JSONArray.parseArray(matrix);
+
+
+                                for (StudentFinalScore items : studentFinalScores) {
+                                    List<String> strings = export.toArray(export.stringTo2DArray(items.getScoreDetails()));
+                                    for (int j = 0; j < strings.size(); j++) {
+                                        if (Boolean.parseBoolean(jsonArray1.get(j).toString())) {
+                                            sum += Double.parseDouble(strings.get(j));
+                                        }
+                                    }
+                                }
+
+                                double v = export.doubleFormat(sum / studentFinalScores.size(), 2);
+                                double v2 = export.doubleFormat(v / n, 2);
+
+                                finalAchievement = v2 * courseExamineMethod.getPercentage() * 0.01;
+
+                                table6.get(rowIndex, 3).addParagraph().appendText(String.valueOf(n));
+                                table6.get(rowIndex, 4).addParagraph().appendText(String.valueOf(v));
+                                table6.get(rowIndex, 5).addParagraph().appendText(String.valueOf(v2));
+
+                                n = 0;
+                            }
+                        }
+                    }
+
+
+                    rowIndex++;
+                }
+                double v = usualAchievement + finalAchievement;
+                table6.applyVerticalMerge(0, temp, rowIndex - 1);
+                table6.get(rowIndex - 1, 6).addParagraph().appendText(String.valueOf(export.doubleFormat(v,2)));
+                table6.applyVerticalMerge(6, temp, rowIndex - 1);
+            }
+
+
+            nullRow(section3, 5);
+            addText(section3, "四、面向学生的课程目标达成度评价问卷调查结果", "title2Style", false);
+            addText(section3, "\t在调查问卷中，对课程目标达成情况的评价为“完全达成、较好达成、基本达成、未达成”四个等级。针对本课程目标达成情况的问卷调查结果如图5所示。", "contentStyle", false);
+            nullRow(section3, 20);
+            addText(section3, "五、课程持续改进措施", "title2Style", false);
+            addText(section3, "（1）近两学年教学课程目标达成度对比", "title2Style", false);
+
+            Table table7 = generateTable(section3, 4, courseTargets.size());
+            table7.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
+            cellCenter(table7);
+            table7.get(0, 0).addParagraph().appendText("授课时间");
+            table7.applyVerticalMerge(0, 0, 1);
+            table7.get(0, 1).addParagraph().appendText("课程目标达成度");
+            table7.applyHorizontalMerge(0, 1, courseTargets.size() - 1);
+
+            table7.get(2, 0).addParagraph().appendText("XX学年第X学期");
+            table7.get(3, 0).addParagraph().appendText("XX学年第X学期");
+
+            addText(section3, "（2）存在问题及持续改进", "title2Style", false);
+            Table table8 = generateTable(section3, 5, 3);
+            cellCenter(table8);
+            table8.get(0, 0).addParagraph().appendText("上轮教学");
+            table8.get(1, 0).addParagraph().appendText("本轮教学");
+            table8.applyVerticalMerge(0, 1, 4);
+
+
+            addText(section3, "任课教师签字", "contentStyle", false);
+            section3.addParagraph();
+            addText(section3, "系（教研室）主任签字", "contentStyle", false);
+            section3.addParagraph();
+            addText(section3, "填写时间", "contentStyle", false);
 
 
             byte[] Bytes;
@@ -618,6 +988,7 @@ public class AnalysisReportServiceIMPL {
             addText(section, "课程名称: " + courseBasicInformation.getCourseName() + "\t\t课程代码: XXXXX\t\t课程性质: " + courseBasicInformation.getCourseNature() + "\t\t学分: 4\t", "contentStyle", true);
 
             Table table = generateTable(section, 9, 7);
+            cellCenter(table);
             // 合并单元格
 //            table.applyHorizontalMerge(2, 3, 5);
             table.get(0, 0).addParagraph().appendText("任课教师");
@@ -675,11 +1046,11 @@ public class AnalysisReportServiceIMPL {
 
             table.get(6, 0).addParagraph().appendText("试卷情况分析");
             table.applyHorizontalMerge(6, 1, 6);
-            nullRow(table, 6, 0, 25);
+            nullRow(table, 6, 0, 20);
 
             table.get(7, 0).addParagraph().appendText("改进措施");
             table.applyHorizontalMerge(7, 1, 6);
-            nullRow(table, 7, 0, 25);
+            nullRow(table, 7, 0, 20);
 
             table.get(8, 0).addParagraph().appendText("教研室主任（签字）：");
             table.applyHorizontalMerge(8, 0, 1);
@@ -759,6 +1130,7 @@ public class AnalysisReportServiceIMPL {
             CourseBasicInformation courseBasicInformation = courseBasicInformationServiceIMPL.getById(courseId);
 
             Table table = generateTable(section, 10, 6);
+            cellCenter(table);
             // 合并单元格
 //            table.applyHorizontalMerge(2, 3, 5);
             table.get(0, 0).addParagraph().appendText("授课学期");
@@ -796,11 +1168,11 @@ public class AnalysisReportServiceIMPL {
 
             table.get(5, 0).addParagraph().appendText("课程教学总结");
             table.applyHorizontalMerge(5, 1, 5);
-            nullRow(table, 5, 0, 25);
+            nullRow(table, 5, 0, 20);
 
             table.get(6, 0).addParagraph().appendText("今后改革设想");
             table.applyHorizontalMerge(6, 1, 5);
-            nullRow(table, 6, 0, 25);
+            nullRow(table, 6, 0, 20);
 
             table.get(7, 0).addParagraph().appendText("填报人");
             table.applyHorizontalMerge(7, 1, 2);
@@ -832,6 +1204,5 @@ public class AnalysisReportServiceIMPL {
             return null;
         }
     }
-
 
 }

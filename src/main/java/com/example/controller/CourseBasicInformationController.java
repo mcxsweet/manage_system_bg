@@ -149,12 +149,12 @@ public class CourseBasicInformationController {
     public DataResponses addCourseTarget(@RequestBody CourseTarget Data) {
         courseTarget.insert(Data);
         QueryWrapper<CourseTarget> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("course_id",Data.getCourseId());
-        queryWrapper.eq("target_name",Data.getTargetName());
-        CourseTarget courseTarget = this.courseTarget.selectOne(queryWrapper);
+        queryWrapper.eq("course_id", Data.getCourseId());
+        queryWrapper.eq("target_name", Data.getTargetName());
+        CourseTarget target = courseTarget.selectOne(queryWrapper);
 
         CourseAttainmentSurvey courseAttainmentSurvey = new CourseAttainmentSurvey();
-        courseAttainmentSurvey.setCourseTargetId(courseTarget.getId());
+        courseAttainmentSurvey.setCourseTargetId(target.getId());
         courseAttainmentSurveyMAPPER.insert(courseAttainmentSurvey);
         return new DataResponses(true);
     }
