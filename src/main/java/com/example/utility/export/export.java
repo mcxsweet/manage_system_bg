@@ -10,6 +10,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class export {
@@ -122,6 +123,19 @@ public class export {
         return null;
     }
 
+    //二维数组转一维数组
+    public static List<String> toArray(List<List<String>> input){
+        List<String> result = new ArrayList<>();
+
+        for (List<String> strings : input) {
+            for (String string : strings) {
+                result.add(string);
+            }
+        }
+        return result;
+    }
+
+
     //单元格赋值且带样式
     public static void valueToCell(Sheet sheet, int row, int colum, String value, CellStyle style) {
         Row sheetRow;
@@ -135,6 +149,7 @@ public class export {
         cell.setCellStyle(style);
     }
 
+    //浮点数格式化
     public static double doubleFormat(double a, int i) {
         String str = "";
         switch (i) {
@@ -150,4 +165,6 @@ public class export {
         }
         return Double.parseDouble(str);
     }
+
+
 }
