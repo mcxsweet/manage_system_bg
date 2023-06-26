@@ -18,6 +18,7 @@ public class StudentComprehensiveScore {
     private double comprehensiveScore;
     //还没做
     private double experimentScore;
+
     private double usualScore;
     private double finalScore;
 

@@ -135,7 +135,6 @@ public class export {
         return result;
     }
 
-
     //单元格赋值且带样式
     public static void valueToCell(Sheet sheet, int row, int colum, String value, CellStyle style) {
         Row sheetRow;
@@ -165,6 +164,4 @@ public class export {
         }
         return Double.parseDouble(str);
     }
-
-
 }

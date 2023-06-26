@@ -11,6 +11,8 @@ public class CourseTarget {
     private String courseName;
     //课程目标名
     private String targetName;
+    //权重
+    private double weight;
     //课程目标
     private String courseTarget;
     //达成途径

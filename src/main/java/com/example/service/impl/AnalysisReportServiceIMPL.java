@@ -8,10 +8,7 @@ import com.example.mapper.CourseTargetMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseAchievementAnalyseMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseScoreAnalyseMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseTargetAnalyseMAPPER;
-import com.example.mapper.examinePaper.CourseFinalExamPaperDetailMAPPER;
-import com.example.mapper.examinePaper.CourseFinalExamPaperMAPPER;
-import com.example.mapper.examinePaper.StudentFinalScoreMAPPER;
-import com.example.mapper.examinePaper.StudentUsualScoreMAPPER;
+import com.example.mapper.examinePaper.*;
 import com.example.object.CourseBasicInformation;
 import com.example.object.CourseExamineChildMethods;
 import com.example.object.CourseExamineMethods;
@@ -20,10 +17,7 @@ import com.example.object.comprehensiveAnalyse.CourseAchievementAnalyse;
 import com.example.object.comprehensiveAnalyse.CourseScoreAnalyse;
 import com.example.object.comprehensiveAnalyse.CourseTargetAnalyse;
 import com.example.object.comprehensiveAnalyse.KeyValue;
-import com.example.object.finalExamine.CourseFinalExamPaper;
-import com.example.object.finalExamine.CourseFinalExamPaperDetail;
-import com.example.object.finalExamine.StudentFinalScore;
-import com.example.object.finalExamine.StudentUsualScore;
+import com.example.object.finalExamine.*;
 import com.example.utility.export.export;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spire.doc.FileFormat;
@@ -72,6 +66,8 @@ public class AnalysisReportServiceIMPL {
     private StudentUsualScoreMAPPER studentUsualScoreMAPPER;
     @Autowired
     private StudentFinalScoreMAPPER studentFinalScoreMAPPER;
+    @Autowired
+    private StudentInformationMAPPER studentInformationMAPPER;
     @Autowired
     private CourseTargetAnalyseMAPPER courseTargetAnalyseMAPPER;
 
@@ -430,7 +426,6 @@ public class AnalysisReportServiceIMPL {
             section.getPageSetup().getMargins().setLeft(60f);
             section.getPageSetup().getMargins().setRight(80f);
 
-
             //一级标题样式
             ParagraphStyle style1 = new ParagraphStyle(document);
             style1.setName("titleStyle");
@@ -533,7 +528,7 @@ public class AnalysisReportServiceIMPL {
                 JSONArray jsonArray = JSONArray.parseArray(indicatorPoints);
 
                 table2.get(i, 0).addParagraph().appendText(target.getTargetName());
-                table2.get(i, 1).addParagraph().appendText("支撑权重###");
+                table2.get(i, 1).addParagraph().appendText(String.valueOf(target.getWeight()));
 
                 String s = "";
                 for (Object o : jsonArray) {
@@ -730,7 +725,7 @@ public class AnalysisReportServiceIMPL {
             addText(section3, "本课程各目标评价结果如下：", "contentStyle", false);
 
             rowNum = courseTargets.size() * courseExamineMethods.size();
-            Table table6 = generateTable(section3, rowNum + 1, 7);
+            Table table6 = generateTable(section3, rowNum + 2, 7);
             table6.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
             cellCenter(table6);
             table6.get(0, 0).addParagraph().appendText("课程教学目标");
@@ -749,6 +744,9 @@ public class AnalysisReportServiceIMPL {
             QueryWrapper<CourseTargetAnalyse> queryWrapper6 = new QueryWrapper<>();
             queryWrapper6.eq("course_id", courseId);
             List<CourseTargetAnalyse> courseTargetAnalyses = courseTargetAnalyseMAPPER.selectList(queryWrapper6);
+
+            String resultStr = "";
+            double result = 0;
 
             for (CourseTarget courseTarget : courseTargets) {
                 int temp = rowIndex;
@@ -870,11 +868,23 @@ public class AnalysisReportServiceIMPL {
 
                     rowIndex++;
                 }
-                double v = usualAchievement + finalAchievement;
+                double v = export.doubleFormat(usualAchievement + finalAchievement, 2);
                 table6.applyVerticalMerge(0, temp, rowIndex - 1);
-                table6.get(rowIndex - 1, 6).addParagraph().appendText(String.valueOf(export.doubleFormat(v,2)));
+                table6.get(rowIndex - 1, 6).addParagraph().appendText(String.valueOf(v));
                 table6.applyVerticalMerge(6, temp, rowIndex - 1);
+
+                resultStr += v + " x " + courseTarget.getWeight() + " + ";
+                result += v * courseTarget.getWeight();
             }
+
+            result = export.doubleFormat(result, 2);
+            resultStr = resultStr.substring(0, resultStr.length() - 1);
+            resultStr = resultStr + " = " + result;
+
+            table6.get(rowIndex, 0).addParagraph().appendText("总课程目标达成度");
+            table6.applyHorizontalMerge(rowIndex, 0, 1);
+            table6.get(rowIndex, 2).addParagraph().appendText(resultStr);
+            table6.applyHorizontalMerge(rowIndex, 2, 6);
 
 
             nullRow(section3, 5);
@@ -909,6 +919,30 @@ public class AnalysisReportServiceIMPL {
             section3.addParagraph();
             addText(section3, "填写时间", "contentStyle", false);
 
+            Section section4 = document.addSection();
+            addText(section4, "附件:学生考核成绩", "contentStyle", false);
+            List<StudentComprehensiveScore> comprehensiveScore = studentInformationMAPPER.getComprehensiveScore(courseId);
+
+            Table table9 = generateTable(section4, comprehensiveScore.size() + 1, 6);
+            table9.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
+            cellCenter(table9);
+            table9.get(0, 0).addParagraph().appendText("学号");
+            table9.get(0, 1).addParagraph().appendText("姓名");
+            table9.get(0, 2).addParagraph().appendText("班级");
+            table9.get(0, 3).addParagraph().appendText("平时成绩");
+            table9.get(0, 4).addParagraph().appendText("期末卷面成绩");
+            table9.get(0, 5).addParagraph().appendText("综合成绩");
+
+            rowIndex = 1;
+            for (StudentComprehensiveScore item : comprehensiveScore) {
+                table9.get(rowIndex, 0).addParagraph().appendText(item.getStudentNumber());
+                table9.get(rowIndex, 1).addParagraph().appendText(item.getStudentName());
+                table9.get(rowIndex, 2).addParagraph().appendText(item.getClassName());
+                table9.get(rowIndex, 3).addParagraph().appendText(String.valueOf(item.getUsualScore()));
+                table9.get(rowIndex, 4).addParagraph().appendText(String.valueOf(item.getFinalScore()));
+                table9.get(rowIndex, 5).addParagraph().appendText(String.valueOf(item.getComprehensiveScore()));
+                rowIndex++;
+            }
 
             byte[] Bytes;
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
