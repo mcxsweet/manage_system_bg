@@ -19,7 +19,7 @@ public class AnalysisReportController {
     @ApiOperation("导出分析报告")
     @GetMapping("{courseId}/analyse")
     public ResponseEntity<byte[]> getAnalysisReport(@PathVariable int courseId) {
-        return analysisReportServiceIMPL.getReport(courseId,1);
+        return analysisReportServiceIMPL.getReport4(courseId,1);
     }
 
 }

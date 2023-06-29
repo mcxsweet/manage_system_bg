@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 @CrossOrigin(origins = "*")
 @Api(tags = "课程信息")
@@ -148,14 +149,14 @@ public class CourseBasicInformationController {
     @PostMapping("/courseTarget")
     public DataResponses addCourseTarget(@RequestBody CourseTarget Data) {
         courseTarget.insert(Data);
-        QueryWrapper<CourseTarget> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("course_id", Data.getCourseId());
-        queryWrapper.eq("target_name", Data.getTargetName());
-        CourseTarget target = courseTarget.selectOne(queryWrapper);
-
-        CourseAttainmentSurvey courseAttainmentSurvey = new CourseAttainmentSurvey();
-        courseAttainmentSurvey.setCourseTargetId(target.getId());
-        courseAttainmentSurveyMAPPER.insert(courseAttainmentSurvey);
+//        QueryWrapper<CourseTarget> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("course_id", Data.getCourseId());
+//        queryWrapper.eq("target_name", Data.getTargetName());
+//        CourseTarget target = courseTarget.selectOne(queryWrapper);
+//
+//        CourseAttainmentSurvey courseAttainmentSurvey = new CourseAttainmentSurvey();
+//        courseAttainmentSurvey.setCourseTargetId(target.getId());
+//        courseAttainmentSurveyMAPPER.insert(courseAttainmentSurvey);
         return new DataResponses(true);
     }
 
@@ -186,17 +187,23 @@ public class CourseBasicInformationController {
         return new DataResponses(true, indicators.selectList(null));
     }
 
+    @ApiOperation("查询专业指标点")
+    @PostMapping("/indicators")
+    public DataResponses getMajorIndicators(@RequestBody HashMap<String, String> major) {
+        return new DataResponses(true, indicators.getMajorIndicators(major.get("major")));
+    }
+
     @ApiOperation("指标点PDF")
     @GetMapping("/{major}/indicatorsPDF")
     public ResponseEntity<byte[]> IndicatorsPDF(@PathVariable String major) {
         return indicatorsServiceIMPL.IndicatorsPDF(major);
     }
 
-    @ApiOperation("添加指标点")
-    @PostMapping("/indicators")
-    public DataResponses insertIndicators(@RequestBody Indicators item) {
-        return new DataResponses(indicators.insert(item));
-    }
+//    @ApiOperation("添加指标点")
+//    @PostMapping("/indicators")
+//    public DataResponses insertIndicators(@RequestBody Indicators item) {
+//        return new DataResponses(indicators.insert(item));
+//    }
 
     @ApiOperation("删除指标点")
     @DeleteMapping("/indicators")

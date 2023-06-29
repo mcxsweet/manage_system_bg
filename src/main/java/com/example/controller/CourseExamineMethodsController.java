@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.CourseExamineMethodsMAPPER;
 import com.example.object.CourseExamineChildMethods;
 import com.example.object.CourseExamineMethods;
 import com.example.service.impl.CourseExamineChildMethodsServiceIMPL;
@@ -11,6 +12,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @CrossOrigin(origins = "*")
 @Api(tags="考核与评价方式")
 @RestController
@@ -19,10 +22,19 @@ public class CourseExamineMethodsController {
     //课程考核项目
     @Autowired
     private CourseExamineMethodsServiceIMPL courseExamineMethodsService;
-
+    @Autowired
+    private CourseExamineMethodsMAPPER courseExamineMethodsMAPPER;
     //课程考核子项目
     @Autowired
     private CourseExamineChildMethodsServiceIMPL courseExamineChildMethodsService;
+
+    //根据课程id获取期末考核试卷id
+    @ApiOperation("根据课程id获取期末考核试卷id")
+    @PostMapping("/examId")
+    public DataResponses getExamIdById(@RequestBody HashMap<String,String> courseId) {
+        return new DataResponses(true,courseExamineMethodsMAPPER.getExamPaperIdByCourseId(courseId.get("courseId")));
+    }
+
 
     //提供课程信息表的id查询所有有关信息
     @ApiOperation("提供课程信息表的id查询所有有关信息")

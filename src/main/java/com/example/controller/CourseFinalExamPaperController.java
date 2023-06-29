@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.examinePaper.CourseFinalExamPaperMAPPER;
 import com.example.object.finalExamine.CourseFinalExamPaper;
 import com.example.object.finalExamine.CourseFinalExamPaperDetail;
 import com.example.service.impl.examinePaper.CourseFinalExamPaperDetailServiceIMPL;
@@ -28,6 +29,10 @@ public class CourseFinalExamPaperController {
     @Autowired
     private CourseFinalExamPaperServiceIMPL courseFinalExamPaperService;
 
+    @Autowired
+    private CourseFinalExamPaperMAPPER courseFinalExamPaperMAPPER;
+
+
     @ApiOperation("查询所有期末考察项目")
     @GetMapping()
     public DataResponses getAll() {
@@ -45,7 +50,8 @@ public class CourseFinalExamPaperController {
     @ApiOperation("提供考察评价方式表的id添加期末考察项目")
     @PostMapping()
     public DataResponses addById(@RequestBody CourseFinalExamPaper information) {
-        return new DataResponses(courseFinalExamPaperService.save(information));
+
+        return new DataResponses(courseFinalExamPaperService.save(information),information.getId());
     }
 
     @ApiOperation("提供id修改期末考察项目")
@@ -104,8 +110,8 @@ public class CourseFinalExamPaperController {
      */
     @ApiOperation("提供课程ID生成该课程考核方式和指标点，课程目标的对应关系")
     @GetMapping("/{courseId}/{type}/Table")
-    public ResponseEntity<byte[]> exportExcel(HttpServletResponse response,@PathVariable int courseId,@PathVariable int type) throws IOException {
-        return courseFinalExamPaperDetailService.ExportExamPaperRelationExcel(response,courseId,type);
+    public ResponseEntity<byte[]> exportExcel(HttpServletResponse response, @PathVariable int courseId, @PathVariable int type) throws IOException {
+        return courseFinalExamPaperDetailService.ExportExamPaperRelationExcel(response, courseId, type);
     }
 
 }
