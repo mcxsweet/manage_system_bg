@@ -41,3 +41,5 @@ build/
 ### 代码生成的临时文件 ###
 /workbook.pdf
 /workbook.xls
+/educationProgram/
+/pdf/
