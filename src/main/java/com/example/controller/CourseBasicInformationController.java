@@ -7,6 +7,7 @@ import com.example.mapper.courseSurvey.CourseAttainmentSurveyMAPPER;
 import com.example.object.CourseBasicInformation;
 import com.example.object.CourseTarget;
 import com.example.object.Indicators;
+import com.example.object.comprehensiveAnalyse.KeyValue;
 import com.example.object.courseSurvey.CourseAttainmentSurvey;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.service.impl.IndicatorsServiceIMPL;
@@ -30,7 +31,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @Api(tags = "课程信息")
@@ -217,14 +221,19 @@ public class CourseBasicInformationController {
         return new DataResponses(indicators.updateById(item));
     }
 
-    @ApiOperation("教学大纲和指标点PDF上传")
-    @PostMapping("/teachingPDF")
+
+    /*
+        教学大纲相关接口
+     */
+
+    @ApiOperation("教学大纲PDF上传")
+    @PostMapping("/syllabus")
     public DataResponses teachingPDF(@RequestParam("file") MultipartFile file,
-                                     @RequestParam int courseId,
-                                     @RequestParam String type) {
+                                     @RequestParam String courseName,
+                                     @RequestParam String type,
+                                     @RequestParam String major) {
         DataResponses res = new DataResponses(false, "上传失败");
         try {
-            //String originalFilename = file.getOriginalFilename();
             String contentType = file.getContentType();
             if (contentType == null) {
                 return res;
@@ -232,11 +241,11 @@ public class CourseBasicInformationController {
                 res.setMessage("只能上传pdf文件");
                 return res;
             }
-            File directory = new File("");//参数为空
+            File directory = new File("");
             String filePath = directory.getCanonicalPath();
 
-            String filename = type + "_" + courseId + ".pdf";
-            String filePath_ = filePath + "/" + type;
+            String filename = courseName + ".pdf";
+            String filePath_ = filePath + "/pdf/syllabus/" + major + "/" + type;
             File fileRealPath = new File(filePath_);
             //路径不存在则创建
             if (!fileRealPath.exists()) {
@@ -253,14 +262,49 @@ public class CourseBasicInformationController {
         return res;
     }
 
-    @ApiOperation("教学大纲和指标点PDF查看")
+    @ApiOperation("培养方案PDF上传")
+    @PostMapping("/educationProgramPDF")
+    public DataResponses educationProgramPDF(@RequestParam("file") MultipartFile file,
+                                             @RequestParam String major,
+                                             @RequestParam String type) {
+        DataResponses res = new DataResponses(false, "上传失败");
+        try {
+            String contentType = file.getContentType();
+            if (contentType == null) {
+                return res;
+            } else if (!contentType.equals("application/pdf")) {
+                res.setMessage("只能上传pdf文件");
+                return res;
+            }
+            File directory = new File("");//参数为空
+            String filePath = directory.getCanonicalPath();
+
+            String filename = major + ".pdf";
+            String filePath_ = filePath + "/pdf/" + type;
+            File fileRealPath = new File(filePath_);
+            //路径不存在则创建
+            if (!fileRealPath.exists()) {
+                if (!fileRealPath.mkdirs()) {
+                    return res;
+                }
+            }
+            File result = new File(filePath_ + "/" + filename);
+            file.transferTo(result);
+            res = new DataResponses(true, filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    @ApiOperation("培养方案PDF查看")
     @GetMapping("/file/{type}/{filename:.*\\.pdf}")
     public ResponseEntity<byte[]> getFile(@PathVariable String type, @PathVariable String filename) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         File directory = new File("");//参数为空
         String filePath = directory.getCanonicalPath();
 
-        Path path = Paths.get(filePath + '/' + type + '/' + filename);
+        Path path = Paths.get(filePath + "/pdf/" + type + '/' + filename);
         File file = path.toFile();
         if (!file.exists()) {
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -274,5 +318,72 @@ public class CourseBasicInformationController {
 
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
+
+    @ApiOperation("教学大纲PDF查看")
+    @GetMapping("/file/syllabus/{major}/{type}/{fileName}")
+    public ResponseEntity<byte[]> getSyllabusPDF(@PathVariable String major, @PathVariable String type, @PathVariable String fileName) throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        File directory = new File("");//参数为空
+        String filePath = directory.getCanonicalPath();
+
+        Path path = Paths.get(filePath + "/pdf/syllabus/" + major + '/' + type + '/' + fileName);
+        File file = path.toFile();
+        if (!file.exists()) {
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            return new ResponseEntity<>(null, headers, HttpStatus.OK);
+        }
+        // 获取文件的字节数组
+        byte[] bytes = Files.readAllBytes(path);
+
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentLength(bytes.length);
+
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+    }
+
+    @ApiOperation("教学大纲PDF查看")
+    @DeleteMapping("/file/syllabus/{major}/{type}/{fileName}")
+    public DataResponses deleteSyllabusPDF(@PathVariable String major, @PathVariable String type, @PathVariable String fileName) throws IOException {
+        File directory = new File("");//参数为空
+        String filePath = directory.getCanonicalPath();
+
+        Path path = Paths.get(filePath + "/pdf/syllabus/" + major + '/' + type + '/' + fileName);
+        File file = path.toFile();
+        if (!file.delete()) {
+            return new DataResponses(false,"删除失败");
+        }
+        return new DataResponses(true,"删除成功");
+    }
+
+    @ApiOperation("获取本地教学大纲pdf列表")
+    @PostMapping("/syllabusList")
+    public DataResponses getPdfList(@RequestBody HashMap<String, String> info) {
+        DataResponses res = new DataResponses();
+        try {
+            //当前项目路径
+            String filePath = new File("").getCanonicalPath();
+
+            String filePath_ = filePath + "/pdf/syllabus/" + info.get("major") + "/" + info.get("type");
+            File fileRealPath = new File(filePath_);
+
+            String[] list = fileRealPath.list();
+            List<Map<String, String>> list1 = new ArrayList<>();
+            if (list != null) {
+                for (String s : list) {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("fileName", s);
+                    s = s.substring(0, s.length() - 4);
+                    map.put("courseName", s);
+                    list1.add(map);
+                }
+            }
+
+            return new DataResponses(true, list1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
 
 }
