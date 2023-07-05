@@ -43,6 +43,7 @@ import com.spire.doc.documents.HorizontalAlignment;
 import com.spire.doc.documents.VerticalAlignment;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class AnalysisReportServiceIMPL {
@@ -410,7 +411,7 @@ public class AnalysisReportServiceIMPL {
     }
 
     //生成报告文档version_2
-    public ResponseEntity<byte[]> getReport(int courseId, int type) {
+    public ResponseEntity<byte[]> getReport(HttpServletResponse response, int courseId, int type) {
         try {
             Document document = new Document();
 
@@ -945,24 +946,36 @@ public class AnalysisReportServiceIMPL {
             }
 
             byte[] Bytes;
+            String fileName = "";
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            document.saveToStream(outputStream, FileFormat.Docx);
+            response.reset();
+
+            if (type == 1) {
+                document.saveToStream(outputStream, FileFormat.Docx);
+                fileName = "课程目标达成评价分析报告.docx";
+                response.setContentType("application/msword");
+
+            } else if (type == 2) {
+                document.saveToStream(outputStream, FileFormat.PDF);
+                fileName = "课程目标达成评价分析报告.pdf";
+                response.setContentType("application/pdf");
+            }
+
             Bytes = outputStream.toByteArray();
             outputStream.close();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=Output.docx");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
 
-
-            return ResponseEntity.ok().headers(headers).body(Bytes);
+            return ResponseEntity.ok()
+                    .body(Bytes);
         } catch (IOException ignored) {
             return null;
         }
     }
 
     //生成课程试卷分析报告表
-    public ResponseEntity<byte[]> getReport3(int courseId, int type) {
+    public ResponseEntity<byte[]> getReport3(HttpServletResponse response, int courseId, int type) {
         try {
             Document document = new Document();
 
@@ -1094,24 +1107,34 @@ public class AnalysisReportServiceIMPL {
             table.applyHorizontalMerge(8, 4, 6);
 
             byte[] Bytes;
+            String fileName = "";
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            document.saveToStream(outputStream, FileFormat.Docx);
+            response.reset();
+
+            if (type == 1) {
+                document.saveToStream(outputStream, FileFormat.Docx);
+                fileName = "课程试卷分析报告.docx";
+
+            } else if (type == 2) {
+                document.saveToStream(outputStream, FileFormat.PDF);
+                fileName = "课程试卷分析报告.pdf";
+            }
             Bytes = outputStream.toByteArray();
             outputStream.close();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=Output.docx");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+            response.setCharacterEncoding("utf-8");
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
 
-
-            return ResponseEntity.ok().headers(headers).body(Bytes);
+            //            return ResponseEntity.ok().headers(headers).body(Bytes);
+            return ResponseEntity.ok().body(Bytes);
         } catch (IOException ignored) {
             return null;
         }
     }
 
     //生成课程教学小结表
-    public ResponseEntity<byte[]> getReport4(int courseId, int type) {
+    public ResponseEntity<byte[]> getReport4(HttpServletResponse response, int courseId, int type) {
         try {
             Document document = new Document();
 
@@ -1223,17 +1246,27 @@ public class AnalysisReportServiceIMPL {
             table.get(9, 0).getLastParagraph().getFormat().setHorizontalAlignment(HorizontalAlignment.Right);
 
             byte[] Bytes;
+            String fileName = "";
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            document.saveToStream(outputStream, FileFormat.Docx);
+            response.reset();
+
+            if (type == 1) {
+                document.saveToStream(outputStream, FileFormat.Docx);
+                fileName = "课程教学小结表.docx";
+
+            } else if (type == 2) {
+                document.saveToStream(outputStream, FileFormat.PDF);
+                fileName = "课程教学小结表.pdf";
+            }
             Bytes = outputStream.toByteArray();
             outputStream.close();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=Output.docx");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+            response.setCharacterEncoding("utf-8");
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
 
-
-            return ResponseEntity.ok().headers(headers).body(Bytes);
+//            return ResponseEntity.ok().headers(headers).body(Bytes);
+            return ResponseEntity.ok().body(Bytes);
         } catch (IOException ignored) {
             return null;
         }
