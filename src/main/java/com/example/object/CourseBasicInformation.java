@@ -9,6 +9,8 @@ public class CourseBasicInformation {
     private String courseName;
     //专业
     private String major;
+    //课程代码
+    private String courseCode;
     //任课教师id
     private int teacherId;
     //任课教师

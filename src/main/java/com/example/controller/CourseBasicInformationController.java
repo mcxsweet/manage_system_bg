@@ -1,10 +1,12 @@
 package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.CourseSyllabusInformationMAPPER;
 import com.example.mapper.CourseTargetMAPPER;
 import com.example.mapper.IndicatorsMAPPER;
 import com.example.mapper.courseSurvey.CourseAttainmentSurveyMAPPER;
 import com.example.object.CourseBasicInformation;
+import com.example.object.CourseSyllabusInformation;
 import com.example.object.CourseTarget;
 import com.example.object.Indicators;
 import com.example.object.comprehensiveAnalyse.KeyValue;
@@ -152,7 +154,6 @@ public class CourseBasicInformationController {
     @ApiOperation("添加该课程课程目标")
     @PostMapping("/courseTarget")
     public DataResponses addCourseTarget(@RequestBody CourseTarget Data) {
-        courseTarget.insert(Data);
 //        QueryWrapper<CourseTarget> queryWrapper = new QueryWrapper<>();
 //        queryWrapper.eq("course_id", Data.getCourseId());
 //        queryWrapper.eq("target_name", Data.getTargetName());
@@ -161,7 +162,7 @@ public class CourseBasicInformationController {
 //        CourseAttainmentSurvey courseAttainmentSurvey = new CourseAttainmentSurvey();
 //        courseAttainmentSurvey.setCourseTargetId(target.getId());
 //        courseAttainmentSurveyMAPPER.insert(courseAttainmentSurvey);
-        return new DataResponses(true);
+        return new DataResponses(true, courseTarget.insert(Data),String.valueOf(Data.getId()));
     }
 
     @ApiOperation("修改课程目标")
@@ -225,13 +226,13 @@ public class CourseBasicInformationController {
     /*
         教学大纲相关接口
      */
+    //课程教学大纲信息
+    @Autowired
+    private CourseSyllabusInformationMAPPER courseSyllabusInformationMAPPER;
 
     @ApiOperation("教学大纲PDF上传")
     @PostMapping("/syllabus")
-    public DataResponses teachingPDF(@RequestParam("file") MultipartFile file,
-                                     @RequestParam String courseName,
-                                     @RequestParam String type,
-                                     @RequestParam String major) {
+    public DataResponses teachingPDF(@RequestParam("file") MultipartFile file, @RequestParam("id") int id) {
         DataResponses res = new DataResponses(false, "上传失败");
         try {
             String contentType = file.getContentType();
@@ -244,8 +245,10 @@ public class CourseBasicInformationController {
             File directory = new File("");
             String filePath = directory.getCanonicalPath();
 
-            String filename = courseName + ".pdf";
-            String filePath_ = filePath + "/pdf/syllabus/" + major + "/" + type;
+            CourseSyllabusInformation courseSyllabusInformation = courseSyllabusInformationMAPPER.selectById(id);
+
+            String filename = courseSyllabusInformation.getCourseName() + ".pdf";
+            String filePath_ = filePath + "/pdf/syllabus/" + courseSyllabusInformation.getMajor() + "/" + courseSyllabusInformation.getCourseType();
             File fileRealPath = new File(filePath_);
             //路径不存在则创建
             if (!fileRealPath.exists()) {
@@ -255,7 +258,8 @@ public class CourseBasicInformationController {
             }
             File result = new File(filePath_ + "/" + filename);
             file.transferTo(result);
-            res = new DataResponses(true, filename);
+            courseSyllabusInformation.setFileAddress(filePath_ + "/" + filename);
+            res = new DataResponses(courseSyllabusInformationMAPPER.updateById(courseSyllabusInformation) == 1, filename);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -264,9 +268,7 @@ public class CourseBasicInformationController {
 
     @ApiOperation("培养方案PDF上传")
     @PostMapping("/educationProgramPDF")
-    public DataResponses educationProgramPDF(@RequestParam("file") MultipartFile file,
-                                             @RequestParam String major,
-                                             @RequestParam String type) {
+    public DataResponses educationProgramPDF(@RequestParam("file") MultipartFile file, @RequestParam String major, @RequestParam String type) {
         DataResponses res = new DataResponses(false, "上传失败");
         try {
             String contentType = file.getContentType();
@@ -320,13 +322,15 @@ public class CourseBasicInformationController {
     }
 
     @ApiOperation("教学大纲PDF查看")
-    @GetMapping("/file/syllabus/{major}/{type}/{fileName}")
-    public ResponseEntity<byte[]> getSyllabusPDF(@PathVariable String major, @PathVariable String type, @PathVariable String fileName) throws IOException {
+    @GetMapping("/file/{courseId}/syllabus")
+    public ResponseEntity<byte[]> getSyllabusPDF(@PathVariable String courseId) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         File directory = new File("");//参数为空
         String filePath = directory.getCanonicalPath();
 
-        Path path = Paths.get(filePath + "/pdf/syllabus/" + major + '/' + type + '/' + fileName);
+        CourseSyllabusInformation courseSyllabusInformation = courseSyllabusInformationMAPPER.selectById(courseId);
+
+        Path path = Paths.get(filePath + "/pdf/syllabus/" + courseSyllabusInformation.getMajor() + '/' + courseSyllabusInformation.getCourseType() + '/' + courseSyllabusInformation.getCourseName() + ".pdf");
         File file = path.toFile();
         if (!file.exists()) {
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -341,7 +345,7 @@ public class CourseBasicInformationController {
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 
-    @ApiOperation("教学大纲PDF查看")
+    @ApiOperation("教学大纲PDF删除")
     @DeleteMapping("/file/syllabus/{major}/{type}/{fileName}")
     public DataResponses deleteSyllabusPDF(@PathVariable String major, @PathVariable String type, @PathVariable String fileName) throws IOException {
         File directory = new File("");//参数为空
@@ -350,12 +354,12 @@ public class CourseBasicInformationController {
         Path path = Paths.get(filePath + "/pdf/syllabus/" + major + '/' + type + '/' + fileName);
         File file = path.toFile();
         if (!file.delete()) {
-            return new DataResponses(false,"删除失败");
+            return new DataResponses(false, "删除失败");
         }
-        return new DataResponses(true,"删除成功");
+        return new DataResponses(true, "删除成功");
     }
 
-    @ApiOperation("获取本地教学大纲pdf列表")
+    @ApiOperation("获取教学大纲pdf列表")
     @PostMapping("/syllabusList")
     public DataResponses getPdfList(@RequestBody HashMap<String, String> info) {
         DataResponses res = new DataResponses();
@@ -366,24 +370,47 @@ public class CourseBasicInformationController {
             String filePath_ = filePath + "/pdf/syllabus/" + info.get("major") + "/" + info.get("type");
             File fileRealPath = new File(filePath_);
 
-            String[] list = fileRealPath.list();
-            List<Map<String, String>> list1 = new ArrayList<>();
-            if (list != null) {
-                for (String s : list) {
-                    Map<String, String> map = new HashMap<>();
-                    map.put("fileName", s);
-                    s = s.substring(0, s.length() - 4);
-                    map.put("courseName", s);
-                    list1.add(map);
-                }
-            }
+            QueryWrapper<CourseSyllabusInformation> queryWrapper = new QueryWrapper<>();
+            queryWrapper.like("major", info.get("major"));
+            queryWrapper.like("course_type", info.get("type"));
 
-            return new DataResponses(true, list1);
+//            String[] list = fileRealPath.list();
+//            List<Map<String, String>> list1 = new ArrayList<>();
+//            if (list != null) {
+//                for (String s : list) {
+//                    Map<String, String> map = new HashMap<>();
+//                    map.put("fileName", s);
+//                    s = s.substring(0, s.length() - 4);
+//                    map.put("courseName", s);
+//                    list1.add(map);
+//                }
+//            }
+
+            return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
         } catch (IOException e) {
             e.printStackTrace();
         }
         return res;
     }
 
+    @ApiOperation("获取当前专业所有课程教学大纲")
+    @GetMapping("/{major}/getAllCourseByMajor")
+    public DataResponses getAllCourseByMajor(@PathVariable String major) {
+        QueryWrapper<CourseSyllabusInformation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like("major", major);
+        queryWrapper.orderByAsc("course_name");
+        return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
+    }
+
+    @ApiOperation("选择课程后(按照教学大纲)自动填充相关信息")
+    @GetMapping("/{courseId}/autoGenerate")
+    public DataResponses autoGenerate(@PathVariable int courseId) {
+        return new DataResponses(true, courseSyllabusInformationMAPPER.selectById(courseId));
+    }
+    @ApiOperation("添加课程教学接口")
+    @PutMapping("/syllabus")
+    public DataResponses insert(@RequestBody CourseSyllabusInformation item) {
+        return new DataResponses(true, courseSyllabusInformationMAPPER.insert(item));
+    }
 
 }
