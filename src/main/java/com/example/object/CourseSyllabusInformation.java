@@ -28,5 +28,6 @@ public class CourseSyllabusInformation {
 //    private int indicatorPointsNum;
     //pdf文件地址
     private String fileAddress;
+    private String uploadUser;
 
 }

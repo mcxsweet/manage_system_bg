@@ -81,19 +81,19 @@ public class CourseBasicInformationController {
         QueryWrapper.orderByDesc("term_start");
         QueryWrapper.orderByAsc("term");
         if (searchTable.getCourseName() != null) {
-            QueryWrapper.eq("course_name", searchTable.getCourseName());
+            QueryWrapper.like("course_name", searchTable.getCourseName());
         }
         if (searchTable.getClassName() != null) {
-            QueryWrapper.eq("class_name", searchTable.getClassName());
+            QueryWrapper.like("class_name", searchTable.getClassName());
         }
         if (searchTable.getTermStart() != null) {
-            QueryWrapper.eq("term_start", searchTable.getTermStart());
+            QueryWrapper.like("term_start", searchTable.getTermStart());
         }
         if (searchTable.getTermEnd() != null) {
-            QueryWrapper.eq("term_end", searchTable.getTermEnd());
+            QueryWrapper.like("term_end", searchTable.getTermEnd());
         }
         if (searchTable.getTerm() != 0) {
-            QueryWrapper.eq("term", searchTable.getTerm());
+            QueryWrapper.like("term", searchTable.getTerm());
         }
         return new DataResponses(true, courseBasicInformationService.list(QueryWrapper));
     }
@@ -373,18 +373,6 @@ public class CourseBasicInformationController {
             QueryWrapper<CourseSyllabusInformation> queryWrapper = new QueryWrapper<>();
             queryWrapper.like("major", info.get("major"));
             queryWrapper.like("course_type", info.get("type"));
-
-//            String[] list = fileRealPath.list();
-//            List<Map<String, String>> list1 = new ArrayList<>();
-//            if (list != null) {
-//                for (String s : list) {
-//                    Map<String, String> map = new HashMap<>();
-//                    map.put("fileName", s);
-//                    s = s.substring(0, s.length() - 4);
-//                    map.put("courseName", s);
-//                    list1.add(map);
-//                }
-//            }
 
             return new DataResponses(true, courseSyllabusInformationMAPPER.selectList(queryWrapper));
         } catch (IOException e) {

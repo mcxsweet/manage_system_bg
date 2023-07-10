@@ -120,9 +120,16 @@ public class StudentInformationController {
     /**
      * 普通增删改查
      *
-     * @param student
-     * @return
      */
+
+    @ApiOperation("查询当前课程信息")
+    @GetMapping("/{courseId}/getStudent")
+    public DataResponses getStudent(@PathVariable int courseId) {
+        QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("course_id", courseId);
+        return new DataResponses(true, studentInformationServiceIMPL.list(queryWrapper));
+    }
+
     @ApiOperation("添加学生信息")
     @PostMapping("/addStudent")
     public DataResponses addStudent(@RequestBody StudentInformation student) {
@@ -198,6 +205,8 @@ public class StudentInformationController {
         queryWrapper.eq("final_score_id", studentFinalScore.getFinalScoreId());
         return new DataResponses(true, studentFinalScoreServiceIMPL.update(studentFinalScore, queryWrapper));
     }
+
+
 
 
     /**
