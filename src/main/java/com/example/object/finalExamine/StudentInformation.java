@@ -21,7 +21,6 @@ public class StudentInformation {
         this.courseId = courseId;
     }
 
-    public StudentInformation() {
-    }
+    public StudentInformation() {}
 }
 

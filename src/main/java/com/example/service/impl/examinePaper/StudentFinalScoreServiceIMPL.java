@@ -101,11 +101,22 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
     //获取学生期末成绩
     @Override
     public DataResponses getAllStudent(int courseId) {
-        int[] emptyArray = new int[0];
+        List<List<String>> emptyArray = new ArrayList<>();
+
         refreshStudentScore(courseId);
         List<StudentFinalScore> allStudent = studentFinalScoreMAPPER.getAllStudent(courseId);
         for (StudentFinalScore studentFinalScore : allStudent) {
             if (studentFinalScore.getScoreDetails() == null) {
+                DataResponses finalExamPaper = getFinalExamPaper(courseId);
+                List<DataExtend> data = (List<DataExtend>) finalExamPaper.getData();
+                for (DataExtend item : data) {
+                    List<String> emptyStringList = new ArrayList<>();
+                    JSONArray jsonArray = JSONArray.parseArray(item.getData());
+                    for (Object i : jsonArray) {
+                        emptyStringList.add("");
+                    }
+                    emptyArray.add(emptyStringList);
+                }
                 studentFinalScore.setScoreResponse(emptyArray);
             } else {
                 studentFinalScore.setScoreResponse(JSONArray.parseArray(studentFinalScore.getScoreDetails()));
@@ -128,8 +139,8 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 double sum = 0;
                 List<List<String>> lists = export.stringTo2DArray(score.getScoreDetails());
                 for (List<String> list : lists) {
-                    for (String s : list){
-                        if (Objects.equals(s, "")){
+                    for (String s : list) {
+                        if (Objects.equals(s, "")) {
                             s = "0";
                         }
                         sum += Double.parseDouble(s);
@@ -339,10 +350,10 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 }
                 refreshStudentScore(courseId);
             }
-            return new DataResponses(true,"导入成功");
+            return new DataResponses(true, "导入成功");
 
         } catch (IOException exception) {
-            return new DataResponses(false,"导入失败，表格数据有缺失");
+            return new DataResponses(false, "导入失败，表格数据有缺失");
         }
     }
 

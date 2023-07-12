@@ -133,9 +133,7 @@ public class StudentInformationController {
     @ApiOperation("添加学生信息")
     @PostMapping("/addStudent")
     public DataResponses addStudent(@RequestBody StudentInformation student) {
-        QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("student_number", student.getStudentNumber());
-        return new DataResponses(true, studentInformationServiceIMPL.save(student), studentInformationServiceIMPL.getOne(queryWrapper).getId().toString());
+        return new DataResponses(true, studentInformationServiceIMPL.save(student),student.getId().toString());
     }
 
     @ApiOperation("添加学生平时成绩")
@@ -165,7 +163,9 @@ public class StudentInformationController {
     @ApiOperation("删除学生平时成绩")
     @DeleteMapping("/deleteStudentUsualScore")
     public DataResponses deleteUsualscore(@RequestBody StudentUsualScore score) {
-        return new DataResponses(true, studentUsualScoreServiceIMPL.removeById(score.getId()));
+        QueryWrapper<StudentUsualScore> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("usual_score_id", score.getUsualScoreId());
+        return new DataResponses(true, studentUsualScoreServiceIMPL.remove(queryWrapper));
     }
 
     @ApiOperation("删除学生期末成绩")

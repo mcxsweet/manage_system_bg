@@ -63,7 +63,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
         return allStudent;
     }
 
-    //获取老师设置的学生平时成绩分类
+    //获取老师设置的学生平时成绩子项目分类
     @Override
     public List<String> getUsualExamMethods(int courseID) {
         List<String> strings = new ArrayList<>();
@@ -89,9 +89,37 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
         return strings;
     }
 
+    //获取老师设置的学生平时成绩子项目百分比
+    public List<Integer> getUsualExamPercentage(int courseId) {
+        List<Integer> percentage = new ArrayList<>();
+        QueryWrapper<CourseExamineMethods> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("course_id", courseId);
+        List<CourseExamineMethods> courseExamineMethods = courseExamineMethodsMAPPER.selectList(queryWrapper);
+
+        int id = 0;
+        for (CourseExamineMethods courseExamineMethods1 : courseExamineMethods) {
+            if (Objects.equals(courseExamineMethods1.getExamineItem(), "平时考核成绩")) {
+                id = courseExamineMethods1.getId();
+            }
+        }
+
+        QueryWrapper<CourseExamineChildMethods> queryWrapper2 = new QueryWrapper<>();
+        queryWrapper2.eq("course_examine_methods_id", id);
+        queryWrapper2.orderByAsc("id");
+        List<CourseExamineChildMethods> courseExamineChildMethods = courseExamineChildMethodsMAPPER.selectList(queryWrapper2);
+
+        for (CourseExamineChildMethods courseExamineChildMethods1 : courseExamineChildMethods) {
+            percentage.add(courseExamineChildMethods1.getChildPercentage());
+        }
+        return percentage;
+    }
+
     //学生平时总成绩设置和刷新
     @Override
     public void refreshStudentScore(int courseId) {
+
+        List<Integer> usualExamPercentage = getUsualExamPercentage(courseId);
+
         List<StudentUsualScore> allStudent = studentUsualScoreMAPPER.getAllStudent(courseId);
         for (StudentUsualScore score : allStudent) {
             if (score.getUsualScoreId() != null) {
@@ -102,10 +130,10 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
 
                 double sum = 0;
                 JSONArray objects = JSONArray.parseArray(score.getScoreDetails());
-                for (Object object : objects) {
-                    sum += Double.parseDouble((String) object);
+                for (int i = 0; i < objects.size(); i++) {
+                    sum += Double.parseDouble((String) objects.get(i)) * usualExamPercentage.get(i) * 0.01;
                 }
-                usualScore.setScore(sum);
+                usualScore.setScore(Math.ceil(sum));
 
                 QueryWrapper<StudentUsualScore> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq("usual_score_id", usualScore.getUsualScoreId());

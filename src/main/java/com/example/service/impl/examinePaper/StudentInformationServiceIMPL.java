@@ -450,7 +450,7 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             if (!Double.isNaN(score.getUsualScore()) && !Double.isNaN(score.getFinalScore())) {
                 double sum = percentage1 * score.getExperimentScore() + percentage2 * score.getUsualScore() + percentage3 * score.getFinalScore();
                 String str = String.format("%.1f", sum);
-                double result = Double.parseDouble(str);
+                double result = Math.ceil(Double.parseDouble(str));
 
                 studentInformationMAPPER.UpdateComprehensiveScore(result, score.getId());
             }
