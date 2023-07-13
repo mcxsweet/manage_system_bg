@@ -19,8 +19,13 @@ public class StpInterfaceImpl implements StpInterface {
     public List<String> getRoleList(Object loginId, String loginType) {
         // 本list仅做模拟，实际要根据具体业务逻辑来查询角色
         List<String> list = new ArrayList<>();
-        User user = (User) StpUtil.getSession().get(StpUtil.getLoginIdAsString());
-        list.add(String.valueOf(user.getIsAdmin()));
+        String id = (String)loginId;
+        if (id.startsWith("admin_")) {
+            User user = (User) StpUtil.getSession().get(StpUtil.getLoginIdAsString());
+            list.add(String.valueOf(user.getIsAdmin()));
+        }else {
+            list.add("student");
+        }
         return list;
     }
 }

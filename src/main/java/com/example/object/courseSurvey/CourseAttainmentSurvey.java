@@ -6,9 +6,9 @@ import lombok.Data;
 public class CourseAttainmentSurvey {
 
     //课程目标id
-    private int courseTargetId;
-    //满意度等级
-    private int studentId;
-    private int attainment;
+    private Integer courseTargetId;
+    private Integer courseId;//课程id
+    private String studentNumber;//学号
+    private Integer attainment;//满意度等级
 
 }
