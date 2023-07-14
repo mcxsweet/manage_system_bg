@@ -159,10 +159,10 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
             Row row1 = sheet.createRow(0);
 
-            export.valueToCell(sheet, 1, 0, "学号", style);
+            export.valueToCell(sheet, 1, 0, "班级", style);
             sheet.setColumnWidth(0, 20 * 256);
             export.valueToCell(sheet, 1, 1, "姓名", style);
-            export.valueToCell(sheet, 1, 2, "班级", style);
+            export.valueToCell(sheet, 1, 2, "学号", style);
             sheet.setColumnWidth(2, 20 * 256);
             export.valueToCell(sheet, 1, 3, "平时成绩", style);
             export.valueToCell(sheet, 1, 4, "期末成绩", style);
@@ -172,9 +172,9 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
             int rowIndex = 2;
             for (StudentComprehensiveScore score : comprehensiveScore) {
-                export.valueToCell(sheet, rowIndex, 0, score.getStudentNumber(), style);
+                export.valueToCell(sheet, rowIndex, 0, score.getClassName(), style);
                 export.valueToCell(sheet, rowIndex, 1, score.getStudentName(), style);
-                export.valueToCell(sheet, rowIndex, 2, score.getClassName(), style);
+                export.valueToCell(sheet, rowIndex, 2, score.getStudentNumber(), style);
                 export.valueToCell(sheet, rowIndex, 3, String.valueOf(score.getUsualScore()), style);
                 export.valueToCell(sheet, rowIndex, 4, String.valueOf(score.getFinalScore()), style);
                 export.valueToCell(sheet, rowIndex, 5, String.valueOf(score.getComprehensiveScore()), style);

@@ -8,15 +8,13 @@ import com.example.mapper.CourseTargetMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseAchievementAnalyseMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseScoreAnalyseMAPPER;
 import com.example.mapper.comprehensiveAnalyse.CourseTargetAnalyseMAPPER;
+import com.example.mapper.comprehensiveAnalyse.ExamPaperAnalyseReportMAPPER;
 import com.example.mapper.examinePaper.*;
 import com.example.object.CourseBasicInformation;
 import com.example.object.CourseExamineChildMethods;
 import com.example.object.CourseExamineMethods;
 import com.example.object.CourseTarget;
-import com.example.object.comprehensiveAnalyse.CourseAchievementAnalyse;
-import com.example.object.comprehensiveAnalyse.CourseScoreAnalyse;
-import com.example.object.comprehensiveAnalyse.CourseTargetAnalyse;
-import com.example.object.comprehensiveAnalyse.KeyValue;
+import com.example.object.comprehensiveAnalyse.*;
 import com.example.object.finalExamine.*;
 import com.example.utility.export.export;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,6 +69,8 @@ public class AnalysisReportServiceIMPL {
     private StudentInformationMAPPER studentInformationMAPPER;
     @Autowired
     private CourseTargetAnalyseMAPPER courseTargetAnalyseMAPPER;
+    @Autowired
+    private ExamPaperAnalyseReportMAPPER examPaperAnalyseReportMAPPER;
 
 
     //在word文档中生成表格
@@ -846,7 +846,7 @@ public class AnalysisReportServiceIMPL {
                                 for (StudentFinalScore items : studentFinalScores) {
                                     List<String> strings = export.toArray(export.stringTo2DArray(items.getScoreDetails()));
                                     for (int j = 0; j < strings.size(); j++) {
-                                        if (Boolean.parseBoolean(jsonArray1.get(j).toString())) {
+                                        if (Boolean.parseBoolean(jsonArray1.get(j).toString()) && !strings.get(j).equals("")) {
                                             sum += Double.parseDouble(strings.get(j));
                                         }
                                     }
@@ -1045,9 +1045,9 @@ public class AnalysisReportServiceIMPL {
             table.applyHorizontalMerge(0, 3, 6);
 
             table.get(1, 0).addParagraph().appendText("考试形式");
-            table.get(1, 1).addParagraph().appendText("XXXX");
+            table.get(1, 1).addParagraph().appendText("");
             table.get(1, 2).addParagraph().appendText("考试日期");
-            table.get(1, 3).addParagraph().appendText("XXXX-XX-XX");
+            table.get(1, 3).addParagraph().appendText("");
             table.applyHorizontalMerge(1, 3, 4);
             table.get(1, 5).addParagraph().appendText("人数");
             table.get(1, 6).addParagraph().appendText(String.valueOf(courseBasicInformation.getStudentsNum()));
@@ -1091,13 +1091,20 @@ public class AnalysisReportServiceIMPL {
             table.get(5, 5).addParagraph().appendText("最低分");
             table.get(5, 6).addParagraph().appendText(String.valueOf(scoreAnalyse.getMinScore()));
 
+            //老师填写部分
+            QueryWrapper<ExamPaperAnalyseReport> queryWrappern = new QueryWrapper<>();
+            queryWrappern.eq("course_id",courseId);
+            ExamPaperAnalyseReport examPaperAnalyseReport = examPaperAnalyseReportMAPPER.selectOne(queryWrappern);
+
             table.get(6, 0).addParagraph().appendText("试卷情况分析");
+            table.get(6, 1).addParagraph().appendText(examPaperAnalyseReport.getExamPaperSituationAnalyse());
             table.applyHorizontalMerge(6, 1, 6);
-            nullRow(table, 6, 0, 20);
+            nullRow(table, 6, 0, 18);
 
             table.get(7, 0).addParagraph().appendText("改进措施");
+            table.get(7, 1).addParagraph().appendText(examPaperAnalyseReport.getImprovementActions());
             table.applyHorizontalMerge(7, 1, 6);
-            nullRow(table, 7, 0, 20);
+            nullRow(table, 7, 0, 18);
 
             table.get(8, 0).addParagraph().appendText("教研室主任（签字）：");
             table.applyHorizontalMerge(8, 0, 1);
@@ -1201,7 +1208,7 @@ public class AnalysisReportServiceIMPL {
             table.get(1, 2).addParagraph().appendText("实验学时");
             table.get(1, 3).addParagraph().appendText(String.valueOf(courseBasicInformation.getLabHours()));
             table.get(1, 4).addParagraph().appendText("实习天数");
-            table.get(1, 5).addParagraph().appendText("XXXX");
+            table.get(1, 5).addParagraph().appendText("");
 
             table.get(2, 0).addParagraph().appendText("开课院系");
             table.get(2, 1).addParagraph().appendText("大数据与智能工程系");
@@ -1211,9 +1218,9 @@ public class AnalysisReportServiceIMPL {
             table.get(2, 5).addParagraph().appendText(String.valueOf(courseBasicInformation.getStudentsNum()));
 
             table.get(3, 0).addParagraph().appendText("多媒体教学");
-            table.get(3, 1).addParagraph().appendText("xxxx");
+            table.get(3, 1).addParagraph().appendText("");
             table.get(3, 2).addParagraph().appendText("双语教学");
-            table.get(3, 3).addParagraph().appendText("XXXX");
+            table.get(3, 3).addParagraph().appendText("");
             table.get(3, 4).addParagraph().appendText("考核方式");
             table.get(3, 5).addParagraph().appendText("统考");
 
@@ -1221,13 +1228,20 @@ public class AnalysisReportServiceIMPL {
             table.get(4, 1).addParagraph().appendText(courseBasicInformation.getTextBook());
             table.applyHorizontalMerge(4, 1, 3);
             table.get(4, 4).addParagraph().appendText("出版日期");
-            table.get(4, 3).addParagraph().appendText("XXXX-xx-xx");
+            table.get(4, 3).addParagraph().appendText("");
+
+            //老师填写部分
+            QueryWrapper<ExamPaperAnalyseReport> queryWrappern = new QueryWrapper<>();
+            queryWrappern.eq("course_id",courseId);
+            ExamPaperAnalyseReport examPaperAnalyseReport = examPaperAnalyseReportMAPPER.selectOne(queryWrappern);
 
             table.get(5, 0).addParagraph().appendText("课程教学总结");
+            table.get(5, 1).addParagraph().appendText(examPaperAnalyseReport.getCourseTeachingSummary());
             table.applyHorizontalMerge(5, 1, 5);
             nullRow(table, 5, 0, 20);
 
             table.get(6, 0).addParagraph().appendText("今后改革设想");
+            table.get(6, 1).addParagraph().appendText(examPaperAnalyseReport.getReformAssumption());
             table.applyHorizontalMerge(6, 1, 5);
             nullRow(table, 6, 0, 20);
 

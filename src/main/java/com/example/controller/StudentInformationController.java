@@ -2,7 +2,9 @@ package com.example.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.mapper.comprehensiveAnalyse.CourseAchievementAnalyseMAPPER;
+import com.example.mapper.comprehensiveAnalyse.CourseScoreAnalyseMAPPER;
 import com.example.object.comprehensiveAnalyse.CourseAchievementAnalyse;
+import com.example.object.comprehensiveAnalyse.CourseScoreAnalyse;
 import com.example.object.finalExamine.StudentFinalScore;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.object.finalExamine.StudentUsualScore;
@@ -34,6 +36,9 @@ public class StudentInformationController {
     @Autowired
     private CourseAchievementAnalyseMAPPER courseAchievementAnalyseMAPPER;
 
+    @Autowired
+    private CourseScoreAnalyseMAPPER courseScoreAnalyseMAPPER;
+
 
     /**
      * 导入一个课程的学生成绩信息
@@ -43,7 +48,6 @@ public class StudentInformationController {
     public DataResponses inputStudentInfo(@RequestParam("file") MultipartFile file, @PathVariable String courseId) {
         return studentInformationServiceIMPL.inputStudentInfo(file, courseId);
     }
-
 
 
     /**
@@ -88,13 +92,21 @@ public class StudentInformationController {
     @ApiOperation("获取当前课程全部学生期末试卷成绩")
     @GetMapping("/{courseId}/getComprehensiveScore")
     public DataResponses getComprehensiveScore(@PathVariable int courseId) {
-        return new DataResponses(true,studentInformationServiceIMPL.getComprehensiveScore(courseId));
+        return new DataResponses(true, studentInformationServiceIMPL.getComprehensiveScore(courseId));
     }
 
     @ApiOperation("导出综合成绩分析表")
     @GetMapping("/{courseId}/exportComprehensiveScoreAnalyse")
     public ResponseEntity<byte[]> exportComprehensiveScoreAnalyse(@PathVariable int courseId) {
         return studentInformationServiceIMPL.exportComprehensiveScoreAnalyse(courseId);
+    }
+
+    @ApiOperation("获取课程综合成绩分析数据")
+    @GetMapping("/{courseId}/getScoreAnalyse")
+    public DataResponses getScoreAnalyse(@PathVariable int courseId) {
+        QueryWrapper<CourseScoreAnalyse> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("course_id",courseId);
+        return new DataResponses(true, courseScoreAnalyseMAPPER.selectOne(queryWrapper));
     }
 
     @ApiOperation("导出综合成绩")
@@ -105,8 +117,8 @@ public class StudentInformationController {
 
     @ApiOperation("导出达成度分析表")
     @GetMapping("/{courseId}/{type}/exportDegreeOfAchievement")
-    public ResponseEntity<byte[]> exportDegreeOfAchievement(@PathVariable int courseId,@PathVariable int type) {
-        return studentInformationServiceIMPL.exportDegreeOfAchievement(courseId,type);
+    public ResponseEntity<byte[]> exportDegreeOfAchievement(@PathVariable int courseId, @PathVariable int type) {
+        return studentInformationServiceIMPL.exportDegreeOfAchievement(courseId, type);
     }
 
     @ApiOperation("获取前端散点图数据")
@@ -119,7 +131,6 @@ public class StudentInformationController {
 
     /**
      * 普通增删改查
-     *
      */
 
     @ApiOperation("查询当前课程信息")
@@ -133,7 +144,7 @@ public class StudentInformationController {
     @ApiOperation("添加学生信息")
     @PostMapping("/addStudent")
     public DataResponses addStudent(@RequestBody StudentInformation student) {
-        return new DataResponses(true, studentInformationServiceIMPL.save(student),student.getId().toString());
+        return new DataResponses(true, studentInformationServiceIMPL.save(student), student.getId().toString());
     }
 
     @ApiOperation("添加学生平时成绩")
@@ -191,7 +202,7 @@ public class StudentInformationController {
         studentUsualScore.setScoreDetails(score.getScoreDetails());
         QueryWrapper<StudentUsualScore> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("usual_score_id", studentUsualScore.getUsualScoreId());
-        return new DataResponses(true, studentUsualScoreServiceIMPL.update(studentUsualScore,queryWrapper));
+        return new DataResponses(true, studentUsualScoreServiceIMPL.update(studentUsualScore, queryWrapper));
     }
 
     @ApiOperation("修改学生期末成绩")
@@ -205,8 +216,6 @@ public class StudentInformationController {
         queryWrapper.eq("final_score_id", studentFinalScore.getFinalScoreId());
         return new DataResponses(true, studentFinalScoreServiceIMPL.update(studentFinalScore, queryWrapper));
     }
-
-
 
 
     /**
@@ -244,5 +253,6 @@ public class StudentInformationController {
     public DataResponses inputStudentFinalScoreExcl(@RequestParam("file") MultipartFile file, @PathVariable int courseId) {
         return studentFinalScoreServiceIMPL.inputStudentFinalScore(file, courseId);
     }
+
 
 }

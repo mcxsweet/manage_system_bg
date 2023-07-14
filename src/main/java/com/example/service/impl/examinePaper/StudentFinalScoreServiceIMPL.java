@@ -68,6 +68,9 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
         queryWrapper.eq("course_id", courseId);
         queryWrapper.like("examine_item", "期末");
         CourseExamineMethods methods = courseExamineMethodsMAPPER.selectOne(queryWrapper);
+        if(methods == null){
+            return new DataResponses(true,null);
+        }
         Integer methodsId = methods.getId();
 
         QueryWrapper<CourseExamineChildMethods> queryWrapper2 = new QueryWrapper<>();
@@ -101,14 +104,17 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
     //获取学生期末成绩
     @Override
     public DataResponses getAllStudent(int courseId) {
-        List<List<String>> emptyArray = new ArrayList<>();
-
         refreshStudentScore(courseId);
         List<StudentFinalScore> allStudent = studentFinalScoreMAPPER.getAllStudent(courseId);
+        DataResponses finalExamPaper = getFinalExamPaper(courseId);
+
         for (StudentFinalScore studentFinalScore : allStudent) {
+            List<List<String>> emptyArray = new ArrayList<>();
             if (studentFinalScore.getScoreDetails() == null) {
-                DataResponses finalExamPaper = getFinalExamPaper(courseId);
                 List<DataExtend> data = (List<DataExtend>) finalExamPaper.getData();
+                if (data == null){
+                    break;
+                }
                 for (DataExtend item : data) {
                     List<String> emptyStringList = new ArrayList<>();
                     JSONArray jsonArray = JSONArray.parseArray(item.getData());
