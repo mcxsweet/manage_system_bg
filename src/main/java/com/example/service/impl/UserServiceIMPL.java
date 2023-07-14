@@ -57,9 +57,10 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
         Map<String,Object> map = new HashMap<>();
         map.put("identity",user.getIdentity());
         if ("0".equals(user.getIdentity())){
-            QueryWrapper<User> QueryWrapper = new QueryWrapper<>();
-            QueryWrapper.eq("name",user.getName());
-            User user2 = userMAPPER.selectOne(QueryWrapper);
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("name",user.getName());
+            queryWrapper.last("limit 1");
+            User user2 = userMAPPER.selectOne(queryWrapper);
             if (user2 == null) {
                 return new DataResponses(false,"用户不存在");
             }
@@ -71,9 +72,10 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             StpUtil.getSession().set("admin_"+user2.getId(),user2);
             map.put("info",user2);
         } else {
-            QueryWrapper<StudentInformation> QueryWrapper = new QueryWrapper<>();
-            QueryWrapper.eq("student_number",user.getName());
-            StudentInformation studentInformation = studentInformationMAPPER.selectOne(QueryWrapper);
+            QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("student_number",user.getName());
+            queryWrapper.last("limit 1");
+            StudentInformation studentInformation = studentInformationMAPPER.selectOne(queryWrapper);
             if (studentInformation == null) {
                 return new DataResponses(false,"用户不存在");
             }
