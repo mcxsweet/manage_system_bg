@@ -20,7 +20,7 @@ public interface CourseAttainmentSurveyMAPPER extends BaseMapper<CourseAttainmen
             "WHERE c.student_number = #{number} GROUP BY c.course_id")
     List<Integer> isSurvey(@Param("number") String number);
 
-    @Select("SELECT s.student_number, c.course_id,c.course_name,c.id AS courseTargetId,c.target_name,c.course_target,a.attainment \n" +
+    @Select("SELECT s.id as student_id, s.student_number, c.course_id,c.course_name,c.id AS courseTargetId,c.target_name,c.course_target,a.attainment \n" +
             "from student_information s JOIN course_target c ON s.course_id = c.course_id LEFT JOIN \n" +
             "course_attainment_survey a ON s.student_number = a.student_number AND c.id = a.course_target_id  \n" +
             "WHERE s.student_number = #{number} AND s.course_id=#{courseId}")

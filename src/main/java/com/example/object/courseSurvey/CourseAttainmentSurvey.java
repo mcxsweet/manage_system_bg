@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class CourseAttainmentSurvey {
 
+    private Integer studentId;
     //课程目标id
     private Integer courseTargetId;
     private Integer courseId;//课程id
