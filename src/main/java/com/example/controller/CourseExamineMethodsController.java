@@ -65,7 +65,7 @@ public class CourseExamineMethodsController {
     @ApiOperation("提供课程id添加考核项目")
     @PostMapping("/courseExamineMethods")
     public DataResponses addCourseExamineMethods(@RequestBody CourseExamineMethods item) {
-        return new DataResponses(courseExamineMethodsService.save(item));
+        return new DataResponses(courseExamineMethodsService.save(item),item.getId());
     }
 
     //提供考核项目id添加子考核项目

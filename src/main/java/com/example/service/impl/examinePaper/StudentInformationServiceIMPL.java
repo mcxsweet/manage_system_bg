@@ -22,10 +22,10 @@ import com.example.service.examinePaper.StudentInformationSERVICE;
 import com.example.utility.DataResponses;
 import com.example.utility.export.export;
 import com.spire.xls.FileFormat;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -69,10 +70,17 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
     @Transactional
     public DataResponses inputStudentInfo(MultipartFile file, String courseId) {
         try {
-            HSSFWorkbook workbook = new HSSFWorkbook(file.getInputStream());
-            HSSFSheet sheet = workbook.getSheetAt(0);
-
+            String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+            Workbook workbook = null;
             DataFormatter formatter = new DataFormatter();
+
+            if (fileSuffix.equals(".xls")) {
+                workbook = new HSSFWorkbook(file.getInputStream());
+            } else if (fileSuffix.equals(".xlsx")) {
+                workbook = new XSSFWorkbook(file.getInputStream());
+            }
+            assert workbook != null;
+            Sheet sheet = workbook.getSheetAt(0);
 
             int StudentNumber = 0;
             int StudentName = 0;
@@ -80,24 +88,27 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             int i = 0;
             Row row1 = sheet.getRow(0);
             while (true) {
-                String s = formatter.formatCellValue(row1.getCell(i));
-                if (Objects.equals(s, "")){
+                if (row1.getCell(i) != null) {
+                    String s = formatter.formatCellValue(row1.getCell(i));
+                    if (Objects.equals(s, "")) {
+                        break;
+                    }
+                    switch (s) {
+                        case "学号":
+                            StudentNumber = i;
+                            break;
+                        case "姓名":
+                            StudentName = i;
+                            break;
+                        case "班级":
+                            ClassName = i;
+                            break;
+                    }
+                    i++;
+                } else {
                     break;
                 }
-                switch (s) {
-                    case "学号":
-                        StudentNumber = i;
-                        break;
-                    case "姓名":
-                        StudentName = i;
-                        break;
-                    case "班级":
-                        ClassName = i;
-                        break;
-                }
-                i++;
             }
-
             //遍历行
             for (int rowIndex = 1; rowIndex < sheet.getLastRowNum() + 1; rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
@@ -113,11 +124,10 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
                 Integer id = 0;
                 if (information == null) {
-                    student.setStudentNumber(formatter.formatCellValue(row.getCell(0)));
+                    student.setStudentNumber(formatter.formatCellValue(row.getCell(StudentNumber)));
                     student.setCourseId(courseId);
 
                     studentInformationMAPPER.insert(student);
-                    id = studentInformationMAPPER.selectOne(queryWrapper).getId();
                 } else {
                     id = information.getId();
                     student.setId(id);
@@ -125,6 +135,8 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
                     studentInformationMAPPER.updateById(student);
                 }
             }
+
+
             return new DataResponses(true, "导入成功");
 
         } catch (IOException exception) {
@@ -143,7 +155,7 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
     //导出学生综合成绩XLS
     @Override
-    public ResponseEntity<byte[]> exportComprehensiveScore(int courseId) {
+    public ResponseEntity<byte[]> exportComprehensiveScore(HttpServletResponse response, int courseId) {
         try {
             Workbook workbook = new HSSFWorkbook();
             Sheet sheet = workbook.createSheet();
@@ -193,13 +205,17 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             workbook.write(byteArrayOutputStream);
             byte[] bytes = byteArrayOutputStream.toByteArray();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+            String fileName = courseBasicInformation.getTermStart() + " - " + courseBasicInformation.getTermEnd() + "学年第" + courseBasicInformation.getTerm() + "学期" + courseBasicInformation.getClassName() + courseBasicInformation.getCourseName() + "[" + courseBasicInformation.getClassroomTeacher() + "]" + "学生综合成绩.xls";
+
+            response.reset();
+            response.setContentType("application/vnd.ms-excel");
+
+            response.setCharacterEncoding("utf-8");
+            response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
 
             return ResponseEntity.ok()
-                    .headers(headers)
                     .body(bytes);
+
         } catch (IOException ignored) {
         }
         return null;
@@ -207,7 +223,7 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
     //导出达成度分析表
     @Override
-    public ResponseEntity<byte[]> exportDegreeOfAchievement(int courseId,int type) {
+    public ResponseEntity<byte[]> exportDegreeOfAchievement(int courseId, int type) {
         try {
             Workbook workbook = new HSSFWorkbook();
             Sheet sheet = workbook.createSheet();
@@ -311,7 +327,7 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
                 for (CourseTargetAnalyse targetAnalyse : courseTargetAnalyses) {
                     JSONArray objects = JSONArray.parseArray(targetAnalyse.getMatrix());
                     double result = 0;
-                    for (int j = 0; j < objects.size(); j++) {
+                    for (int j = 0; j < ints.size(); j++) {
                         if (Boolean.parseBoolean(objects.get(j).toString())) {
                             result += ints.get(j);
                         }
@@ -328,8 +344,6 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
 
                     i += 3;
                 }
-
-
                 rowIndex++;
             }
 

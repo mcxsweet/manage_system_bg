@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.mapper.CourseBasicInformationMAPPER;
 import com.example.mapper.CourseExamineChildMethodsMAPPER;
 import com.example.mapper.CourseExamineMethodsMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
 import com.example.mapper.examinePaper.StudentUsualScoreMAPPER;
+import com.example.object.CourseBasicInformation;
 import com.example.object.CourseExamineChildMethods;
 import com.example.object.CourseExamineMethods;
 import com.example.object.finalExamine.StudentInformation;
@@ -18,8 +20,6 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +33,8 @@ import java.util.Objects;
 
 import com.example.utility.export.export;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Service
 public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreMAPPER, StudentUsualScore> implements StudentUsualScoreSERVICE {
 
@@ -43,6 +45,9 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
 
     @Autowired
     private CourseExamineMethodsMAPPER courseExamineMethodsMAPPER;
+
+    @Autowired
+    private CourseBasicInformationMAPPER courseBasicInformationMAPPER;
 
     @Autowired
     private CourseExamineChildMethodsMAPPER courseExamineChildMethodsMAPPER;
@@ -145,7 +150,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
 
     //学生成绩表格导出
     @Override
-    public ResponseEntity<byte[]> exportStudentUsualScore(int courseId) throws IOException {
+    public ResponseEntity<byte[]> exportStudentUsualScore(HttpServletResponse response, int courseId) throws IOException {
 
         //工作簿事例
         int rowIndex = 1;
@@ -235,17 +240,27 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
             rowIndex++;
         }
 
+        CourseBasicInformation courseBasicInformation = courseBasicInformationMAPPER.selectById(courseId);
+        String fileName = courseBasicInformation.getTermStart() + " - " + courseBasicInformation.getTermEnd() + "学年第" + courseBasicInformation.getTerm() + "学期" + courseBasicInformation.getClassName() + courseBasicInformation.getCourseName() + "[" + courseBasicInformation.getClassroomTeacher() + "]" + "平时成绩.xls";
+
+        mergedRegion = new CellRangeAddress(0, 0, 0, columIndex);
+        sheet.addMergedRegion(mergedRegion);
+        row1.createCell(0).setCellValue(fileName);
+        export.reloadCellStyle(mergedRegion, sheet, style);
+
         //写入文件
         //使用字节数组读取
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         workbook.write(byteArrayOutputStream);
         byte[] bytes = byteArrayOutputStream.toByteArray();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+        response.reset();
+        response.setContentType("application/vnd.ms-excel");
+
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
+
         return ResponseEntity.ok()
-                .headers(headers)
                 .body(bytes);
     }
 

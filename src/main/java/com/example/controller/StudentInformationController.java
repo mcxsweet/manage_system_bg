@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
@@ -105,14 +106,14 @@ public class StudentInformationController {
     @GetMapping("/{courseId}/getScoreAnalyse")
     public DataResponses getScoreAnalyse(@PathVariable int courseId) {
         QueryWrapper<CourseScoreAnalyse> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("course_id",courseId);
+        queryWrapper.eq("course_id", courseId);
         return new DataResponses(true, courseScoreAnalyseMAPPER.selectOne(queryWrapper));
     }
 
     @ApiOperation("导出综合成绩")
     @GetMapping("/{courseId}/exportComprehensiveScore")
-    public ResponseEntity<byte[]> exportComprehensiveScore(@PathVariable int courseId) {
-        return studentInformationServiceIMPL.exportComprehensiveScore(courseId);
+    public ResponseEntity<byte[]> exportComprehensiveScore(HttpServletResponse response, @PathVariable int courseId) {
+        return studentInformationServiceIMPL.exportComprehensiveScore(response, courseId);
     }
 
     @ApiOperation("导出达成度分析表")
@@ -223,8 +224,8 @@ public class StudentInformationController {
      */
     @ApiOperation("导出平时成绩表格")
     @GetMapping("/{courseId}/studentUsualScoreExcl")
-    public ResponseEntity<byte[]> studentUsualScoreExcl(@PathVariable int courseId) throws IOException {
-        return studentUsualScoreServiceIMPL.exportStudentUsualScore(courseId);
+    public ResponseEntity<byte[]> studentUsualScoreExcl(HttpServletResponse response, @PathVariable int courseId) throws IOException {
+        return studentUsualScoreServiceIMPL.exportStudentUsualScore(response, courseId);
     }
 
     /**
@@ -241,8 +242,8 @@ public class StudentInformationController {
      */
     @ApiOperation("导出学生期末成绩表格")
     @GetMapping("/{courseId}/studentFinalScoreExcl")
-    public ResponseEntity<byte[]> inputStudentFinalScoreExcl(@PathVariable int courseId) throws IOException {
-        return studentFinalScoreServiceIMPL.exportStudentFinalScore(courseId);
+    public ResponseEntity<byte[]> inputStudentFinalScoreExcl(HttpServletResponse response, @PathVariable int courseId) throws IOException {
+        return studentFinalScoreServiceIMPL.exportStudentFinalScore(response, courseId);
     }
 
     /**

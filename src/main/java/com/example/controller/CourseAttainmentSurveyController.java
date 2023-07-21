@@ -60,8 +60,8 @@ public class CourseAttainmentSurveyController {
     }
 
     @ApiOperation("获取指定课程问卷的完成情况")
-    @GetMapping("/getStudentComplete")
-    public DataResponses getStudentComplete(@RequestParam int courseId) {
+    @GetMapping("/{courseId}/getStudentComplete")
+    public DataResponses getStudentComplete(@PathVariable int courseId) {
         return new DataResponses(true, courseAttainmentSurveyMAPPER.getStudent(courseId));
     }
 }

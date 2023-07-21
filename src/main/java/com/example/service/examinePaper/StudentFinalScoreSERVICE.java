@@ -6,6 +6,7 @@ import com.example.utility.DataResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public interface StudentFinalScoreSERVICE extends IService<StudentFinalScore> {
@@ -17,7 +18,7 @@ public interface StudentFinalScoreSERVICE extends IService<StudentFinalScore> {
     void refreshStudentScore(int course);
 
     //导出学生期末成绩
-    ResponseEntity<byte[]> exportStudentFinalScore(int courseId) throws IOException;
+    ResponseEntity<byte[]> exportStudentFinalScore(HttpServletResponse response, int courseId) throws IOException;
 
     //学生平时成绩导入
     DataResponses inputStudentFinalScore(MultipartFile file, int courseId);

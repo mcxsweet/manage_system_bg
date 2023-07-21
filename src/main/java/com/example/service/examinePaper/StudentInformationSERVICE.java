@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface StudentInformationSERVICE extends IService<StudentInformation> {
@@ -19,7 +20,7 @@ public interface StudentInformationSERVICE extends IService<StudentInformation> 
     List<StudentComprehensiveScore> getComprehensiveScore(int courseId);
 
     //导出学生综合成绩XLS
-    ResponseEntity<byte[]> exportComprehensiveScore(int courseId);
+    ResponseEntity<byte[]> exportComprehensiveScore(HttpServletResponse response, int courseId);
 
     //导出达成度分析表
     ResponseEntity<byte[]> exportDegreeOfAchievement(int courseId,int type);

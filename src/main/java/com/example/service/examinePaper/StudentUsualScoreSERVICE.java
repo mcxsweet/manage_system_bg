@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +22,8 @@ public interface StudentUsualScoreSERVICE extends IService<StudentUsualScore> {
     //学生平时总成绩设置和刷新
     void refreshStudentScore(int courseId);
 
-    ResponseEntity<byte[]> exportStudentUsualScore(int courseId) throws IOException;
+    //学生成绩表格导出
+    ResponseEntity<byte[]> exportStudentUsualScore(HttpServletResponse response, int courseId) throws IOException;
 
     @Transactional
     DataResponses inputStudentUsualScore(MultipartFile file, String courseId) throws IOException;

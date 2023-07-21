@@ -23,8 +23,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +35,8 @@ import java.util.Objects;
 import com.example.utility.export.export;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreMAPPER, StudentFinalScore> implements StudentFinalScoreSERVICE {
@@ -68,8 +68,8 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
         queryWrapper.eq("course_id", courseId);
         queryWrapper.like("examine_item", "期末");
         CourseExamineMethods methods = courseExamineMethodsMAPPER.selectOne(queryWrapper);
-        if(methods == null){
-            return new DataResponses(true,null);
+        if (methods == null) {
+            return new DataResponses(true, null);
         }
         Integer methodsId = methods.getId();
 
@@ -112,7 +112,7 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
             List<List<String>> emptyArray = new ArrayList<>();
             if (studentFinalScore.getScoreDetails() == null) {
                 List<DataExtend> data = (List<DataExtend>) finalExamPaper.getData();
-                if (data == null){
+                if (data == null) {
                     break;
                 }
                 for (DataExtend item : data) {
@@ -163,7 +163,7 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
 
     //导出学生期末成绩
     @Override
-    public ResponseEntity<byte[]> exportStudentFinalScore(int courseId) throws IOException {
+    public ResponseEntity<byte[]> exportStudentFinalScore(HttpServletResponse response, int courseId) throws IOException {
 
         //行列索引
         int rowIndex = 1;
@@ -224,7 +224,9 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
             }
             columIndex--;
             CellRangeAddress cellAddresses = new CellRangeAddress(2, 2, temp, columIndex);
-            sheet.addMergedRegion(cellAddresses);
+            if (temp != columIndex) {
+                sheet.addMergedRegion(cellAddresses);
+            }
             row3.createCell(temp).setCellValue(data.getMessage());
             export.reloadCellStyle(cellAddresses, sheet, style);
             columIndex++;
@@ -278,12 +280,15 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
         workbook.write(byteArrayOutputStream);
         byte[] bytes = byteArrayOutputStream.toByteArray();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+        String fileName = courseBasicInformation.getTermStart() + " - " + courseBasicInformation.getTermEnd() + "学年第" + courseBasicInformation.getTerm() + "学期" + courseBasicInformation.getClassName() + courseBasicInformation.getCourseName() + "[" + courseBasicInformation.getClassroomTeacher() + "]" + "卷面成绩.xls";
+
+        response.reset();
+        response.setContentType("application/vnd.ms-excel");
+
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
 
         return ResponseEntity.ok()
-                .headers(headers)
                 .body(bytes);
     }
 

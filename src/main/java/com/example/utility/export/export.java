@@ -100,6 +100,9 @@ public class export {
             Row row = sheet.getRow(i);
             for (int j = mergedRegion.getFirstColumn(); j <= mergedRegion.getLastColumn(); j++) {
                 Cell cell = row.getCell(j);
+                if (cell == null) {
+                    cell = row.createCell(j);
+                }
                 if (cell != null) {
                     cell.setCellStyle(style);
                 }
@@ -124,12 +127,14 @@ public class export {
     }
 
     //二维数组转一维数组
-    public static List<String> toArray(List<List<String>> input){
+    public static List<String> toArray(List<List<String>> input) {
         List<String> result = new ArrayList<>();
 
-        for (List<String> strings : input) {
-            for (String string : strings) {
-                result.add(string);
+        if (input != null) {
+            for (List<String> strings : input) {
+                for (String string : strings) {
+                    result.add(string);
+                }
             }
         }
         return result;
@@ -163,5 +168,12 @@ public class export {
                 break;
         }
         return Double.parseDouble(str);
+    }
+
+    //Apache POI 合并单元格
+    public static void mergeRowCell(HSSFSheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+        if (firstCol != lastCol) {
+            sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
+        }
     }
 }

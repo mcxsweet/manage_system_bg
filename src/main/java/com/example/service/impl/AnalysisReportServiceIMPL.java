@@ -16,6 +16,7 @@ import com.example.object.CourseExamineMethods;
 import com.example.object.CourseTarget;
 import com.example.object.comprehensiveAnalyse.*;
 import com.example.object.finalExamine.*;
+import com.example.utility.DataExtend;
 import com.example.utility.export.export;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spire.doc.FileFormat;
@@ -34,7 +35,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.spire.doc.*;
 import com.spire.doc.documents.HorizontalAlignment;
@@ -772,9 +775,10 @@ public class AnalysisReportServiceIMPL {
                     String s = "";
                     int n = 0;
                     if (courseExamineMethod.getExamineItem().contains("平时")) {
-                        boolean[] boolArray = new boolean[courseExamineChildMethods1.size()];
+//                        boolean[] boolArray = new boolean[courseExamineChildMethods1.size()];
+                        List<DataExtend> keyValues = new ArrayList<>();
 
-                        int childMethodsIndex = 0;
+//                        int childMethodsIndex = 0;
                         for (CourseExamineChildMethods item : courseExamineChildMethods1) {
                             //判断是否含有该课程目标
                             boolean isHave = false;
@@ -788,21 +792,23 @@ public class AnalysisReportServiceIMPL {
                                 }
                             }
                             //构建关系数组
-                            boolArray[childMethodsIndex] = isHave;
-                            childMethodsIndex++;
+                            keyValues.add(new DataExtend(String.valueOf(isHave), String.valueOf(item.getChildPercentage())));
+//                            boolArray[childMethodsIndex] = isHave;
+//                            childMethodsIndex++;
                         }
 
                         double sum = 0;
                         for (StudentUsualScore items : studentUsualScores) {
                             JSONArray jsonArray1 = JSONArray.parseArray(items.getScoreDetails());
                             for (int j = 0; j < jsonArray1.size(); j++) {
-                                if (boolArray[j]) {
-                                    sum += Double.parseDouble(jsonArray1.get(j).toString());
+                                if (Boolean.parseBoolean(keyValues.get(j).getMessage())) {
+                                    sum += Double.parseDouble(jsonArray1.get(j).toString()) * Integer.parseInt(keyValues.get(j).getData()) * 0.01;
                                 }
                             }
-
                         }
-                        double v = export.doubleFormat(sum / studentUsualScores.size(), 2);
+
+                        double avg = sum / studentUsualScores.size();
+                        double v = export.doubleFormat(avg, 2);
                         double v2 = export.doubleFormat(v / n, 2);
                         usualAchievement = v2 * courseExamineMethod.getPercentage() * 0.01;
 
@@ -879,7 +885,7 @@ public class AnalysisReportServiceIMPL {
             }
 
             result = export.doubleFormat(result, 2);
-            resultStr = resultStr.substring(0, resultStr.length() - 1);
+            resultStr = resultStr.substring(0, resultStr.length() - 2);
             resultStr = resultStr + " = " + result;
 
             table6.get(rowIndex, 0).addParagraph().appendText("总课程目标达成度");
@@ -1093,7 +1099,7 @@ public class AnalysisReportServiceIMPL {
 
             //老师填写部分
             QueryWrapper<ExamPaperAnalyseReport> queryWrappern = new QueryWrapper<>();
-            queryWrappern.eq("course_id",courseId);
+            queryWrappern.eq("course_id", courseId);
             ExamPaperAnalyseReport examPaperAnalyseReport = examPaperAnalyseReportMAPPER.selectOne(queryWrappern);
 
             table.get(6, 0).addParagraph().appendText("试卷情况分析");
@@ -1232,7 +1238,7 @@ public class AnalysisReportServiceIMPL {
 
             //老师填写部分
             QueryWrapper<ExamPaperAnalyseReport> queryWrappern = new QueryWrapper<>();
-            queryWrappern.eq("course_id",courseId);
+            queryWrappern.eq("course_id", courseId);
             ExamPaperAnalyseReport examPaperAnalyseReport = examPaperAnalyseReportMAPPER.selectOne(queryWrappern);
 
             table.get(5, 0).addParagraph().appendText("课程教学总结");
