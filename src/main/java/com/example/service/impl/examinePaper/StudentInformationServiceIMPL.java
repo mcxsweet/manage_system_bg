@@ -82,10 +82,12 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             assert workbook != null;
             Sheet sheet = workbook.getSheetAt(0);
 
+            //对应的列位置索引
             int StudentNumber = 0;
             int StudentName = 0;
             int ClassName = 0;
             int i = 0;
+
             Row row1 = sheet.getRow(0);
             while (true) {
                 if (row1.getCell(i) != null) {
