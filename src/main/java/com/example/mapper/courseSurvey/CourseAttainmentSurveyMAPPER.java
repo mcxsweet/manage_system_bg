@@ -29,14 +29,13 @@ public interface CourseAttainmentSurveyMAPPER extends BaseMapper<CourseAttainmen
     @Select("SELECT course_target_id,attainment,COUNT(attainment) AS amount\n" +
             "FROM course_attainment_survey  \n" +
             "WHERE course_id = #{courseId}\n" +
-            "GROUP BY  attainment,course_target_id")
+            "GROUP BY attainment,course_target_id")
     List<SurveyDAO> getTable(@Param("courseId") Integer courseId);
 
     @Select("SELECT s.course_target_id,COUNT(s.course_target_id) AS total,c.course_target\n" +
             "FROM course_attainment_survey s JOIN  course_target c ON s.course_target_id = c.id\n" +
             "WHERE s.course_id = #{courseId}\n" +
             "GROUP BY  s.course_target_id")
-
     List<SurveyVO> getTotal(@Param("courseId") Integer courseId);
 
     @Select("SELECT s.student_number,s.student_name,IF(COUNT(s.student_number)>1,1,0) AS completed FROM student_information s\n" +

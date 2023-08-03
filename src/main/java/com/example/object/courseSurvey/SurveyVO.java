@@ -29,7 +29,7 @@ public class SurveyVO {
         if (this.total==0){
             return 0d;
         }else {
-            BigDecimal c = new BigDecimal(this.gradeA).divide(new BigDecimal(this.total), 4, BigDecimal.ROUND_HALF_UP);
+            BigDecimal c = new BigDecimal(this.gradeB).divide(new BigDecimal(this.total), 4, BigDecimal.ROUND_HALF_UP);
             return c.doubleValue();
         }
     }
@@ -39,7 +39,7 @@ public class SurveyVO {
         if (this.total==0){
             return 0d;
         }else {
-            BigDecimal c = new BigDecimal(this.gradeA).divide(new BigDecimal(this.total), 4, BigDecimal.ROUND_HALF_UP);
+            BigDecimal c = new BigDecimal(this.gradeC).divide(new BigDecimal(this.total), 4, BigDecimal.ROUND_HALF_UP);
             return c.doubleValue();
         }
     }
@@ -49,7 +49,7 @@ public class SurveyVO {
         if (this.total==0){
             return 0d;
         }else {
-            BigDecimal c = new BigDecimal(this.gradeA).divide(new BigDecimal(this.total), 4, BigDecimal.ROUND_HALF_UP);
+            BigDecimal c = new BigDecimal(this.gradeD).divide(new BigDecimal(this.total), 4, BigDecimal.ROUND_HALF_UP);
             return c.doubleValue();
         }
     }
