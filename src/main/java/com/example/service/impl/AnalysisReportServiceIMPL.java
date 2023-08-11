@@ -973,6 +973,11 @@ public class AnalysisReportServiceIMPL {
             response.setCharacterEncoding("utf-8");
             response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
 
+            /*
+                在这写判断是否生成分析报告的逻辑
+             */
+            System.out.println("报告生成");
+
             return ResponseEntity.ok()
                     .body(Bytes);
         } catch (IOException ignored) {
