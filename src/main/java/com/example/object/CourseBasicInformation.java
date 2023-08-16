@@ -39,5 +39,7 @@ public class CourseBasicInformation {
     private int indicatorPointsNum;
     //指标点编号
     private String indicatorPoints;
+    //
+    private String accomplish;
 
 }

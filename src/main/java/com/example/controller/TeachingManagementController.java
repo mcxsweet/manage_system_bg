@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 
 @CrossOrigin(origins = "*")
 @Api(tags = "分析报告")
@@ -21,14 +23,16 @@ public class TeachingManagementController {
 
 
     @ApiOperation("获取当前专业的所有课程")
-    @GetMapping("/{major}/getCourseByMajor")
-    public DataResponses getCourseByMajor(@PathVariable String major) {
+    @PostMapping("/getCourseByMajor")
+    public DataResponses getCourseByMajor(@RequestBody HashMap<String, String> major) {
         QueryWrapper<CourseBasicInformation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("major",major);
+        queryWrapper.like("major",major.get("major"));
         queryWrapper.orderByDesc("term_start");
         queryWrapper.orderByAsc("term");
         return new DataResponses(true, courseBasicInformationServiceIMPL.list(queryWrapper));
     }
+
+
 
 
 }

@@ -2,6 +2,7 @@ package com.example.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.CourseBasicInformationMAPPER;
 import com.example.mapper.comprehensiveAnalyse.ExamPaperAnalyseReportMAPPER;
 import com.example.object.comprehensiveAnalyse.ExamPaperAnalyseReport;
 import com.example.service.impl.AnalysisReportServiceIMPL;
@@ -23,7 +24,15 @@ public class AnalysisReportController {
     private AnalysisReportServiceIMPL analysisReportServiceIMPL;
     @Autowired
     private ExamPaperAnalyseReportMAPPER examPaperAnalyseReportMAPPER;
+    @Autowired
+    private CourseBasicInformationMAPPER courseBasicInformationMAPPER;
 
+
+    @ApiOperation("老师更新当前课程分析报告生成状态并将其存储到本地")
+    @GetMapping("/{courseId}/updateStatus")
+    public DataResponses updateStatus(HttpServletResponse response, @PathVariable int courseId) {
+        return analysisReportServiceIMPL.updateStatus(response, courseId, 1);
+    }
 
     @ApiOperation("导出课程目标达成评价分析报告")
     @GetMapping("{courseId}/{type}/analyse")
@@ -47,19 +56,19 @@ public class AnalysisReportController {
     @GetMapping("{courseId}/getImprovementActions")
     public DataResponses getImprovementActions(@PathVariable int courseId) {
         QueryWrapper<ExamPaperAnalyseReport> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("course_id",courseId);
-        return new DataResponses(true,examPaperAnalyseReportMAPPER.selectOne(queryWrapper));
+        queryWrapper.eq("course_id", courseId);
+        return new DataResponses(true, examPaperAnalyseReportMAPPER.selectOne(queryWrapper));
     }
 
     @ApiOperation("添加及更新改进措施")
     @PostMapping("/InsertImprovementActions")
     public DataResponses InsertImprovementActions(@RequestBody ExamPaperAnalyseReport item) {
         QueryWrapper<ExamPaperAnalyseReport> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("course_id",item.getCourseId());
-        if (examPaperAnalyseReportMAPPER.update(item,queryWrapper) == 0){
+        queryWrapper.eq("course_id", item.getCourseId());
+        if (examPaperAnalyseReportMAPPER.update(item, queryWrapper) == 0) {
             examPaperAnalyseReportMAPPER.insert(item);
         }
-        return new DataResponses(true,item.getCourseId());
+        return new DataResponses(true, item.getCourseId());
     }
 
 

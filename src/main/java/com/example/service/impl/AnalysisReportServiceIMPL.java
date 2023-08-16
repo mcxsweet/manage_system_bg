@@ -2,6 +2,7 @@ package com.example.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.mapper.CourseBasicInformationMAPPER;
 import com.example.mapper.CourseExamineChildMethodsMAPPER;
 import com.example.mapper.CourseExamineMethodsMAPPER;
 import com.example.mapper.CourseTargetMAPPER;
@@ -17,6 +18,7 @@ import com.example.object.CourseTarget;
 import com.example.object.comprehensiveAnalyse.*;
 import com.example.object.finalExamine.*;
 import com.example.utility.DataExtend;
+import com.example.utility.DataResponses;
 import com.example.utility.export.export;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spire.doc.FileFormat;
@@ -32,12 +34,10 @@ import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 import com.spire.doc.*;
 import com.spire.doc.documents.HorizontalAlignment;
@@ -50,6 +50,8 @@ import javax.servlet.http.HttpServletResponse;
 public class AnalysisReportServiceIMPL {
     @Autowired
     private CourseBasicInformationServiceIMPL courseBasicInformationServiceIMPL;
+    @Autowired
+    private CourseBasicInformationMAPPER courseBasicInformationMAPPER;
     @Autowired
     private CourseTargetMAPPER courseTargetMAPPER;
     @Autowired
@@ -973,10 +975,6 @@ public class AnalysisReportServiceIMPL {
             response.setCharacterEncoding("utf-8");
             response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
 
-            /*
-                在这写判断是否生成分析报告的逻辑
-             */
-            System.out.println("报告生成");
 
             return ResponseEntity.ok()
                     .body(Bytes);
@@ -1297,4 +1295,44 @@ public class AnalysisReportServiceIMPL {
         }
     }
 
+    //确定该课程的三个报告文档的生成情况（并将其报存）
+    public DataResponses updateStatus(HttpServletResponse response, int courseId, int type) {
+        CourseBasicInformation info = courseBasicInformationServiceIMPL.getById(courseId);
+        try {
+            File directory = new File("");
+            String filePath = directory.getCanonicalPath();
+
+            String filename1 = info.getCourseName() + "-" + info.getClassName() + "-" + info.getClassroomTeacher() + "-" + info.getTermStart() + "-" + info.getTermEnd() + "-" + info.getTerm() + "课程目标达成评价分析报告.docx";
+            String filename2 = info.getCourseName() + "-" + info.getClassName() + "-" + info.getClassroomTeacher() + "-" + info.getTermStart() + "-" + info.getTermEnd() + "-" + info.getTerm() + "课程试卷分析报告.docx";
+            String filename3 = info.getCourseName() + "-" + info.getClassName() + "-" + info.getClassroomTeacher() + "-" + info.getTermStart() + "-" + info.getTermEnd() + "-" + info.getTerm() + "课程教学小结表.docx";
+
+            String filePath_ = filePath + "/doc/" + info.getMajor() + "/" + info.getClassroomTeacher();
+            File fileRealPath = new File(filePath_);
+            //路径不存在则创建
+            if (!fileRealPath.exists()) {
+                if (!fileRealPath.mkdirs()) {
+                    return new DataResponses(false);
+                }
+            }
+
+            ResponseEntity<byte[]> report1 = getReport(response, courseId, type);
+            byte[] body1 = report1.getBody();
+            FileOutputStream fileOutputStream1 = new FileOutputStream(filePath_ + "/" + filename1);
+            fileOutputStream1.write(body1);
+
+            ResponseEntity<byte[]> report2 = getReport3(response, courseId, type);
+            byte[] body2 = report2.getBody();
+            FileOutputStream fileOutputStream2 = new FileOutputStream(filePath_ + "/" + filename2);
+            fileOutputStream2.write(body2);
+
+            ResponseEntity<byte[]> report3 = getReport4(response, courseId, type);
+            byte[] body3 = report3.getBody();
+            FileOutputStream fileOutputStream3 = new FileOutputStream(filePath_ + "/" + filename3);
+            fileOutputStream3.write(body3);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new DataResponses(courseBasicInformationMAPPER.updateStatus(courseId));
+    }
 }
