@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -412,28 +413,30 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
                 courseAchievementAnalyseMAPPER.insert(courseAchievementAnalyse);
             }
 
-            FileOutputStream fileOut = new FileOutputStream("workbook.xls");
-            workbook.write(fileOut);
-            fileOut.close();
+            ByteArrayOutputStream outputStreamXLS = new ByteArrayOutputStream();
+            workbook.write(outputStreamXLS);
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStreamXLS.toByteArray());
 
             // 加载 XLS 文件
             com.spire.xls.Workbook workbookn = new com.spire.xls.Workbook();
-            workbookn.loadFromFile("workbook.xls");
+            workbookn.loadFromStream(inputStream);
             //设置转换后的PDGF页面高度适应工作表的内容大小
             workbookn.getConverterSetting().setSheetFitToPage(true);
             //设置转换后PDF的页面宽度适应工作表的内容宽度
             workbookn.getConverterSetting().setSheetFitToWidth(true);
             // 将 XLS 文件转换为 PDF 文件
-            workbookn.saveToFile("workbook.pdf", FileFormat.PDF);
+            ByteArrayOutputStream outputStreamPDF = new ByteArrayOutputStream();
+            workbookn.saveToStream(outputStreamPDF, FileFormat.PDF);
             // 将 PDF 文件读入字节数组
             byte[] Bytes = null;
             HttpHeaders headers = new HttpHeaders();
             if (type == 1) {
-                Bytes = Files.readAllBytes(Paths.get("workbook.pdf"));
+                Bytes = outputStreamPDF.toByteArray();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.pdf");
                 headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
             } else if (type == 2) {
-                Bytes = Files.readAllBytes(Paths.get("workbook.xls"));
+                Bytes = outputStreamXLS.toByteArray();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
                 headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
             }
@@ -547,19 +550,23 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             export.valueToCell(sheet, 0, 0, "课程成绩分析", style);
             export.reloadCellStyle(mergedRegion, sheet, style);
 
-            FileOutputStream fileOut = new FileOutputStream("workbook.xls");
-            workbook.write(fileOut);
-            fileOut.close();
+            ByteArrayOutputStream outputStreamXLS = new ByteArrayOutputStream();
+            workbook.write(outputStreamXLS);
+
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStreamXLS.toByteArray());
 
             // 加载 XLS 文件
             com.spire.xls.Workbook workbookn = new com.spire.xls.Workbook();
-            workbookn.loadFromFile("workbook.xls");
+            workbookn.loadFromStream(inputStream);
+
             workbookn.getConverterSetting().setSheetFitToPage(true);
             workbookn.getConverterSetting().setSheetFitToWidth(true);
             // 将 XLS 文件转换为 PDF 文件
-            workbookn.saveToFile("workbook.pdf", FileFormat.PDF);
+            ByteArrayOutputStream outputStreamPDF = new ByteArrayOutputStream();
+
+            workbookn.saveToStream(outputStreamPDF, FileFormat.PDF);
             //使用字节数组读取
-            byte[] pdfBytes = Files.readAllBytes(Paths.get("workbook.pdf"));
+            byte[] pdfBytes = outputStreamPDF.toByteArray();
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.pdf");
