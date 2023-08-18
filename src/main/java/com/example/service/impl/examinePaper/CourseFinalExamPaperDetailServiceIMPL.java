@@ -479,28 +479,30 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
         }
 
         //写入xls文件
-        FileOutputStream fileOut = new FileOutputStream("workbook.xls");
-        workbook.write(fileOut);
-        fileOut.close();
+        ByteArrayOutputStream outputStreamXLS = new ByteArrayOutputStream();
+        workbook.write(outputStreamXLS);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStreamXLS.toByteArray());
 
         // 加载 XLS 文件
         Workbook workbookn = new Workbook();
-        workbookn.loadFromFile("workbook.xls");
+        workbookn.loadFromStream(inputStream);
         //设置转换后的PDGF页面高度适应工作表的内容大小
         workbookn.getConverterSetting().setSheetFitToPage(true);
         //设置转换后PDF的页面宽度适应工作表的内容宽度
         workbookn.getConverterSetting().setSheetFitToWidth(true);
         // 将 XLS 文件转换为 PDF 文件
-        workbookn.saveToFile("workbook.pdf", FileFormat.PDF);
+        ByteArrayOutputStream outputStreamPDF = new ByteArrayOutputStream();
+        workbookn.saveToStream(outputStreamPDF, FileFormat.PDF);
         // 将 PDF 文件读入字节数组
         byte[] Bytes = null;
         HttpHeaders headers = new HttpHeaders();
         if (type == 1) {
-            Bytes = Files.readAllBytes(Paths.get("workbook.pdf"));
+            Bytes = outputStreamPDF.toByteArray();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=converted.pdf");
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
         } else if (type == 2) {
-            Bytes = Files.readAllBytes(Paths.get("workbook.xls"));
+            Bytes = outputStreamXLS.toByteArray();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=template.xls");
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
         }
