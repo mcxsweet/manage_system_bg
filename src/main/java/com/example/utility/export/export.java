@@ -1,7 +1,9 @@
 package com.example.utility.export;
 
 import com.example.object.CourseBasicInformation;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.poi.hssf.usermodel.*;
@@ -123,6 +125,30 @@ public class export {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    //json字符串转一维数组
+    public static String[] stringToOneDArray(String jsonString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = null;
+            jsonNode = objectMapper.readTree(jsonString);
+
+
+            if (jsonNode.isArray()) {
+                int length = jsonNode.size();
+                String[] array = new String[length];
+
+                for (int i = 0; i < length; i++) {
+                    array[i] = jsonNode.get(i).asText();
+                }
+
+                return array;
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

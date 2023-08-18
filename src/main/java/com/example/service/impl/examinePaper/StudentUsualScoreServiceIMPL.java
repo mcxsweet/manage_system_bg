@@ -19,6 +19,7 @@ import com.example.utility.DataResponses;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -134,9 +135,13 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 usualScore.setStudentId(score.getId());
 
                 double sum = 0;
-                JSONArray objects = JSONArray.parseArray(score.getScoreDetails());
-                for (int i = 0; i < objects.size(); i++) {
-                    sum += Double.parseDouble((String) objects.get(i)) * usualExamPercentage.get(i) * 0.01;
+                String[] strings = export.stringToOneDArray(score.getScoreDetails());
+                for (int i = 0; i < strings.length; i++) {
+                    if (Objects.equals(strings[i], "")) {
+                        sum += 0;
+                    }else{
+                        sum += Double.parseDouble(strings[i]) * usualExamPercentage.get(i) * 0.01;
+                    }
                 }
                 usualScore.setScore(Math.ceil(sum));
 
@@ -269,8 +274,16 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
     @Transactional
     public DataResponses inputStudentUsualScore(MultipartFile file, String courseId) {
         try {
-            HSSFWorkbook workbook = new HSSFWorkbook(file.getInputStream());
-            HSSFSheet sheet = workbook.getSheetAt(0);
+            String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+            Workbook workbook = null;
+
+            if (fileSuffix.equals(".xls")) {
+                workbook = new HSSFWorkbook(file.getInputStream());
+            } else if (fileSuffix.equals(".xlsx")) {
+                workbook = new XSSFWorkbook(file.getInputStream());
+            }
+            assert workbook != null;
+            Sheet sheet = workbook.getSheetAt(0);
 
             DataFormatter formatter = new DataFormatter();
             //遍历列
@@ -304,7 +317,11 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 int columIndex = 3;
                 List<String> strings = new ArrayList<>();
                 for (int i = 0; i < usualExamMethods.size(); i++) {
-                    strings.add(formatter.formatCellValue(row.getCell(columIndex)));
+                    if (formatter.formatCellValue(row.getCell(columIndex)) == null) {
+                        strings.add(null);
+                    }else{
+                        strings.add(formatter.formatCellValue(row.getCell(columIndex)));
+                    }
                     columIndex++;
                 }
                 StudentUsualScore studentUsualScore = new StudentUsualScore();

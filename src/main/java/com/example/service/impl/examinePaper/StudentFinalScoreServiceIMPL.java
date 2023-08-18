@@ -22,6 +22,7 @@ import com.example.utility.DataResponses;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -297,7 +298,16 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
     @Transactional
     public DataResponses inputStudentFinalScore(MultipartFile file, int courseId) {
         try {
-            Workbook workbook = new HSSFWorkbook(file.getInputStream());
+
+            String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+            Workbook workbook = null;
+
+            if (fileSuffix.equals(".xls")) {
+                workbook = new HSSFWorkbook(file.getInputStream());
+            } else if (fileSuffix.equals(".xlsx")) {
+                workbook = new XSSFWorkbook(file.getInputStream());
+            }
+            assert workbook != null;
             Sheet sheet = workbook.getSheetAt(0);
 
             DataFormatter formatter = new DataFormatter();
@@ -339,8 +349,9 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                     for (int j = 0; j < objects.size(); j++) {
                         if (formatter.formatCellValue(row.getCell(index)) == null) {
                             list1.add(null);
+                        }else{
+                            list1.add(formatter.formatCellValue(row.getCell(index)));
                         }
-                        list1.add(formatter.formatCellValue(row.getCell(index)));
                         index++;
                     }
                     list.add(list1);

@@ -37,6 +37,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 import com.spire.doc.*;
@@ -801,10 +802,15 @@ public class AnalysisReportServiceIMPL {
 
                         double sum = 0;
                         for (StudentUsualScore items : studentUsualScores) {
-                            JSONArray jsonArray1 = JSONArray.parseArray(items.getScoreDetails());
-                            for (int j = 0; j < jsonArray1.size(); j++) {
+                            String[] strings = export.stringToOneDArray(items.getScoreDetails());
+//                            JSONArray jsonArray1 = JSONArray.parseArray(items.getScoreDetails());
+                            for (int j = 0; j < strings.length; j++) {
                                 if (Boolean.parseBoolean(keyValues.get(j).getMessage())) {
-                                    sum += Double.parseDouble(jsonArray1.get(j).toString()) * Integer.parseInt(keyValues.get(j).getData()) * 0.01;
+                                    if (Objects.equals(strings[j], "")) {
+                                        sum += 0;
+                                    } else {
+                                        sum += Double.parseDouble(strings[j]) * Integer.parseInt(keyValues.get(j).getData()) * 0.01;
+                                    }
                                 }
                             }
                         }
@@ -1306,7 +1312,7 @@ public class AnalysisReportServiceIMPL {
             String filename2 = info.getCourseName() + "-" + info.getClassName() + "-" + info.getClassroomTeacher() + "-" + info.getTermStart() + "-" + info.getTermEnd() + "-" + info.getTerm() + "课程试卷分析报告.docx";
             String filename3 = info.getCourseName() + "-" + info.getClassName() + "-" + info.getClassroomTeacher() + "-" + info.getTermStart() + "-" + info.getTermEnd() + "-" + info.getTerm() + "课程教学小结表.docx";
 
-            String filePath_ = filePath + "/doc/" + info.getMajor() + "/" + info.getClassroomTeacher();
+            String filePath_ = filePath + "/doc/" + info.getMajor() + "/" + info.getClassroomTeacher() + "/" + info.getCourseName();
             File fileRealPath = new File(filePath_);
             //路径不存在则创建
             if (!fileRealPath.exists()) {
