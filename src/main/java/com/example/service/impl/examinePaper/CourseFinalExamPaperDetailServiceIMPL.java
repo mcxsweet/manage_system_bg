@@ -151,11 +151,14 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
 
         //表格赋值课程目标
         int targetNum = 0;
+        //缓存课程目标id
+        List<Integer> courseTargetIndex = new ArrayList<>();
         for (CourseTarget courseTarget : courseTargets) {
             HSSFRow row2 = sheet.createRow(rowIndex);
             row2.setRowStyle(style);
             row2.createCell(0).setCellValue(courseTarget.getTargetName());
             row2.getCell(0).setCellStyle(style);
+            courseTargetIndex.add(courseTarget.getId());
             rowIndex++;
             targetNum++;
         }
@@ -268,6 +271,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
 
                 //生成关系矩阵
                 int result = 0;
+                //指标点
                 for (int i = 4; i < rowIndex - targetNum - 1; i++) {
                     HSSFRow rown = sheet.getRow(i);
                     List<Boolean> list = new ArrayList<>();
@@ -296,6 +300,8 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                     result = 0;
                 }
 
+                //课程目标
+                int n = 0;
                 for (int i = rowIndex - targetNum; i < rowIndex; i++) {
                     HSSFRow rown = sheet.getRow(i);
                     List<Boolean> list = new ArrayList<>();
@@ -310,6 +316,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                     String s = JSON.toJSONString(list);
                     CourseTargetAnalyse targetAnalyse = new CourseTargetAnalyse();
                     targetAnalyse.setCourseId(courseId);
+                    targetAnalyse.setTargetId(courseTargetIndex.get(n));
                     targetAnalyse.setTargetName(rown.getCell(0).getStringCellValue());
                     targetAnalyse.setValue(result);
                     targetAnalyse.setMatrix(s);
@@ -322,6 +329,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                     }
                     export.valueToCell(sheet, i, columIndex, String.valueOf(result), style);
                     result = 0;
+                    n++;
                 }
 
                 columIndex++;
