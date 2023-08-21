@@ -19,6 +19,7 @@ import com.example.object.comprehensiveAnalyse.*;
 import com.example.object.finalExamine.*;
 import com.example.utility.DataExtend;
 import com.example.utility.DataResponses;
+import com.example.utility.export.ConvertToPdf;
 import com.example.utility.export.export;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spire.doc.FileFormat;
@@ -35,6 +36,9 @@ import org.springframework.stereotype.Service;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -959,7 +963,7 @@ public class AnalysisReportServiceIMPL {
                 rowIndex++;
             }
 
-            byte[] Bytes;
+            byte[] Bytes = null;
             String fileName = "";
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             response.reset();
@@ -968,14 +972,29 @@ public class AnalysisReportServiceIMPL {
                 document.saveToStream(outputStream, FileFormat.Docx);
                 fileName = "课程目标达成评价分析报告.docx";
                 response.setContentType("application/msword");
+                Bytes = outputStream.toByteArray();
 
             } else if (type == 2) {
-                document.saveToStream(outputStream, FileFormat.PDF);
+                File directory = new File("");
+                String dirPath = directory.getCanonicalPath() + "/temp/";
+                String fileNameText = dirPath + "temp.docx";
+                File fileRealPath = new File(dirPath);
+                if (!fileRealPath.exists()) {
+                    if (!fileRealPath.mkdirs()) {
+                        return null;
+                    }
+                }
+                document.saveToFile(fileNameText, FileFormat.Docx);
+
+                if (ConvertToPdf.convertWordToPdf(fileNameText, dirPath)) {
+                    Path path = Paths.get(dirPath + "temp.pdf");
+                    Bytes = Files.readAllBytes(path);
+                }
+
                 fileName = "课程目标达成评价分析报告.pdf";
                 response.setContentType("application/pdf");
             }
 
-            Bytes = outputStream.toByteArray();
             outputStream.close();
 
             response.setCharacterEncoding("utf-8");
@@ -984,7 +1003,7 @@ public class AnalysisReportServiceIMPL {
 
             return ResponseEntity.ok()
                     .body(Bytes);
-        } catch (IOException ignored) {
+        } catch (IOException | InterruptedException ignored) {
             return null;
         }
     }
