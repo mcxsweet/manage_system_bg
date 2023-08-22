@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -43,13 +44,10 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
     private StudentInformationMAPPER studentInformationMAPPER;
     @Autowired
     private StudentUsualScoreMAPPER studentUsualScoreMAPPER;
-
     @Autowired
     private CourseExamineMethodsMAPPER courseExamineMethodsMAPPER;
-
     @Autowired
     private CourseBasicInformationMAPPER courseBasicInformationMAPPER;
-
     @Autowired
     private CourseExamineChildMethodsMAPPER courseExamineChildMethodsMAPPER;
 
@@ -143,7 +141,10 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                         sum += Double.parseDouble(strings[i]) * usualExamPercentage.get(i) * 0.01;
                     }
                 }
-                usualScore.setScore(Math.ceil(sum));
+                DecimalFormat decimalFormat = new DecimalFormat("#.0");
+                // 格式化双精度浮点数
+                double formattedNumber = Double.parseDouble(decimalFormat.format(sum));
+                usualScore.setScore(formattedNumber);
 
                 QueryWrapper<StudentUsualScore> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq("usual_score_id", usualScore.getUsualScoreId());

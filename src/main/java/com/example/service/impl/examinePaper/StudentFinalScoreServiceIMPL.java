@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -153,7 +154,9 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                         sum += Double.parseDouble(s);
                     }
                 }
-                finalScore.setScore(sum);
+                DecimalFormat decimalFormat = new DecimalFormat("#.0");
+                double formattedNumber = Double.parseDouble(decimalFormat.format(sum));
+                finalScore.setScore(formattedNumber);
 
                 QueryWrapper<StudentFinalScore> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq("final_score_id", finalScore.getFinalScoreId());
