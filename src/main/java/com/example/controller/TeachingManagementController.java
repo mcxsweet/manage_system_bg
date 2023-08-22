@@ -6,8 +6,8 @@ import com.example.object.CourseBasicInformation;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
 import com.example.utility.DataResponses;
 
-import com.spire.doc.Document;
-import com.spire.doc.FileFormat;
+import com.sini.com.spire.doc.Document;
+import com.sini.com.spire.doc.FileFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

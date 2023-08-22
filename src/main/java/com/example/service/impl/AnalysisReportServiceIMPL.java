@@ -22,9 +22,11 @@ import com.example.utility.DataResponses;
 import com.example.utility.export.ConvertToPdf;
 import com.example.utility.export.export;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spire.doc.FileFormat;
-import com.spire.doc.documents.*;
-import com.spire.doc.fields.DocPicture;
+import com.sini.com.spire.doc.*;
+import com.sini.com.spire.doc.FileFormat;
+import com.sini.com.spire.doc.documents.*;
+import com.sini.com.spire.doc.fields.DocPicture;
+
 import com.spire.xls.*;
 import com.spire.xls.core.IChartTrendLine;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +46,6 @@ import java.util.List;
 import java.util.Objects;
 
 
-import com.spire.doc.*;
-import com.spire.doc.documents.HorizontalAlignment;
-import com.spire.doc.documents.VerticalAlignment;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -191,11 +190,9 @@ public class AnalysisReportServiceIMPL {
             chart.getPrimaryCategoryAxis().setTitle("学生人数");
 
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            BufferedImage image = workbook.saveChartAsImage(workbook.getWorksheets().get(0), 0);
-            ImageIO.write(image, "PNG", outStream);
-            byte[] bytes = outStream.toByteArray();
+            ImageIO.write(workbook.saveChartAsImage(workbook.getWorksheets().get(0), 0), "PNG", outStream);
 
-            return bytes;
+            return outStream.toByteArray();
         } catch (Exception exception) {
             return null;
         }
@@ -232,7 +229,7 @@ public class AnalysisReportServiceIMPL {
             //添加一个section
             Section section = document.addSection();
             //设置页面大小为A3
-            section.getPageSetup().setPageSize(com.spire.doc.documents.PageSize.A3);
+            section.getPageSetup().setPageSize(PageSize.A3);
             //设置页面方向为Landscape纵向
             section.getPageSetup().setOrientation(PageOrientation.Portrait);
             //设置页边距
@@ -428,7 +425,7 @@ public class AnalysisReportServiceIMPL {
             //添加一个section
             Section section = document.addSection();
             //设置页面大小为A3
-            section.getPageSetup().setPageSize(com.spire.doc.documents.PageSize.A3);
+            section.getPageSetup().setPageSize(PageSize.A3);
             //设置页面方向为Landscape纵向
             section.getPageSetup().setOrientation(PageOrientation.Portrait);
             //设置页边距
@@ -473,10 +470,10 @@ public class AnalysisReportServiceIMPL {
 
 
             //绘制空行
-            nullRow(section, 10);
-            addText(section, "1.课程考核分析报告", "title2Style", true);
-            addText(section, "2.课程教学小结", "title2Style", true);
-            addText(section, "3.课程目标达成情况分析报告", "title2Style", true);
+//            nullRow(section, 10);
+//            addText(section, "1.课程考核分析报告", "title2Style", true);
+//            addText(section, "2.课程教学小结", "title2Style", true);
+//            addText(section, "3.课程目标达成情况分析报告", "title2Style", true);
 
             //第二段
             //课程目标达成情况分析报告
@@ -720,15 +717,15 @@ public class AnalysisReportServiceIMPL {
             CourseAchievementAnalyse courseAchievementAnalyse = courseAchievementAnalyseMAPPER.selectOne(queryWrapper5);
 
             //绘制图表
-            JSONArray jsonArray = JSONArray.parseArray(courseAchievementAnalyse.getValue());
-            for (int j = 0; j < jsonArray.size(); j++) {
-
-                JSONArray jsonArray1 = JSONArray.parseArray(jsonArray.get(j).toString());
-                byte[] bytes = generateCharts(jsonArray1, j + 1);
-
-                insertChart(document, bytes, section2);
-                nullRow(section2, 2);
-            }
+//            JSONArray jsonArray = JSONArray.parseArray(courseAchievementAnalyse.getValue());
+//            for (int j = 0; j < jsonArray.size(); j++) {
+//
+//                JSONArray jsonArray1 = JSONArray.parseArray(jsonArray.get(j).toString());
+//                byte[] bytes = generateCharts(jsonArray1, j + 1);
+//
+//                insertChart(document, bytes, section2);
+//                nullRow(section2, 2);
+//            }
 
             Section section3 = document.addSection();
             addText(section3, "（2）课程目标达成情况", "title2Style", false);
@@ -972,29 +969,29 @@ public class AnalysisReportServiceIMPL {
                 document.saveToStream(outputStream, FileFormat.Docx);
                 fileName = "课程目标达成评价分析报告.docx";
                 response.setContentType("application/msword");
-                Bytes = outputStream.toByteArray();
 
             } else if (type == 2) {
-                File directory = new File("");
-                String dirPath = directory.getCanonicalPath() + "/temp/";
-                String fileNameText = dirPath + "temp.docx";
-                File fileRealPath = new File(dirPath);
-                if (!fileRealPath.exists()) {
-                    if (!fileRealPath.mkdirs()) {
-                        return null;
-                    }
-                }
-                document.saveToFile(fileNameText, FileFormat.Docx);
-
-                if (ConvertToPdf.convertWordToPdf(fileNameText, dirPath)) {
-                    Path path = Paths.get(dirPath + "temp.pdf");
-                    Bytes = Files.readAllBytes(path);
-                }
+//                File directory = new File("");
+//                String dirPath = directory.getCanonicalPath() + "/temp/";
+//                String fileNameText = dirPath + "temp.docx";
+//                File fileRealPath = new File(dirPath);
+//                if (!fileRealPath.exists()) {
+//                    if (!fileRealPath.mkdirs()) {
+//                        return null;
+//                    }
+//                }
+//                document.saveToFile(fileNameText, FileFormat.Docx);
+//
+//                if (ConvertToPdf.convertWordToPdf(fileNameText, dirPath)) {
+//                    Path path = Paths.get(dirPath + "temp.pdf");
+//                    Bytes = Files.readAllBytes(path);
+//                }
+                document.saveToStream(outputStream, FileFormat.PDF);
 
                 fileName = "课程目标达成评价分析报告.pdf";
                 response.setContentType("application/pdf");
             }
-
+            Bytes = outputStream.toByteArray();
             outputStream.close();
 
             response.setCharacterEncoding("utf-8");
@@ -1003,7 +1000,7 @@ public class AnalysisReportServiceIMPL {
 
             return ResponseEntity.ok()
                     .body(Bytes);
-        } catch (IOException | InterruptedException ignored) {
+        } catch (IOException ignored) {
             return null;
         }
     }
@@ -1016,7 +1013,7 @@ public class AnalysisReportServiceIMPL {
             //添加一个section
             Section section = document.addSection();
             //设置页面大小为A3
-            section.getPageSetup().setPageSize(com.spire.doc.documents.PageSize.A3);
+            section.getPageSetup().setPageSize(PageSize.A3);
             //设置页面方向为Landscape纵向
             section.getPageSetup().setOrientation(PageOrientation.Portrait);
             //设置页边距
@@ -1182,7 +1179,7 @@ public class AnalysisReportServiceIMPL {
             //添加一个section
             Section section = document.addSection();
             //设置页面大小为A3
-            section.getPageSetup().setPageSize(com.spire.doc.documents.PageSize.A3);
+            section.getPageSetup().setPageSize(PageSize.A3);
             //设置页面方向为Landscape纵向
             section.getPageSetup().setOrientation(PageOrientation.Portrait);
             //设置页边距

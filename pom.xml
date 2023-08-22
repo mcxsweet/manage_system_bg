@@ -108,13 +108,13 @@
             <version>5.3.1</version>
        </dependency>
 <!--   引入第三方Spire.doc-->
-<!--         <dependency> -->
-<!--              <groupId>com.spire</groupId> -->
-<!--              <artifactId>spirej.doc.cracked</artifactId> -->
-<!--              <version>11.4.2</version> -->
-<!--              <scope>system</scope> -->
-<!--              <systemPath>${project.basedir}/src/main/resources/lib/spirej.doc.cracked-11.4.2.jar</systemPath> -->
-<!--         </dependency> -->
+        <dependency>
+             <groupId>com.spire</groupId>
+             <artifactId>spire.office.cracked</artifactId>
+             <version>3.7.3</version>
+             <scope>system</scope>
+             <systemPath>${project.basedir}/src/main/resources/lib/spirej.doc.cracked-11.4.2.jar</systemPath>
+        </dependency>
 
 
 <!--        API Document-->

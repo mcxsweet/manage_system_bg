@@ -4,6 +4,7 @@ import java.io.*;
 
 public class ConvertToPdf {
     public static Boolean convertWordToPdf(String filePath, String dirPath) throws IOException, InterruptedException {
+
         String command = "libreoffice --headless --convert-to pdf " + filePath + " --outdir " + dirPath;
 
         Process process = Runtime.getRuntime().exec(command);
