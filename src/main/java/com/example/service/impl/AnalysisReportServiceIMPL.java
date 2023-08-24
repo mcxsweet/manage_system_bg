@@ -29,6 +29,14 @@ import com.sini.com.spire.doc.fields.DocPicture;
 
 import com.spire.xls.*;
 import com.spire.xls.core.IChartTrendLine;
+import org.jfree.chart.*;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.DefaultXYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -46,9 +54,9 @@ import java.util.List;
 import java.util.Objects;
 
 
-
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
 
 @Service
 public class AnalysisReportServiceIMPL {
@@ -151,49 +159,55 @@ public class AnalysisReportServiceIMPL {
     //在word文档使用excel中生成图表
     private byte[] generateCharts(JSONArray jsonArray, int index) {
         try {
-            //先在xls中生成图表
-            Workbook workbook = new Workbook();
-            Worksheet sheet = workbook.getWorksheets().get(0);
+            XYSeriesCollection dataset = new XYSeriesCollection();
+            XYSeries series = new XYSeries("学生达成度");
 
-            //设置列宽,工作表名
-            sheet.getCellRange("A1:B1").setColumnWidth(15f);
-
-            //添加图表数据源
-            int i = 1;
             for (Object item : jsonArray) {
-                i++;
                 KeyValue value = new ObjectMapper().convertValue(item, KeyValue.class);
-                sheet.getCellRange("A" + i).setValue(String.valueOf(value.getValue()));
-                sheet.getCellRange("B" + i).setValue(String.valueOf(value.getIndex()));
+                series.add(value.getIndex(), value.getValue());
             }
+            dataset.addSeries(series);
 
-            sheet.setName("散点图");
 
-            //创建散点图
-            Chart chart = sheet.getCharts().add(ExcelChartType.ScatterMarkers);
-            chart.setDataRange(sheet.getCellRange("B2:B" + i));
-            chart.setSeriesDataFromRange(false);
+            //创建主题样式
+            StandardChartTheme mChartTheme = new StandardChartTheme("CN");
+            //设置标题字体
+            mChartTheme.setExtraLargeFont(new Font("黑体", Font.BOLD, 20));
+            //设置轴向字体
+            mChartTheme.setLargeFont(new Font("黑体", Font.CENTER_BASELINE, 15));
+            //设置图例字体
+            mChartTheme.setRegularFont(new Font("黑体", Font.CENTER_BASELINE, 15));
+            //应用主题样式
+            ChartFactory.setChartTheme(mChartTheme);
 
-            //添加图表标题、系列标签
-            chart.setChartTitle("课程目标" + index + "达成情况");
-            chart.getChartTitleArea().isBold(true);
-            chart.getChartTitleArea().setSize(12);
-            chart.getSeries().get(0).setCategoryLabels(sheet.getCellRange("B2:B" + i));
-            chart.getSeries().get(0).setValues(sheet.getCellRange("A2:A" + i));
+            String s = "课程目标" + index + "达成情况";
+            JFreeChart chart = ChartFactory.createScatterPlot(
+                    s,
+                    "",
+                    "成绩达成度情况",
+                    dataset,
+                    PlotOrientation.VERTICAL,
+                    true,
+                    true,
+                    false
+            );
 
-            //添加趋势线
-            IChartTrendLine trendLine = chart.getSeries().get(0).getTrendLines().add(TrendLineType.Linear);
-            trendLine.setName("趋势线");
+            XYPlot plot = (XYPlot) chart.getPlot();
+            XYItemRenderer renderer = plot.getRenderer();
+            renderer.setSeriesShape(0, new java.awt.geom.Ellipse2D.Double(-3, -3, 6, 6));
+            renderer.setSeriesPaint(0, java.awt.Color.BLUE);
 
-            //添加坐标轴名称
-            chart.getPrimaryValueAxis().setTitle("成绩达成情况");
-            chart.getPrimaryCategoryAxis().setTitle("学生人数");
+            plot.addRangeMarker(new ValueMarker(0.6, Color.RED, new BasicStroke(1)));
 
-            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-            ImageIO.write(workbook.saveChartAsImage(workbook.getWorksheets().get(0), 0), "PNG", outStream);
+            // Create a buffered image of the chart
+            BufferedImage bufferedImage = chart.createBufferedImage(800, 300);
+            // Convert the buffered image to a byte array
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ChartUtils.writeBufferedImageAsPNG(byteArrayOutputStream, bufferedImage);
 
-            return outStream.toByteArray();
+            return byteArrayOutputStream.toByteArray();
         } catch (Exception exception) {
+            exception.printStackTrace();
             return null;
         }
     }
@@ -217,203 +231,10 @@ public class AnalysisReportServiceIMPL {
             for (int col = 0; col < table.getDefaultColumnsNumber(); col++) {
                 TableCell cell = tableRow.getCells().get(col);
                 cell.getCellFormat().setVerticalAlignment(VerticalAlignment.Middle);
+                for (int i = 0; i < cell.getParagraphs().getCount(); i++) {
+                    cell.getParagraphs().get(i).getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
+                }
             }
-        }
-    }
-
-    //生成报告文档version_1
-    public ResponseEntity<byte[]> getReport1(int courseId, int type) {
-        try {
-            Document document = new Document();
-
-            //添加一个section
-            Section section = document.addSection();
-            //设置页面大小为A3
-            section.getPageSetup().setPageSize(PageSize.A3);
-            //设置页面方向为Landscape纵向
-            section.getPageSetup().setOrientation(PageOrientation.Portrait);
-            //设置页边距
-            section.getPageSetup().getMargins().setTop(60f);
-            section.getPageSetup().getMargins().setBottom(60f);
-            section.getPageSetup().getMargins().setLeft(60f);
-            section.getPageSetup().getMargins().setRight(80f);
-
-
-            //标题样式
-            ParagraphStyle style1 = new ParagraphStyle(document);
-            style1.setName("titleStyle");
-            style1.getCharacterFormat().setBold(true);
-            //设置字体颜色
-//            style1.getCharacterFormat().setTextColor(Color.BLUE);
-            style1.getCharacterFormat().setFontName("宋体");
-            style1.getCharacterFormat().setFontSize(30f);
-            document.getStyles().add(style1);
-
-            //文本样式
-            ParagraphStyle style2 = new ParagraphStyle(document);
-            style2.setName("contentStyle");
-            style2.getCharacterFormat().setFontName("宋体");
-            style2.getCharacterFormat().setFontSize(15f);
-            document.getStyles().add(style2);
-
-            //二级标题样式
-            ParagraphStyle style3 = new ParagraphStyle(document);
-            style3.setName("title2Style");
-            style3.getCharacterFormat().setBold(true);
-            style3.getCharacterFormat().setFontName("宋体");
-            style3.getCharacterFormat().setFontSize(20f);
-            document.getStyles().add(style3);
-
-            /*
-                段落文字部分
-             */
-
-            Paragraph para1 = section.addParagraph();
-            para1.appendText("西南林业大学课程考核分析报告");
-            para1.applyStyle("titleStyle");
-            para1.getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
-
-
-            CourseBasicInformation courseBasicInformation = courseBasicInformationServiceIMPL.getById(courseId);
-            String courseInformation = "( " + courseBasicInformation.getTermStart() + " —— " + courseBasicInformation.getTermEnd() + " 学年 " + "第 " + courseBasicInformation.getTerm() + " 学期 )";
-            Paragraph para2 = section.addParagraph();
-            para2.appendText(courseInformation);
-            para2.applyStyle("contentStyle");
-            para2.getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
-
-
-            section.addParagraph();
-            Paragraph para3 = section.addParagraph();
-            para3.appendText("填表时间:   年   月   日");
-            para3.applyStyle("contentStyle");
-            para3.getFormat().setHorizontalAlignment(HorizontalAlignment.Right);
-
-            section.addParagraph();
-            Paragraph para4 = section.addParagraph();
-            para4.appendText("一、基本情况");
-            para4.applyStyle("title2Style");
-            para4.getFormat().setHorizontalAlignment(HorizontalAlignment.Left);
-            //添加表格
-            Table table = generateTable(section, 5, 6);
-            // 合并单元格
-            table.applyHorizontalMerge(2, 3, 5);
-            table.applyHorizontalMerge(3, 1, 2);
-            table.applyHorizontalMerge(3, 4, 5);
-            table.applyHorizontalMerge(4, 1, 5);
-
-            table.get(0, 0).addParagraph().appendText("课程名称");
-            table.get(0, 1).addParagraph().appendText(courseBasicInformation.getCourseName());
-            table.get(0, 2).addParagraph().appendText("授课学时");
-            table.get(0, 3).addParagraph().appendText(String.valueOf(courseBasicInformation.getTheoreticalHours()));
-            table.get(0, 4).addParagraph().appendText("学分");
-            table.get(0, 5).addParagraph().appendText("4");
-
-            table.get(1, 0).addParagraph().appendText("考核时间");
-            table.get(1, 1).addParagraph().appendText("2021 年__1_月__13_日");
-            table.get(1, 2).addParagraph().appendText("课程号");
-            table.get(1, 3).addParagraph().appendText(String.valueOf(courseBasicInformation.getTheoreticalHours()));
-            table.get(1, 4).addParagraph().appendText("课序号");
-            table.get(1, 5).addParagraph().appendText("42312313");
-
-            table.get(2, 0).addParagraph().appendText("任课教师/职称");
-            table.get(2, 1).addParagraph().appendText(courseBasicInformation.getClassroomTeacher());
-            table.get(2, 2).addParagraph().appendText("考试类别");
-            table.get(2, 3).addParagraph().appendText("笔试√ 口试 实际 操作");
-
-            table.get(3, 0).addParagraph().appendText("考核方式");
-            table.get(3, 1).addParagraph().appendText("开卷   闭卷√   上机   综述   论文   设计   其他");
-            table.get(3, 3).addParagraph().appendText("课程类型");
-            table.get(3, 4).addParagraph().appendText(courseBasicInformation.getCourseNature());
-
-            table.get(4, 0).addParagraph().appendText("考核对象");
-            String s = "专业班级: " + courseBasicInformation.getClassName() + "\n应考人数: " + courseBasicInformation.getStudentsNum() + "\n实考人数: " + courseBasicInformation.getStudentsNum();
-            table.get(4, 1).addParagraph().appendText(s);
-
-            //设置单元格格式
-            cellCenter(table);
-            //表二
-            section.addParagraph();
-            Paragraph para5 = section.addParagraph();
-            para5.appendText("二、命题评价、卷面质量");
-            para5.applyStyle("title2Style");
-            para5.getFormat().setHorizontalAlignment(HorizontalAlignment.Left);
-            //添加表格
-            Table table2 = generateTable(section, 6, 6);
-            table2.applyHorizontalMerge(0, 1, 2);
-            table2.applyHorizontalMerge(0, 4, 5);
-            table2.applyHorizontalMerge(2, 1, 2);
-            table2.applyHorizontalMerge(2, 4, 5);
-            table2.applyHorizontalMerge(3, 1, 2);
-            table2.applyHorizontalMerge(3, 4, 5);
-            table2.applyHorizontalMerge(4, 1, 2);
-            table2.applyHorizontalMerge(4, 4, 5);
-            table2.applyHorizontalMerge(5, 1, 5);
-
-            table2.get(0, 0).addParagraph().appendText("命题方式");
-            table2.get(0, 1).addParagraph().appendText("试题库 试卷库 集体命题√");
-            table2.get(0, 3).addParagraph().appendText("评分标准拟定人");
-
-            table2.get(1, 0).addParagraph().appendText("审题人");
-            table2.get(1, 2).addParagraph().appendText("试做试卷教师");
-            table2.get(1, 4).addParagraph().appendText("试做试卷时间");
-            table2.get(1, 5).addParagraph().appendText("90 分钟");
-
-            table2.get(2, 0).addParagraph().appendText("符合大纲要求");
-            table2.get(2, 1).addParagraph().appendText("符合√ 基本符合 不符合");
-            table2.get(2, 3).addParagraph().appendText("题量大小");
-            table2.get(2, 4).addParagraph().appendText("偏多 适中√ 偏少");
-
-            table2.get(3, 0).addParagraph().appendText("题型难易程度");
-            table2.get(3, 1).addParagraph().appendText("难 偏难 适中√ 简单");
-            table2.get(3, 3).addParagraph().appendText("题意表述");
-            table2.get(3, 4).addParagraph().appendText("好 较好√ 一般");
-
-            table2.get(4, 0).addParagraph().appendText("内容覆盖面");
-            table2.get(4, 1).addParagraph().appendText(">90%√  >80%  >70%  >60%");
-            table2.get(4, 3).addParagraph().appendText("插图");
-            table2.get(4, 4).addParagraph().appendText("清晰√ 中等 一般");
-
-            table2.get(5, 0).addParagraph().appendText("题型");
-
-            //表格单元格格式
-            cellCenter(table2);
-
-            //表三
-            Paragraph para6 = section.addParagraph();
-            para6.appendText("三、成绩分析");
-            para6.applyStyle("title2Style");
-            para6.getFormat().setHorizontalAlignment(HorizontalAlignment.Left);
-
-            Table table3 = generateTable(section, 2, 2);
-
-            table3.get(0, 0).addParagraph().appendText("平时成绩考核");
-            table3.get(0, 1).addParagraph().appendText("考勤 作业 √ 课堂讨论√ 小论文 期中考试 其他√");
-            table3.get(1, 0).addParagraph().appendText("总评成绩比例");
-            table3.get(1, 1).addParagraph().appendText("期末考试 50% ;平时 30%(课堂讨论 10%;平时作业 10%;综述论文 10%);实验 20%");
-
-            cellCenter(table3);
-            //设置首行缩进
-//            Paragraph para = section.getParagraphs().get(3);
-//            ParagraphFormat format = para.getFormat();
-//            format.setFirstLineIndent(30);
-
-            //保存文档
-//            document.saveToFile("Output.docx", FileFormat.Docx);
-
-            byte[] Bytes = null;
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            document.saveToStream(outputStream, FileFormat.Docx);
-            Bytes = outputStream.toByteArray();
-            outputStream.close();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=Output.docx");
-            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
-
-
-            return ResponseEntity.ok().headers(headers).body(Bytes);
-        } catch (IOException ignored) {
-            return null;
         }
     }
 
@@ -468,13 +289,6 @@ public class AnalysisReportServiceIMPL {
             addText(section, "西南林业大学", "titleStyle", true);
             addText(section, "课程考核分析和目标达成情况分析报告", "titleStyle", true);
 
-
-            //绘制空行
-//            nullRow(section, 10);
-//            addText(section, "1.课程考核分析报告", "title2Style", true);
-//            addText(section, "2.课程教学小结", "title2Style", true);
-//            addText(section, "3.课程目标达成情况分析报告", "title2Style", true);
-
             //第二段
             //课程目标达成情况分析报告
             Section section2 = document.addSection();
@@ -485,11 +299,10 @@ public class AnalysisReportServiceIMPL {
             section2.addParagraph();
             CourseBasicInformation courseBasicInformation = courseBasicInformationServiceIMPL.getById(courseId);
             Table table = generateTable(section2, 3, 4);
-            cellCenter(table);
             table.get(0, 0).addParagraph().appendText("课程名称");
             table.get(0, 1).addParagraph().appendText(courseBasicInformation.getCourseName());
             table.get(0, 2).addParagraph().appendText("课程代码");
-            table.get(0, 3).addParagraph().appendText("课程代码#####");
+            table.get(0, 3).addParagraph().appendText(courseBasicInformation.getCourseCode());
 
             table.get(1, 0).addParagraph().appendText("任课教师姓名");
             table.get(1, 1).addParagraph().appendText(courseBasicInformation.getClassroomTeacher());
@@ -501,10 +314,12 @@ public class AnalysisReportServiceIMPL {
             table.get(2, 2).addParagraph().appendText("学生人数");
             table.get(2, 3).addParagraph().appendText(String.valueOf(courseBasicInformation.getStudentsNum()));
 
+            cellCenter(table);
+
             //获取课程目标
             QueryWrapper<CourseTarget> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("course_id", courseId);
-            queryWrapper.orderByAsc("id");
+            queryWrapper.orderByAsc("target_name");
             List<CourseTarget> courseTargets = courseTargetMAPPER.selectList(queryWrapper);
 
             addText(section2, "一、课程目标", "title2Style", false);
@@ -522,7 +337,6 @@ public class AnalysisReportServiceIMPL {
             addText(section2, "（2）课程目标对毕业要求的支撑", "title2Style", false);
             Table table2 = generateTable(section2, courseTargets.size() + 1, 3);
             table2.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
-            cellCenter(table2);
             table2.get(0, 0).addParagraph().appendText("课程目标");
             table2.get(0, 1).addParagraph().appendText("支撑权重");
             table2.get(0, 2).addParagraph().appendText("毕业要求指标点");
@@ -545,6 +359,7 @@ public class AnalysisReportServiceIMPL {
                 table2.get(i, 2).addParagraph().appendText(s);
                 i++;
             }
+            cellCenter(table2);
 
             addText(section2, "二、评分规则", "title2Style", false);
             nullRow(section2, 1);
@@ -591,7 +406,6 @@ public class AnalysisReportServiceIMPL {
 
             Table table3 = generateTable(section2, rowNum + 1, 4);
             table3.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
-            cellCenter(table3);
             table3.get(0, 0).addParagraph().appendText("考核项目");
             table3.get(0, 1).addParagraph().appendText("项目百分比");
             table3.get(0, 2).addParagraph().appendText("考核子项目");
@@ -613,6 +427,7 @@ public class AnalysisReportServiceIMPL {
 
                 i1++;
             }
+            cellCenter(table3);
 
             //计分方法与对应的课程目标
 //            Section section3 = document.addSection();
@@ -621,7 +436,6 @@ public class AnalysisReportServiceIMPL {
             rowNum = courseTargets.size() * courseExamineMethods.size();
             Table table4 = generateTable(section2, rowNum + 1, 4);
             table4.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
-            cellCenter(table4);
             table4.get(0, 0).addParagraph().appendText("课程教学目标");
             table4.get(0, 1).addParagraph().appendText("预设的学习任务");
             table4.get(0, 2).addParagraph().appendText("观测点");
@@ -691,6 +505,7 @@ public class AnalysisReportServiceIMPL {
                 }
                 table4.applyVerticalMerge(0, temp, rowIndex - 1);
             }
+            cellCenter(table4);
 
             //评价标准
             addText(section2, "（3）评分标准", "title2Style", false);
@@ -700,13 +515,28 @@ public class AnalysisReportServiceIMPL {
             table5.get(0, 1).addParagraph().appendText("评价标准");
             table5.get(0, 2).addParagraph().appendText("得分");
 
+            table5.get(1, 2).addParagraph().appendText("80～100");
+            table5.get(2, 2).addParagraph().appendText("65～79");
+            table5.get(3, 2).addParagraph().appendText("45～64");
+            table5.get(4, 2).addParagraph().appendText("0～44");
+
+            table5.get(1, 1).addParagraph().appendText("所表述的概念充分、严谨、准确;计算步骤完整,结果准确,运用的概念、理论和公式准确;准时上交、作业本整洁、书写工整");
+            table5.get(2, 1).addParagraph().appendText("所表述的概念较充分、正确;计算步骤较完整,结果正确, 运用的概念、理论和公式较准确;按时上交、作业本有涂改、书写较工整");
+            table5.get(3, 1).addParagraph().appendText("所表述的概念基本正确,个别有误;计算步骤不太完整, 结果基本正确,运用的概念、理论和公式基本准确;按时上交、作业本有涂改、书写潦草");
+            table5.get(4, 1).addParagraph().appendText("所表述的概念错误较多;计算步骤不完整,结果不正确, 运用的概念、理论和公式不准确;未准时上交、书写潦草");
+
+            table5.applyVerticalMerge(0, 1, 4);
+            table5.get(1, 1).addParagraph().appendText("考核方式");
+            cellCenter(table5);
+
+
             addText(section2, "（4）考核成绩情况", "title2Style", false);
             addText(section2, "学生考核成绩见附件，无考核成绩调整情况。", "contentStyle", false);
             nullRow(section2, 3);
 
             addText(section2, "三、课程目标达成情况分析", "title2Style", false);
             nullRow(section2, 1);
-            addText(section2, "（1）评分标准", "title2Style", false);
+            addText(section2, "（1）达成情况", "title2Style", false);
             section2.addParagraph();
             addText(section2, "\t依据" + courseBasicInformation.getClassName() + "班《" + courseBasicInformation.getCourseName() + "》原始考试成绩中学生个体所对应的各观测点数据分析，可得各课程目标考试成绩达成情况散点分布：", "contentStyle", false);
 
@@ -717,15 +547,15 @@ public class AnalysisReportServiceIMPL {
             CourseAchievementAnalyse courseAchievementAnalyse = courseAchievementAnalyseMAPPER.selectOne(queryWrapper5);
 
             //绘制图表
-//            JSONArray jsonArray = JSONArray.parseArray(courseAchievementAnalyse.getValue());
-//            for (int j = 0; j < jsonArray.size(); j++) {
-//
-//                JSONArray jsonArray1 = JSONArray.parseArray(jsonArray.get(j).toString());
-//                byte[] bytes = generateCharts(jsonArray1, j + 1);
-//
-//                insertChart(document, bytes, section2);
-//                nullRow(section2, 2);
-//            }
+            JSONArray jsonArray = JSONArray.parseArray(courseAchievementAnalyse.getValue());
+            for (int j = 0; j < jsonArray.size(); j++) {
+
+                JSONArray jsonArray1 = JSONArray.parseArray(jsonArray.get(j).toString());
+                byte[] bytes = generateCharts(jsonArray1, j + 1);
+
+                insertChart(document, bytes, section2);
+                nullRow(section2, 2);
+            }
 
             Section section3 = document.addSection();
             addText(section3, "（2）课程目标达成情况", "title2Style", false);
@@ -735,7 +565,6 @@ public class AnalysisReportServiceIMPL {
             rowNum = courseTargets.size() * courseExamineMethods.size();
             Table table6 = generateTable(section3, rowNum + 2, 7);
             table6.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
-            cellCenter(table6);
             table6.get(0, 0).addParagraph().appendText("课程教学目标");
             table6.get(0, 1).addParagraph().appendText("预设的学习任务");
             table6.get(0, 2).addParagraph().appendText("观测点");
@@ -901,6 +730,7 @@ public class AnalysisReportServiceIMPL {
             table6.applyHorizontalMerge(rowIndex, 0, 1);
             table6.get(rowIndex, 2).addParagraph().appendText(resultStr);
             table6.applyHorizontalMerge(rowIndex, 2, 6);
+            cellCenter(table6);
 
 
             nullRow(section3, 5);
@@ -912,7 +742,6 @@ public class AnalysisReportServiceIMPL {
 
             Table table7 = generateTable(section3, 4, courseTargets.size());
             table7.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
-            cellCenter(table7);
             table7.get(0, 0).addParagraph().appendText("授课时间");
             table7.applyVerticalMerge(0, 0, 1);
             table7.get(0, 1).addParagraph().appendText("课程目标达成度");
@@ -920,14 +749,15 @@ public class AnalysisReportServiceIMPL {
 
             table7.get(2, 0).addParagraph().appendText("XX学年第X学期");
             table7.get(3, 0).addParagraph().appendText("XX学年第X学期");
+            cellCenter(table7);
+
 
             addText(section3, "（2）存在问题及持续改进", "title2Style", false);
             Table table8 = generateTable(section3, 5, 3);
-            cellCenter(table8);
             table8.get(0, 0).addParagraph().appendText("上轮教学");
             table8.get(1, 0).addParagraph().appendText("本轮教学");
             table8.applyVerticalMerge(0, 1, 4);
-
+            cellCenter(table8);
 
             addText(section3, "任课教师签字", "contentStyle", false);
             section3.addParagraph();
@@ -941,7 +771,6 @@ public class AnalysisReportServiceIMPL {
 
             Table table9 = generateTable(section4, comprehensiveScore.size() + 1, 6);
             table9.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
-            cellCenter(table9);
             table9.get(0, 0).addParagraph().appendText("学号");
             table9.get(0, 1).addParagraph().appendText("姓名");
             table9.get(0, 2).addParagraph().appendText("班级");
@@ -959,6 +788,8 @@ public class AnalysisReportServiceIMPL {
                 table9.get(rowIndex, 5).addParagraph().appendText(String.valueOf(item.getComprehensiveScore()));
                 rowIndex++;
             }
+            cellCenter(table9);
+
 
             byte[] Bytes = null;
             String fileName = "";
@@ -1066,7 +897,6 @@ public class AnalysisReportServiceIMPL {
             addText(section, "课程名称: " + courseBasicInformation.getCourseName() + "\t\t课程代码: XXXXX\t\t课程性质: " + courseBasicInformation.getCourseNature() + "\t\t学分: 4\t", "contentStyle", true);
 
             Table table = generateTable(section, 9, 7);
-            cellCenter(table);
             // 合并单元格
 //            table.applyHorizontalMerge(2, 3, 5);
             table.get(0, 0).addParagraph().appendText("任课教师");
@@ -1143,6 +973,7 @@ public class AnalysisReportServiceIMPL {
 
             table.get(8, 4).addParagraph().appendText("日期：");
             table.applyHorizontalMerge(8, 4, 6);
+            cellCenter(table);
 
             byte[] Bytes;
             String fileName = "";
@@ -1225,7 +1056,6 @@ public class AnalysisReportServiceIMPL {
             CourseBasicInformation courseBasicInformation = courseBasicInformationServiceIMPL.getById(courseId);
 
             Table table = generateTable(section, 10, 6);
-            cellCenter(table);
             // 合并单元格
 //            table.applyHorizontalMerge(2, 3, 5);
             table.get(0, 0).addParagraph().appendText("授课学期");
@@ -1275,6 +1105,7 @@ public class AnalysisReportServiceIMPL {
             table.get(6, 1).addParagraph().appendText(examPaperAnalyseReport.getReformAssumption());
             table.applyHorizontalMerge(6, 1, 5);
             nullRow(table, 6, 0, 20);
+            cellCenter(table);
 
             table.get(7, 0).addParagraph().appendText("填报人");
             table.applyHorizontalMerge(7, 1, 2);
@@ -1289,6 +1120,7 @@ public class AnalysisReportServiceIMPL {
             nullRow(table, 9, 0, 5);
             table.get(9, 0).addParagraph().appendText("签名：                       年    月    日");
             table.get(9, 0).getLastParagraph().getFormat().setHorizontalAlignment(HorizontalAlignment.Right);
+
 
             byte[] Bytes;
             String fileName = "";
