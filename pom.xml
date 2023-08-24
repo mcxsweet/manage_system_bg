@@ -115,7 +115,12 @@
              <scope>system</scope>
              <systemPath>${project.basedir}/src/main/resources/lib/spirej.doc.cracked-11.4.2.jar</systemPath>
         </dependency>
-
+<!--  使用JFreeChart绘制图像-->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.3</version>
+        </dependency>
 
 <!--        API Document-->
         <!-- Swagger -->
