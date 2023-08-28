@@ -27,36 +27,25 @@ import com.sini.com.spire.doc.FileFormat;
 import com.sini.com.spire.doc.documents.*;
 import com.sini.com.spire.doc.fields.DocPicture;
 
-import com.spire.xls.*;
-import com.spire.xls.core.IChartTrendLine;
 import org.jfree.chart.*;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.*;
 
 @Service
 public class AnalysisReportServiceIMPL {
@@ -509,7 +498,7 @@ public class AnalysisReportServiceIMPL {
 
             //评价标准
             addText(section2, "（3）评分标准", "title2Style", false);
-            Table table5 = generateTable(section2, 10, 3);
+            Table table5 = generateTable(section2, 5, 3);
             table5.applyStyle(DefaultTableStyle.Medium_Shading_1_Accent_1);
             table5.get(0, 0).addParagraph().appendText("考核方式");
             table5.get(0, 1).addParagraph().appendText("评价标准");
@@ -526,8 +515,8 @@ public class AnalysisReportServiceIMPL {
             table5.get(4, 1).addParagraph().appendText("所表述的概念错误较多;计算步骤不完整,结果不正确, 运用的概念、理论和公式不准确;未准时上交、书写潦草");
 
             table5.applyVerticalMerge(0, 1, 4);
-            table5.get(1, 1).addParagraph().appendText("考核方式");
-            cellCenter(table5);
+            table5.get(1, 0).addParagraph().appendText("考核方式");
+//            cellCenter(table5);
 
 
             addText(section2, "（4）考核成绩情况", "title2Style", false);
@@ -973,7 +962,8 @@ public class AnalysisReportServiceIMPL {
 
             table.get(8, 4).addParagraph().appendText("日期：");
             table.applyHorizontalMerge(8, 4, 6);
-            cellCenter(table);
+            // 表格居中
+//            cellCenter(table);
 
             byte[] Bytes;
             String fileName = "";
@@ -1105,7 +1095,8 @@ public class AnalysisReportServiceIMPL {
             table.get(6, 1).addParagraph().appendText(examPaperAnalyseReport.getReformAssumption());
             table.applyHorizontalMerge(6, 1, 5);
             nullRow(table, 6, 0, 20);
-            cellCenter(table);
+            //表格居中
+//            cellCenter(table);
 
             table.get(7, 0).addParagraph().appendText("填报人");
             table.applyHorizontalMerge(7, 1, 2);
