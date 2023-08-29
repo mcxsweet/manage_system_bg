@@ -940,21 +940,24 @@ public class AnalysisReportServiceIMPL {
             table.get(5, 4).addParagraph().appendText(String.valueOf(scoreAnalyse.getMaxScore()));
             table.get(5, 5).addParagraph().appendText("最低分");
             table.get(5, 6).addParagraph().appendText(String.valueOf(scoreAnalyse.getMinScore()));
+            cellCenter(table);
 
             //老师填写部分
             QueryWrapper<ExamPaperAnalyseReport> queryWrappern = new QueryWrapper<>();
             queryWrappern.eq("course_id", courseId);
             ExamPaperAnalyseReport examPaperAnalyseReport = examPaperAnalyseReportMAPPER.selectOne(queryWrappern);
 
+            nullRow(table, 6, 0, 9);
             table.get(6, 0).addParagraph().appendText("试卷情况分析");
             table.get(6, 1).addParagraph().appendText(examPaperAnalyseReport.getExamPaperSituationAnalyse());
             table.applyHorizontalMerge(6, 1, 6);
-            nullRow(table, 6, 0, 18);
+            nullRow(table, 6, 0, 9);
 
+            nullRow(table, 7, 0, 9);
             table.get(7, 0).addParagraph().appendText("改进措施");
             table.get(7, 1).addParagraph().appendText(examPaperAnalyseReport.getImprovementActions());
             table.applyHorizontalMerge(7, 1, 6);
-            nullRow(table, 7, 0, 18);
+            nullRow(table, 7, 0, 9);
 
             table.get(8, 0).addParagraph().appendText("教研室主任（签字）：");
             table.applyHorizontalMerge(8, 0, 1);
@@ -962,8 +965,7 @@ public class AnalysisReportServiceIMPL {
 
             table.get(8, 4).addParagraph().appendText("日期：");
             table.applyHorizontalMerge(8, 4, 6);
-            // 表格居中
-//            cellCenter(table);
+            table.getRows().get(8).setHeight(30f);
 
             byte[] Bytes;
             String fileName = "";
@@ -1081,30 +1083,35 @@ public class AnalysisReportServiceIMPL {
             table.get(4, 4).addParagraph().appendText("出版日期");
             table.get(4, 3).addParagraph().appendText("");
 
+            cellCenter(table);
+
             //老师填写部分
             QueryWrapper<ExamPaperAnalyseReport> queryWrappern = new QueryWrapper<>();
             queryWrappern.eq("course_id", courseId);
             ExamPaperAnalyseReport examPaperAnalyseReport = examPaperAnalyseReportMAPPER.selectOne(queryWrappern);
 
+            nullRow(table, 5, 0, 10);
             table.get(5, 0).addParagraph().appendText("课程教学总结");
             table.get(5, 1).addParagraph().appendText(examPaperAnalyseReport.getCourseTeachingSummary());
             table.applyHorizontalMerge(5, 1, 5);
-            nullRow(table, 5, 0, 20);
+            nullRow(table, 5, 0, 10);
 
+            nullRow(table, 6, 0, 10);
             table.get(6, 0).addParagraph().appendText("今后改革设想");
             table.get(6, 1).addParagraph().appendText(examPaperAnalyseReport.getReformAssumption());
             table.applyHorizontalMerge(6, 1, 5);
-            nullRow(table, 6, 0, 20);
-            //表格居中
-//            cellCenter(table);
+            nullRow(table, 6, 0, 10);
 
             table.get(7, 0).addParagraph().appendText("填报人");
             table.applyHorizontalMerge(7, 1, 2);
             table.get(7, 3).addParagraph().appendText("职称");
             table.applyHorizontalMerge(7, 4, 5);
+            table.getRows().get(7).setHeight(30f);
 
             table.get(8, 0).addParagraph().appendText("填报日期：");
             table.applyHorizontalMerge(8, 0, 5);
+            table.getRows().get(8).setHeight(30f);
+
 
             table.get(9, 0).addParagraph().appendText("教研室负责人审阅意见：");
             table.applyHorizontalMerge(9, 0, 5);
