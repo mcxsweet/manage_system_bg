@@ -51,6 +51,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
     @Autowired
     private CourseExamineChildMethodsMAPPER courseExamineChildMethodsMAPPER;
 
+
     //获取所有学生平时成绩信息
     @Override
     public List<StudentUsualScore> getAllStudent(int courseId) {
@@ -135,9 +136,9 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 double sum = 0;
                 String[] strings = export.stringToOneDArray(score.getScoreDetails());
                 for (int i = 0; i < strings.length; i++) {
-                    if (Objects.equals(strings[i], "")) {
+                    if (Objects.equals(strings[i], "") || Objects.equals(strings[i], " ")) {
                         sum += 0;
-                    }else{
+                    } else {
                         sum += Double.parseDouble(strings[i]) * usualExamPercentage.get(i) * 0.01;
                     }
                 }
@@ -286,23 +287,24 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
             assert workbook != null;
             Sheet sheet = workbook.getSheetAt(0);
 
-            DataFormatter formatter = new DataFormatter();
+            //数据格式化对象用于读取表格单元格
+//            DataFormatter formatter = new DataFormatter();
             //遍历列
             for (int rowIndex = 4; rowIndex < sheet.getLastRowNum() + 1; rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
 
                 QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
-                queryWrapper.eq("student_number", formatter.formatCellValue(row.getCell(0)));
+                queryWrapper.eq("student_number", export.getCellStringValue(row.getCell(0)));
                 queryWrapper.eq("course_id", courseId);
                 StudentInformation information = studentInformationMAPPER.selectOne(queryWrapper);
 
                 StudentInformation student = new StudentInformation();
-                student.setStudentName(formatter.formatCellValue(row.getCell(1)));
-                student.setClassName(formatter.formatCellValue(row.getCell(2)));
+                student.setStudentName(export.getCellStringValue(row.getCell(1)));
+                student.setClassName(export.getCellStringValue(row.getCell(2)));
 
                 Integer id = 0;
                 if (information == null) {
-                    student.setStudentNumber(formatter.formatCellValue(row.getCell(0)));
+                    student.setStudentNumber(export.getCellStringValue(row.getCell(0)));
                     student.setCourseId(courseId);
 
                     studentInformationMAPPER.insert(student);
@@ -318,10 +320,11 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 int columIndex = 3;
                 List<String> strings = new ArrayList<>();
                 for (int i = 0; i < usualExamMethods.size(); i++) {
-                    if (formatter.formatCellValue(row.getCell(columIndex)) == null) {
-                        strings.add(null);
+                    String cellStringValue = export.getCellStringValue(row.getCell(columIndex));
+                    if (!export.isNumeric(cellStringValue)){
+                        strings.add("");
                     }else{
-                        strings.add(formatter.formatCellValue(row.getCell(columIndex)));
+                        strings.add(cellStringValue);
                     }
                     columIndex++;
                 }
@@ -337,12 +340,13 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
                 } else {
                     studentUsualScoreMAPPER.update(studentUsualScore, queryWrapper2);
                 }
-                refreshStudentScore((Integer.parseInt(courseId)));
             }
+            refreshStudentScore((Integer.parseInt(courseId)));
             return new DataResponses(true, "导入成功");
 
         } catch (IOException exception) {
             return new DataResponses(false, "导入失败，表格数据有缺失");
         }
     }
+
 }

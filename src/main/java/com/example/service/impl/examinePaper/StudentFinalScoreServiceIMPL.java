@@ -148,7 +148,7 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 List<List<String>> lists = export.stringTo2DArray(score.getScoreDetails());
                 for (List<String> list : lists) {
                     for (String s : list) {
-                        if (Objects.equals(s, "")) {
+                        if (Objects.equals(s, "") || Objects.equals(s, " ")) {
                             s = "0";
                         }
                         sum += Double.parseDouble(s);
@@ -313,23 +313,23 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
             assert workbook != null;
             Sheet sheet = workbook.getSheetAt(0);
 
-            DataFormatter formatter = new DataFormatter();
+//            DataFormatter formatter = new DataFormatter();
             //遍历行
             for (int i = 4; i < sheet.getLastRowNum() + 1; i++) {
                 Row row = sheet.getRow(i);
 //                StudentInformation information = new StudentInformation(formatter.formatCellValue(row.getCell(0)), formatter.formatCellValue(row.getCell(1)), formatter.formatCellValue(row.getCell(2)), courseId);
                 QueryWrapper<StudentInformation> queryWrapper = new QueryWrapper<>();
-                queryWrapper.eq("student_number", formatter.formatCellValue(row.getCell(0)));
+                queryWrapper.eq("student_number", export.getCellStringValue(row.getCell(0)));
                 queryWrapper.eq("course_id", courseId);
                 StudentInformation information = studentInformationMAPPER.selectOne(queryWrapper);
 
                 StudentInformation student = new StudentInformation();
-                student.setStudentName(formatter.formatCellValue(row.getCell(1)));
-                student.setClassName(formatter.formatCellValue(row.getCell(2)));
+                student.setStudentName(export.getCellStringValue(row.getCell(1)));
+                student.setClassName(export.getCellStringValue(row.getCell(2)));
 
                 Integer id = 0;
                 if (information == null) {
-                    student.setStudentNumber(formatter.formatCellValue(row.getCell(0)));
+                    student.setStudentNumber(export.getCellStringValue(row.getCell(0)));
                     student.setCourseId(String.valueOf(courseId));
 
                     studentInformationMAPPER.insert(student);
@@ -350,10 +350,11 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                     JSONArray objects = JSONArray.parseArray(data.getData());
                     List<String> list1 = new ArrayList();
                     for (int j = 0; j < objects.size(); j++) {
-                        if (formatter.formatCellValue(row.getCell(index)) == null) {
-                            list1.add(null);
+                        String cellStringValue = export.getCellStringValue(row.getCell(index));
+                        if (!export.isNumeric(cellStringValue)){
+                            list1.add("");
                         }else{
-                            list1.add(formatter.formatCellValue(row.getCell(index)));
+                            list1.add(cellStringValue);
                         }
                         index++;
                     }
@@ -373,8 +374,8 @@ public class StudentFinalScoreServiceIMPL extends ServiceImpl<StudentFinalScoreM
                 } else {
                     studentFinalScoreMAPPER.update(score, queryWrapper2);
                 }
-                refreshStudentScore(courseId);
             }
+            refreshStudentScore(courseId);
             return new DataResponses(true, "导入成功");
 
         } catch (IOException exception) {
