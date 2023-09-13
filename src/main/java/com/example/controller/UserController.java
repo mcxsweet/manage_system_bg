@@ -1,17 +1,22 @@
 package com.example.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.example.mapper.UserMAPPER;
+import com.example.object.CourseBasicInformation;
 import com.example.object.LoginDTO;
 import com.example.object.User;
+import com.example.object.finalExamine.StudentInformation;
 import com.example.service.impl.UserServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -77,21 +82,34 @@ public class UserController {
     }
 
     @ApiOperation("按id修改")
-    @PutMapping()
-    public DataResponses UpdateById(@RequestBody User data) {
-        return new DataResponses(userService.updateById(data));
+    @PutMapping("/updateUser")
+    public DataResponses updateUser(@RequestBody User data) {
+        System.out.println("User修改功能");
+        return new DataResponses(true,userService.updateById(data));
     }
 
+
+
     @ApiOperation("添加")
-    @PostMapping("/regin")
-    public DataResponses write(@RequestBody User pages) {
-        return new DataResponses(userService.save(pages));
+    @PostMapping("/addUser")
+    public DataResponses addUser(@RequestBody User user) {
+        System.out.println("User添加功能");
+        return new DataResponses(true, userService.save(user),user.getName());
     }
 
     @ApiOperation("删除")
-    @DeleteMapping
-    public DataResponses delete(@RequestBody User pages) {
-        return new DataResponses(userService.removeById(pages));
+    @DeleteMapping("/deleteUser")
+    public DataResponses deleteUser(@RequestBody User user) {
+        System.out.println("User删除功能");
+        return new DataResponses(true,userService.removeById(user.getId()));
+    }
+
+    @ApiOperation("查询全部")
+    @GetMapping
+    public DataResponses getAll() {
+        return new DataResponses(true, userService.list());
     }
 
 }
+
+
