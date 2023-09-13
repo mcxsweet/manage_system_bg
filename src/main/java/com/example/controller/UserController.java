@@ -84,23 +84,18 @@ public class UserController {
     @ApiOperation("按id修改")
     @PutMapping("/updateUser")
     public DataResponses updateUser(@RequestBody User data) {
-        System.out.println("User修改功能");
         return new DataResponses(true,userService.updateById(data));
     }
-
-
 
     @ApiOperation("添加")
     @PostMapping("/addUser")
     public DataResponses addUser(@RequestBody User user) {
-        System.out.println("User添加功能");
         return new DataResponses(true, userService.save(user),user.getName());
     }
 
     @ApiOperation("删除")
     @DeleteMapping("/deleteUser")
     public DataResponses deleteUser(@RequestBody User user) {
-        System.out.println("User删除功能");
         return new DataResponses(true,userService.removeById(user.getId()));
     }
 
