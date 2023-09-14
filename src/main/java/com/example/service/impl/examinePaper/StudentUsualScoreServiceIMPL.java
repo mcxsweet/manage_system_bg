@@ -135,7 +135,7 @@ public class StudentUsualScoreServiceIMPL extends ServiceImpl<StudentUsualScoreM
 
                 double sum = 0;
                 String[] strings = export.stringToOneDArray(score.getScoreDetails());
-                for (int i = 0; i < strings.length; i++) {
+                for (int i = 0; i < usualExamPercentage.size(); i++) {
                     if (Objects.equals(strings[i], "") || Objects.equals(strings[i], " ")) {
                         sum += 0;
                     } else {
