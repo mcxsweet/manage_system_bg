@@ -37,8 +37,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -270,7 +268,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
                 row4.getCell(columIndex).setCellStyle(style);
 
                 //生成关系矩阵
-                int result = 0;
+                float result = 0;
                 //指标点
                 for (int i = 4; i < rowIndex - targetNum - 1; i++) {
                     HSSFRow rown = sheet.getRow(i);
