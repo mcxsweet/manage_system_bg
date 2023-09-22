@@ -1,18 +1,21 @@
 package com.example.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.example.mapper.UserMAPPER;
 import com.example.object.CourseBasicInformation;
 import com.example.object.LoginDTO;
 import com.example.object.User;
 import com.example.object.finalExamine.StudentInformation;
 import com.example.service.impl.UserServiceIMPL;
+import com.example.service.impl.examinePaper.StudentInformationServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -26,6 +29,9 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserServiceIMPL userService;
+
+    @Autowired
+    private UserServiceIMPL userServiceIMPL;
 
     // 会话登录接口
     @PostMapping("/doLogin")
@@ -87,6 +93,8 @@ public class UserController {
         return new DataResponses(true,userService.updateById(data));
     }
 
+
+
     @ApiOperation("添加")
     @PostMapping("/addUser")
     public DataResponses addUser(@RequestBody User user) {
@@ -103,6 +111,15 @@ public class UserController {
     @GetMapping
     public DataResponses getAll() {
         return new DataResponses(true, userService.list());
+    }
+
+    /**
+     * 导入教师信息
+     */
+    @ApiOperation("导入教师信息表格")
+    @PostMapping("/userInfo")
+    public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
+        return new DataResponses(true,userService.removeById(user.getId()));
     }
 
 }
