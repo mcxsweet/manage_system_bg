@@ -119,7 +119,7 @@ public class UserController {
     @ApiOperation("导入教师信息表格")
     @PostMapping("/userInfo")
     public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
-        return new DataResponses(true,userService.removeById(user.getId()));
+        return userServiceIMPL.inputUserInfo(file);
     }
 
 }
