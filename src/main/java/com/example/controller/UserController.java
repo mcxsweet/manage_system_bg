@@ -1,14 +1,17 @@
 package com.example.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.example.object.LoginDTO;
 import com.example.object.User;
 import com.example.service.impl.UserServiceIMPL;
+import com.example.service.impl.examinePaper.StudentInformationServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -21,6 +24,9 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserServiceIMPL userService;
+
+    @Autowired
+    private UserServiceIMPL userServiceIMPL;
 
     // 会话登录接口
     @PostMapping("/doLogin")
@@ -77,21 +83,41 @@ public class UserController {
     }
 
     @ApiOperation("按id修改")
-    @PutMapping()
-    public DataResponses UpdateById(@RequestBody User data) {
-        return new DataResponses(userService.updateById(data));
+    @PutMapping("/updateUser")
+    public DataResponses updateUser(@RequestBody User data) {
+        System.out.println("User修改功能");
+        return new DataResponses(true,userService.updateById(data));
     }
 
+
+
     @ApiOperation("添加")
-    @PostMapping("/regin")
-    public DataResponses write(@RequestBody User pages) {
-        return new DataResponses(userService.save(pages));
+    @PostMapping("/addUser")
+    public DataResponses addUser(@RequestBody User user) {
+        System.out.println("User添加功能");
+        return new DataResponses(true, userService.save(user),user.getName());
     }
 
     @ApiOperation("删除")
-    @DeleteMapping
-    public DataResponses delete(@RequestBody User pages) {
-        return new DataResponses(userService.removeById(pages));
+    @DeleteMapping("/deleteUser")
+    public DataResponses deleteUser(@RequestBody User user) {
+        System.out.println("User删除功能");
+        return new DataResponses(true,userService.removeById(user.getId()));
+    }
+
+    @ApiOperation("查询全部")
+    @GetMapping
+    public DataResponses getAll() {
+        return new DataResponses(true, userService.list());
+    }
+
+    /**
+     * 导入教师信息
+     */
+    @ApiOperation("导入教师信息表格")
+    @PostMapping("/userInfo")
+    public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
+        return userServiceIMPL.inputUserInfo(file);
     }
 
 }
