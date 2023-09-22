@@ -22,6 +22,7 @@ import com.example.service.examinePaper.StudentInformationSERVICE;
 import com.example.utility.DataResponses;
 import com.example.utility.export.export;
 import com.spire.xls.FileFormat;
+import org.apache.poi.hssf.OldExcelFormatException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -76,7 +77,11 @@ public class StudentInformationServiceIMPL extends ServiceImpl<StudentInformatio
             DataFormatter formatter = new DataFormatter();
 
             if (fileSuffix.equals(".xls")) {
-                workbook = new HSSFWorkbook(file.getInputStream());
+                try{
+                    workbook = new HSSFWorkbook(file.getInputStream());
+                }catch (OldExcelFormatException e){
+                    return new DataResponses(false, "该表格生成时采用的模板是 Excel 5.0/95工作簿 版本太老不兼容，请将表格在本地另存为操作一下即可导入");
+                }
             } else if (fileSuffix.equals(".xlsx")) {
                 workbook = new XSSFWorkbook(file.getInputStream());
             }

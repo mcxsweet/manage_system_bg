@@ -2,19 +2,24 @@ package com.example.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson.JSONArray;
+import com.example.mapper.UserMAPPER;
+import com.example.object.CourseBasicInformation;
 import com.example.object.LoginDTO;
 import com.example.object.User;
+import com.example.object.finalExamine.StudentInformation;
 import com.example.service.impl.UserServiceIMPL;
 import com.example.service.impl.examinePaper.StudentInformationServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -85,7 +90,6 @@ public class UserController {
     @ApiOperation("按id修改")
     @PutMapping("/updateUser")
     public DataResponses updateUser(@RequestBody User data) {
-        System.out.println("User修改功能");
         return new DataResponses(true,userService.updateById(data));
     }
 
@@ -94,14 +98,12 @@ public class UserController {
     @ApiOperation("添加")
     @PostMapping("/addUser")
     public DataResponses addUser(@RequestBody User user) {
-        System.out.println("User添加功能");
         return new DataResponses(true, userService.save(user),user.getName());
     }
 
     @ApiOperation("删除")
     @DeleteMapping("/deleteUser")
     public DataResponses deleteUser(@RequestBody User user) {
-        System.out.println("User删除功能");
         return new DataResponses(true,userService.removeById(user.getId()));
     }
 
@@ -117,7 +119,9 @@ public class UserController {
     @ApiOperation("导入教师信息表格")
     @PostMapping("/userInfo")
     public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
-        return userServiceIMPL.inputUserInfo(file);
+        return new DataResponses(true,userService.removeById(user.getId()));
     }
 
 }
+
+

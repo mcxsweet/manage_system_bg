@@ -28,6 +28,7 @@ import com.sini.com.spire.doc.documents.*;
 import com.sini.com.spire.doc.fields.DocPicture;
 
 import org.jfree.chart.*;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
@@ -188,6 +189,11 @@ public class AnalysisReportServiceIMPL {
 
             plot.addRangeMarker(new ValueMarker(0.6, Color.RED, new BasicStroke(1)));
 
+            // 获取 Y 轴对象
+            ValueAxis yAxis = plot.getRangeAxis();
+            // 设置 Y 轴的最小值为 0
+            yAxis.setLowerBound(0);
+
             // Create a buffered image of the chart
             BufferedImage bufferedImage = chart.createBufferedImage(800, 300);
             // Convert the buffered image to a byte array
@@ -196,20 +202,20 @@ public class AnalysisReportServiceIMPL {
 
             return byteArrayOutputStream.toByteArray();
         } catch (Exception exception) {
-            exception.printStackTrace();
             return null;
         }
     }
 
     //在word文档中插入图表
     private void insertChart(Document document, byte[] bytes, Section section) {
-        DocPicture picture = new DocPicture(document);
-        picture.loadImage(bytes);
+        if (bytes != null) {
+            DocPicture picture = new DocPicture(document);
+            picture.loadImage(bytes);
 
-        Paragraph para = section.addParagraph();
-        para.getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
-        para.getChildObjects().insert(0, picture);
-
+            Paragraph para = section.addParagraph();
+            para.getFormat().setHorizontalAlignment(HorizontalAlignment.Center);
+            para.getChildObjects().insert(0, picture);
+        }
     }
 
     //表格内容居中
@@ -586,6 +592,8 @@ public class AnalysisReportServiceIMPL {
                 }
                 double usualAchievement = 0;
                 double finalAchievement = 0;
+                double usualPercentage = 1;
+                double finalPercentage = 1;
 
                 for (CourseExamineMethods courseExamineMethod : courseExamineMethods) {
                     table6.get(rowIndex, 1).addParagraph().appendText(courseExamineMethod.getExamineItem());
@@ -599,6 +607,8 @@ public class AnalysisReportServiceIMPL {
                     if (courseExamineMethod.getExamineItem().contains("平时")) {
 //                        boolean[] boolArray = new boolean[courseExamineChildMethods1.size()];
                         List<DataExtend> keyValues = new ArrayList<>();
+
+                        usualPercentage = courseExamineMethod.getPercentage() * 0.01;
 
 //                        int childMethodsIndex = 0;
                         for (CourseExamineChildMethods item : courseExamineChildMethods1) {
@@ -636,8 +646,11 @@ public class AnalysisReportServiceIMPL {
 
                         double avg = sum / studentUsualScores.size();
                         double v = export.doubleFormat(avg, 2);
-                        double v2 = export.doubleFormat(v / n, 2);
-                        usualAchievement = v2 * courseExamineMethod.getPercentage() * 0.01;
+                        double v2 = 0;
+                        if (!(n == 0)) {
+                            v2 = export.doubleFormat(v / n, 2);
+                            usualAchievement = v2 * usualPercentage;
+                        }
 
                         table6.get(rowIndex, 2).addParagraph().appendText(s);
                         table6.get(rowIndex, 3).addParagraph().appendText(String.valueOf(n));
@@ -645,6 +658,7 @@ public class AnalysisReportServiceIMPL {
                         table6.get(rowIndex, 5).addParagraph().appendText(String.valueOf(v2));
 
                     } else if (courseExamineMethod.getExamineItem().contains("期末")) {
+                        finalPercentage = courseExamineMethod.getPercentage() * 0.01;
                         for (CourseExamineChildMethods item : courseExamineChildMethods1) {
                             if (item.getExamineChildItem().contains("试卷")) {
                                 QueryWrapper<CourseFinalExamPaper> queryWrapper3 = new QueryWrapper<>();
@@ -686,9 +700,13 @@ public class AnalysisReportServiceIMPL {
                                 }
 
                                 double v = export.doubleFormat(sum / studentFinalScores.size(), 2);
-                                double v2 = export.doubleFormat(v / n, 2);
+                                double v2 = 0;
 
-                                finalAchievement = v2 * courseExamineMethod.getPercentage() * 0.01;
+                                if (!(n == 0)) {
+                                    v2 = export.doubleFormat(v / n, 2);
+                                    finalAchievement = v2 * finalPercentage;
+                                }
+
 
                                 table6.get(rowIndex, 3).addParagraph().appendText(String.valueOf(n));
                                 table6.get(rowIndex, 4).addParagraph().appendText(String.valueOf(v));
@@ -702,6 +720,14 @@ public class AnalysisReportServiceIMPL {
 
                     rowIndex++;
                 }
+
+                //防止出现平时或者期末达成度为0
+                if (usualAchievement == 0) {
+                    finalAchievement = finalAchievement / finalPercentage;
+                } else if (finalAchievement == 0) {
+                    usualAchievement = usualAchievement / usualPercentage;
+                }
+
                 double v = export.doubleFormat(usualAchievement + finalAchievement, 2);
                 table6.applyVerticalMerge(0, temp, rowIndex - 1);
                 table6.get(rowIndex - 1, 6).addParagraph().appendText(String.valueOf(v));
