@@ -2,6 +2,7 @@ package com.example.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson.JSONArray;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.mapper.UserMAPPER;
 import com.example.object.CourseBasicInformation;
 import com.example.object.LoginDTO;
@@ -120,6 +121,18 @@ public class UserController {
     @PostMapping("/userInfo")
     public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
         return userServiceIMPL.inputUserInfo(file);
+    }
+
+    /*
+    *教学大纲管理页面的课程负责人查询
+    */
+    @ApiOperation("负责人查询")
+    @GetMapping("/searchTeacher")
+    public DataResponses searchTeacher() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.select("teacher_name");
+        queryWrapper.select("teacher_name").notLike("teacher_name","管理员").eq("is_admin",0);
+        return new DataResponses(true, userService.list(queryWrapper));
     }
 
 }
