@@ -28,15 +28,12 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
-    private UserServiceIMPL userService;
-
-    @Autowired
     private UserServiceIMPL userServiceIMPL;
 
     // 会话登录接口
     @PostMapping("/doLogin")
     public DataResponses doLogin(@RequestBody LoginDTO user) {
-        return userService.login(user);
+        return userServiceIMPL.login(user);
     }
 
     // 查询登录信息 登录信息可以不存在前端，每次需通过后端验证获取
@@ -84,13 +81,13 @@ public class UserController {
     @ApiOperation("登录接口")
     @PostMapping
     public DataResponses submit(@RequestBody User user, HttpServletResponse response) {
-        return userService.loginCheck(user, response);
+        return userServiceIMPL.loginCheck(user, response);
     }
 
     @ApiOperation("按id修改")
     @PutMapping("/updateUser")
     public DataResponses updateUser(@RequestBody User data) {
-        return new DataResponses(true,userService.updateById(data));
+        return new DataResponses(true,userServiceIMPL.updateById(data));
     }
 
 
@@ -98,19 +95,19 @@ public class UserController {
     @ApiOperation("添加")
     @PostMapping("/addUser")
     public DataResponses addUser(@RequestBody User user) {
-        return new DataResponses(true, userService.save(user),user.getName());
+        return new DataResponses(true, userServiceIMPL.save(user),user.getName());
     }
 
     @ApiOperation("删除")
     @DeleteMapping("/deleteUser")
     public DataResponses deleteUser(@RequestBody User user) {
-        return new DataResponses(true,userService.removeById(user.getId()));
+        return new DataResponses(true,userServiceIMPL.removeById(user.getId()));
     }
 
     @ApiOperation("查询全部")
     @GetMapping
     public DataResponses getAll() {
-        return new DataResponses(true, userService.list());
+        return new DataResponses(true, userServiceIMPL.list());
     }
 
     /**
