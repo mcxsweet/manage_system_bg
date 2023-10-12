@@ -129,7 +129,7 @@ public class UserController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
 //        queryWrapper.select("teacher_name");
         queryWrapper.select("teacher_name").notLike("teacher_name","管理员").eq("is_admin",0);
-        return new DataResponses(true, userService.list(queryWrapper));
+        return new DataResponses(true, userServiceIMPL.list(queryWrapper));
     }
 
 }
