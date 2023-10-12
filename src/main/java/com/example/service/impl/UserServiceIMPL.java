@@ -1,31 +1,38 @@
 package com.example.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.UserMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
+import com.example.object.CourseBasicInformation;
 import com.example.object.LoginDTO;
 import com.example.object.User;
 import com.example.object.finalExamine.StudentInformation;
+import com.example.object.finalExamine.StudentUsualScore;
 import com.example.service.UserSERVICE;
 import com.example.utility.DataResponses;
 import com.example.utility.Token.TokenUtil;
+import com.example.utility.export.export;
+import io.swagger.annotations.ApiOperation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -99,6 +106,11 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
 
         //此处只是为了前端不过多修改，实际可不用返回用户信息
         return new DataResponses(true, map, "登录成功");
+    }
+
+    public List<User> getAllUser() {
+        List<User> allUser = UserMAPPER.getAllUser();
+        return allUser;
     }
 
     //用户信息导入
@@ -195,5 +207,134 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
         }
 
 
+    }
+
+
+    //用户信息导出
+    @Override
+    public ResponseEntity<byte[]> outUserInformation(HttpServletResponse response) throws IOException {
+
+        //工作簿事例
+        int rowIndex = 1;
+        int columIndex = 0;
+
+        Workbook workbook = new HSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+
+        //单元格样式
+        CellStyle style = workbook.createCellStyle();
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+
+        //表头设置
+        Row row1 = sheet.createRow(0);
+        row1.setRowStyle(style);
+        Row row2 = sheet.createRow(1);
+        row2.setRowStyle(style);
+        Row row3 = sheet.createRow(2);
+        row3.setRowStyle(style);
+        Row row4 = sheet.createRow(3);
+        row4.setRowStyle(style);
+
+        CellRangeAddress mergedRegion = new CellRangeAddress(1, 3, 0, 0);
+        sheet.addMergedRegion(mergedRegion);
+        row2.createCell(0).setCellValue("账号名称");
+        export.reloadCellStyle(mergedRegion, sheet, style);
+        sheet.setColumnWidth(0, 20 * 256);
+
+        mergedRegion = new CellRangeAddress(1, 3, 1, 1);
+        sheet.addMergedRegion(mergedRegion);
+        row2.createCell(1).setCellValue("账号密码");
+        export.reloadCellStyle(mergedRegion, sheet, style);
+        sheet.autoSizeColumn(1);
+
+        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
+        sheet.addMergedRegion(mergedRegion);
+        row2.createCell(2).setCellValue("教师姓名");
+        export.reloadCellStyle(mergedRegion, sheet, style);
+        sheet.setColumnWidth(2, 20 * 256);
+
+        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
+        sheet.addMergedRegion(mergedRegion);
+        row2.createCell(2).setCellValue("教师姓名");
+        export.reloadCellStyle(mergedRegion, sheet, style);
+        sheet.setColumnWidth(2, 20 * 256);
+
+        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
+        sheet.addMergedRegion(mergedRegion);
+        row2.createCell(2).setCellValue("教师姓名");
+        export.reloadCellStyle(mergedRegion, sheet, style);
+        sheet.setColumnWidth(2, 20 * 256);
+
+        //考核条目
+        List<String> usualExamMethods = getUsualExamMethods(courseId);
+        columIndex = 3;
+        for (String dataExtend : usualExamMethods) {
+            mergedRegion = new CellRangeAddress(1, 3, columIndex, columIndex);
+            sheet.addMergedRegion(mergedRegion);
+            row2.createCell(columIndex).setCellValue(dataExtend);
+            export.reloadCellStyle(mergedRegion, sheet, style);
+            columIndex++;
+        }
+
+        mergedRegion = new CellRangeAddress(1, 3, columIndex, columIndex);
+        sheet.addMergedRegion(mergedRegion);
+        row2.createCell(columIndex).setCellValue("总分");
+        export.reloadCellStyle(mergedRegion, sheet, style);
+
+        rowIndex = 4;
+        //学生列表
+        List<StudentUsualScore> allStudent = getAllUser();
+        for (StudentUsualScore score : allStudent) {
+            Row eachRow = sheet.createRow(rowIndex);
+            eachRow.setRowStyle(style);
+
+            export.valueToCell(sheet, rowIndex, 0, score.getStudentNumber(), style);
+            export.valueToCell(sheet, rowIndex, 1, score.getStudentName(), style);
+            export.valueToCell(sheet, rowIndex, 2, score.getClassName(), style);
+
+            //成绩
+            int index = 3;
+            JSONArray objects = JSONArray.parseArray(score.getScoreDetails());
+            if (objects == null) {
+
+            } else {
+                for (Object object : objects) {
+//                    eachRow.createCell(index).setCellValue(object.toString());
+//                    eachRow.getCell(index).setCellStyle(style);
+                    export.valueToCell(sheet, rowIndex, index, object.toString(), style);
+                    index++;
+                }
+            }
+            rowIndex++;
+        }
+
+        CourseBasicInformation courseBasicInformation = courseBasicInformationMAPPER.selectById(courseId);
+        String fileName = courseBasicInformation.getTermStart() + " - " + courseBasicInformation.getTermEnd() + "学年第" + courseBasicInformation.getTerm() + "学期" + courseBasicInformation.getClassName() + courseBasicInformation.getCourseName() + "[" + courseBasicInformation.getClassroomTeacher() + "]" + "平时成绩.xls";
+
+        mergedRegion = new CellRangeAddress(0, 0, 0, columIndex);
+        sheet.addMergedRegion(mergedRegion);
+        row1.createCell(0).setCellValue(fileName);
+        export.reloadCellStyle(mergedRegion, sheet, style);
+
+        //写入文件
+        //使用字节数组读取
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        workbook.write(byteArrayOutputStream);
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+
+        response.reset();
+        response.setContentType("application/vnd.ms-excel");
+
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
+
+        return ResponseEntity.ok()
+                .body(bytes);
     }
 }

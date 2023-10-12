@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.object.LoginDTO;
 import com.example.object.User;
 import com.example.utility.DataResponses;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,5 +21,9 @@ public interface UserSERVICE extends IService<User> {
     //用户信息导入
     @Transactional
     DataResponses inputUserInfo(MultipartFile file);
+
+
+    //导出模板XLS
+    ResponseEntity<byte[]> outUserInformation(HttpServletResponse response);
 
 }

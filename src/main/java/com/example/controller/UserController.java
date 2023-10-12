@@ -10,10 +10,12 @@ import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -119,5 +121,14 @@ public class UserController {
     public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
         return userServiceIMPL.inputUserInfo(file);
     }
+    /**
+     * 导出学生平时成绩表格
+     */
+    @ApiOperation("导出模板")
+    @GetMapping("/outUserExcl")
+    public ResponseEntity<byte[]> outUserInformation(HttpServletResponse response) throws IOException {
+        return userServiceIMPL.outUserInformation(response);
+    }
+
 
 }
