@@ -146,7 +146,7 @@ public class TeachingManagementController {
 
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         ZipOutputStream zipStream = new ZipOutputStream(byteStream);
-        String FileName = "text.zip";
+        String FileName = "批量导出.zip";
 
         try {
 
