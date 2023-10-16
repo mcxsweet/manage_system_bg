@@ -12,6 +12,7 @@ import com.example.object.Indicators;
 import com.example.object.comprehensiveAnalyse.KeyValue;
 import com.example.object.courseSurvey.CourseAttainmentSurvey;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
+import com.example.service.impl.IndicatorOutlineSERVICEIMPL;
 import com.example.service.impl.IndicatorsServiceIMPL;
 import com.example.utility.DataResponses;
 import com.example.utility.export.export;
@@ -182,6 +183,15 @@ public class CourseBasicInformationController {
      */
 
     @Autowired
+    IndicatorOutlineSERVICEIMPL indicatorOutlineSERVICEIMPL;
+
+    @ApiOperation("查询指标点概要")
+    @GetMapping("/indicatorsOutline")
+    public DataResponses getIndicatorOutline() {
+        return new DataResponses(true, indicatorOutlineSERVICEIMPL.list());
+    }
+
+    @Autowired
     private IndicatorsMAPPER indicators;
     @Autowired
     private IndicatorsServiceIMPL indicatorsServiceIMPL;
@@ -189,7 +199,13 @@ public class CourseBasicInformationController {
     @ApiOperation("查询全部指标点")
     @GetMapping("/indicators")
     public DataResponses getAllIndicators() {
-        return new DataResponses(true, indicators.selectList(null));
+        return new DataResponses(true, indicatorsServiceIMPL.list());
+    }
+
+    @ApiOperation("添加指标点")
+    @PostMapping("/saveIndicator")
+    public DataResponses insertIndicators(@RequestBody Indicators item) {
+        return new DataResponses(true, indicatorsServiceIMPL.save(item));
     }
 
     @ApiOperation("查询专业指标点")
@@ -197,18 +213,6 @@ public class CourseBasicInformationController {
     public DataResponses getMajorIndicators(@RequestBody HashMap<String, String> major) {
         return new DataResponses(true, indicators.getMajorIndicators(major.get("major")));
     }
-
-    @ApiOperation("指标点PDF")
-    @GetMapping("/{major}/indicatorsPDF")
-    public ResponseEntity<byte[]> IndicatorsPDF(@PathVariable String major) {
-        return indicatorsServiceIMPL.IndicatorsPDF(major);
-    }
-
-//    @ApiOperation("添加指标点")
-//    @PostMapping("/indicators")
-//    public DataResponses insertIndicators(@RequestBody Indicators item) {
-//        return new DataResponses(indicators.insert(item));
-//    }
 
     @ApiOperation("删除指标点")
     @DeleteMapping("/indicators")
@@ -220,6 +224,12 @@ public class CourseBasicInformationController {
     @PutMapping("/indicators")
     public DataResponses PutIndicators(@RequestBody Indicators item) {
         return new DataResponses(indicators.updateById(item));
+    }
+
+    @ApiOperation("指标点PDF")
+    @GetMapping("/{major}/indicatorsPDF")
+    public ResponseEntity<byte[]> IndicatorsPDF(@PathVariable String major) {
+        return indicatorsServiceIMPL.IndicatorsPDF(major);
     }
 
 
