@@ -1,46 +1,49 @@
 package com.example.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.UserMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
-import com.example.object.CourseBasicInformation;
 import com.example.object.LoginDTO;
 import com.example.object.User;
 import com.example.object.finalExamine.StudentInformation;
-import com.example.object.finalExamine.StudentUsualScore;
 import com.example.service.UserSERVICE;
 import com.example.utility.DataResponses;
 import com.example.utility.Token.TokenUtil;
-import com.example.utility.export.export;
-import io.swagger.annotations.ApiOperation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.util.*;
 
 @Service
 public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements UserSERVICE {
 
     @Autowired
     private UserMAPPER userMAPPER;
+
 
     @Autowired
     private StudentInformationMAPPER studentInformationMAPPER;
@@ -108,8 +111,9 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
         return new DataResponses(true, map, "登录成功");
     }
 
-    public List<User> getAllUser() {
-        List<User> allUser = UserMAPPER.getAllUser();
+    @Override
+    public List<User> getAll() {
+        List<User> allUser = userMAPPER.getAll();
         return allUser;
     }
 
@@ -209,132 +213,201 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
 
     }
 
+    //用户导出 导入模板
+    @Override
+    public ResponseEntity<byte[]> exportUserInformation(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            String fileName = "UserTemplate.xlsx";
+            String userAgent = request.getHeader("user-agent");
+            if (userAgent != null && userAgent.indexOf("Edge") >= 0) {
+                fileName = URLEncoder.encode(fileName, "UTF8");
+            } else if (userAgent.indexOf("Firefox") >= 0 || userAgent.indexOf("Chrome") >= 0
+                    || userAgent.indexOf("Safari") >= 0) {
+                fileName = new String((fileName).getBytes("UTF-8"), "ISO8859-1");
+            } else {
+                fileName = URLEncoder.encode(fileName, "UTF8");
+            }
+
+            // Create a list of headers
+            List<String> headers = Arrays.asList( "账号名称", "账号密码", "教师姓名", "教师权限", "所属院系");
+
+            // Create a new Excel workbook
+            XSSFWorkbook wb = new XSSFWorkbook();
+            OutputStream os = response.getOutputStream();
+
+            try {
+                XSSFSheet sheet = wb.createSheet("用户信息模板");
+                sheet.setDefaultRowHeight((short) (2 * 256));
+                sheet.setDefaultColumnWidth(17);
+
+                // Create the header row
+                XSSFRow headerRow = sheet.createRow(0);
+                for (int i = 0; i < headers.size() ; i++) {
+                    XSSFCell headerCell = headerRow.createCell(i);
+                    headerCell.setCellValue(headers.get(i));
+                }
+
+                // Write the Excel file to a ByteArrayOutputStream
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                wb.write(bos);
+                wb.close();
+                bos.close();
+
+                byte[] excelBytes = bos.toByteArray();
+
+                // Set HTTP headers for the response
+                HttpHeaders httpHeaders = new HttpHeaders();
+                httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                httpHeaders.setContentLength(excelBytes.length);
+                httpHeaders.setContentDispositionFormData("attachment", fileName);
+
+                return new ResponseEntity<>(excelBytes, httpHeaders, HttpStatus.OK);
+            } catch (Exception e) {
+                log.error("export error: {}", e);
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+    }
+
+
+    //用户导出 用户信息
+    @Override
+    public ResponseEntity<byte[]> outUserInformation(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String fileName = "UserInformation.xlsx";
+        String userAgent = request.getHeader("user-agent");
+        if (userAgent != null && userAgent.indexOf("Edge") >= 0) {
+            fileName = URLEncoder.encode(fileName, "UTF8");
+        } else if (userAgent.indexOf("Firefox") >= 0 || userAgent.indexOf("Chrome") >= 0
+                || userAgent.indexOf("Safari") >= 0) {
+            fileName = new String((fileName).getBytes("UTF-8"), "ISO8859-1");
+        } else {
+            fileName = URLEncoder.encode(fileName, "UTF8");
+        }
+
+        // Replace this with your code to retrieve user data and create a list of user information
+        List<User> users = getAll(); // Implement this method to get user data
+
+        // Create a new Excel workbook
+        XSSFWorkbook wb = new XSSFWorkbook();
+
+        try {
+            XSSFSheet sheet = wb.createSheet("用户信息");
+            sheet.setDefaultRowHeight((short) (2 * 256));
+            sheet.setDefaultColumnWidth(17);
+
+            // Create the header row
+            List<String> headers = Arrays.asList("序号", "账号名称", "账号密码", "教师姓名", "教师权限", "所属院系");
+            XSSFRow headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.size(); i++) {
+                XSSFCell headerCell = headerRow.createCell(i);
+                headerCell.setCellValue(headers.get(i));
+            }
+
+            // Create rows with user information
+            for (int i = 0; i < users.size(); i++) {
+                User user = users.get(i);
+                XSSFRow dataRow = sheet.createRow(i + 1);
+                XSSFCell cell0 = dataRow.createCell(0);
+                cell0.setCellValue(i + 1); // Sequence number
+                XSSFCell cell1 = dataRow.createCell(1);
+                cell1.setCellValue(user.getName());
+                XSSFCell cell2 = dataRow.createCell(2);
+                cell2.setCellValue(user.getPassword());
+                XSSFCell cell3 = dataRow.createCell(3);
+                cell3.setCellValue(user.getTeacherName());
+                XSSFCell cell4 = dataRow.createCell(4);
+                cell4.setCellValue(user.getIsAdmin());
+                XSSFCell cell5 = dataRow.createCell(5);
+                cell5.setCellValue(user.getDepartment());
+            }
+
+            // Write the Excel file to a ByteArrayOutputStream
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            wb.write(bos);
+            wb.close();
+            bos.close();
+
+            byte[] excelBytes = bos.toByteArray();
+
+            // Set HTTP headers for the response
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            httpHeaders.setContentLength(excelBytes.length);
+            httpHeaders.setContentDispositionFormData("attachment", fileName);
+
+            return new ResponseEntity<>(excelBytes, httpHeaders, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("export error: {}", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     //用户信息导出
-    @Override
-    public ResponseEntity<byte[]> outUserInformation(HttpServletResponse response) throws IOException {
-
-        //工作簿事例
-        int rowIndex = 1;
-        int columIndex = 0;
-
-        Workbook workbook = new HSSFWorkbook();
-        Sheet sheet = workbook.createSheet();
-
-        //单元格样式
-        CellStyle style = workbook.createCellStyle();
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setVerticalAlignment(VerticalAlignment.CENTER);
-
-
-        //表头设置
-        Row row1 = sheet.createRow(0);
-        row1.setRowStyle(style);
-        Row row2 = sheet.createRow(1);
-        row2.setRowStyle(style);
-        Row row3 = sheet.createRow(2);
-        row3.setRowStyle(style);
-        Row row4 = sheet.createRow(3);
-        row4.setRowStyle(style);
-
-        CellRangeAddress mergedRegion = new CellRangeAddress(1, 3, 0, 0);
-        sheet.addMergedRegion(mergedRegion);
-        row2.createCell(0).setCellValue("账号名称");
-        export.reloadCellStyle(mergedRegion, sheet, style);
-        sheet.setColumnWidth(0, 20 * 256);
-
-        mergedRegion = new CellRangeAddress(1, 3, 1, 1);
-        sheet.addMergedRegion(mergedRegion);
-        row2.createCell(1).setCellValue("账号密码");
-        export.reloadCellStyle(mergedRegion, sheet, style);
-        sheet.autoSizeColumn(1);
-
-        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
-        sheet.addMergedRegion(mergedRegion);
-        row2.createCell(2).setCellValue("教师姓名");
-        export.reloadCellStyle(mergedRegion, sheet, style);
-        sheet.setColumnWidth(2, 20 * 256);
-
-        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
-        sheet.addMergedRegion(mergedRegion);
-        row2.createCell(2).setCellValue("教师姓名");
-        export.reloadCellStyle(mergedRegion, sheet, style);
-        sheet.setColumnWidth(2, 20 * 256);
-
-        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
-        sheet.addMergedRegion(mergedRegion);
-        row2.createCell(2).setCellValue("教师姓名");
-        export.reloadCellStyle(mergedRegion, sheet, style);
-        sheet.setColumnWidth(2, 20 * 256);
-
-        //考核条目
-        List<String> usualExamMethods = getUsualExamMethods(courseId);
-        columIndex = 3;
-        for (String dataExtend : usualExamMethods) {
-            mergedRegion = new CellRangeAddress(1, 3, columIndex, columIndex);
-            sheet.addMergedRegion(mergedRegion);
-            row2.createCell(columIndex).setCellValue(dataExtend);
-            export.reloadCellStyle(mergedRegion, sheet, style);
-            columIndex++;
-        }
-
-        mergedRegion = new CellRangeAddress(1, 3, columIndex, columIndex);
-        sheet.addMergedRegion(mergedRegion);
-        row2.createCell(columIndex).setCellValue("总分");
-        export.reloadCellStyle(mergedRegion, sheet, style);
-
-        rowIndex = 4;
-        //学生列表
-        List<StudentUsualScore> allStudent = getAllUser();
-        for (StudentUsualScore score : allStudent) {
-            Row eachRow = sheet.createRow(rowIndex);
-            eachRow.setRowStyle(style);
-
-            export.valueToCell(sheet, rowIndex, 0, score.getStudentNumber(), style);
-            export.valueToCell(sheet, rowIndex, 1, score.getStudentName(), style);
-            export.valueToCell(sheet, rowIndex, 2, score.getClassName(), style);
-
-            //成绩
-            int index = 3;
-            JSONArray objects = JSONArray.parseArray(score.getScoreDetails());
-            if (objects == null) {
-
-            } else {
-                for (Object object : objects) {
-//                    eachRow.createCell(index).setCellValue(object.toString());
-//                    eachRow.getCell(index).setCellStyle(style);
-                    export.valueToCell(sheet, rowIndex, index, object.toString(), style);
-                    index++;
-                }
-            }
-            rowIndex++;
-        }
-
-        CourseBasicInformation courseBasicInformation = courseBasicInformationMAPPER.selectById(courseId);
-        String fileName = courseBasicInformation.getTermStart() + " - " + courseBasicInformation.getTermEnd() + "学年第" + courseBasicInformation.getTerm() + "学期" + courseBasicInformation.getClassName() + courseBasicInformation.getCourseName() + "[" + courseBasicInformation.getClassroomTeacher() + "]" + "平时成绩.xls";
-
-        mergedRegion = new CellRangeAddress(0, 0, 0, columIndex);
-        sheet.addMergedRegion(mergedRegion);
-        row1.createCell(0).setCellValue(fileName);
-        export.reloadCellStyle(mergedRegion, sheet, style);
-
-        //写入文件
-        //使用字节数组读取
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        workbook.write(byteArrayOutputStream);
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-
-        response.reset();
-        response.setContentType("application/vnd.ms-excel");
-
-        response.setCharacterEncoding("utf-8");
-        response.setHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes(), "iso-8859-1"));
-
-        return ResponseEntity.ok()
-                .body(bytes);
-    }
+//    @Override
+//    public ResponseEntity<byte[]> outUserInformation() throws IOException {
+//
+//        //工作簿事例
+//        int rowIndex = 1;
+//        int columIndex = 0;
+//        Workbook workbook = new HSSFWorkbook();
+//        Sheet sheet = workbook.createSheet();
+//
+//        //单元格样式
+//        CellStyle style = workbook.createCellStyle();
+//        style.setBorderBottom(BorderStyle.THIN);
+//        style.setBorderTop(BorderStyle.THIN);
+//        style.setBorderRight(BorderStyle.THIN);
+//        style.setBorderLeft(BorderStyle.THIN);
+//        style.setAlignment(HorizontalAlignment.CENTER);
+//        style.setVerticalAlignment(VerticalAlignment.CENTER);
+//
+//
+//        //表头设置
+//        Row row1 = sheet.createRow(0);
+//        row1.setRowStyle(style);
+//        Row row2 = sheet.createRow(1);
+//        row2.setRowStyle(style);
+//        Row row3 = sheet.createRow(2);
+//        row3.setRowStyle(style);
+//        Row row4 = sheet.createRow(3);
+//        row4.setRowStyle(style);
+//
+//        CellRangeAddress mergedRegion = new CellRangeAddress(1, 3, 0, 0);
+//        sheet.addMergedRegion(mergedRegion);
+//        row2.createCell(0).setCellValue("账号名称");
+//        export.reloadCellStyle(mergedRegion, sheet, style);
+//        sheet.setColumnWidth(0, 20 * 256);
+//
+//        mergedRegion = new CellRangeAddress(1, 3, 1, 1);
+//        sheet.addMergedRegion(mergedRegion);
+//        row2.createCell(1).setCellValue("账号密码");
+//        export.reloadCellStyle(mergedRegion, sheet, style);
+//        sheet.autoSizeColumn(1);
+//
+//        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
+//        sheet.addMergedRegion(mergedRegion);
+//        row2.createCell(2).setCellValue("教师姓名");
+//        export.reloadCellStyle(mergedRegion, sheet, style);
+//        sheet.setColumnWidth(2, 20 * 256);
+//
+//        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
+//        sheet.addMergedRegion(mergedRegion);
+//        row2.createCell(3).setCellValue("教师权限");
+//        export.reloadCellStyle(mergedRegion, sheet, style);
+//        sheet.setColumnWidth(2, 20 * 256);
+//
+//        mergedRegion = new CellRangeAddress(1, 3, 2, 2);
+//        sheet.addMergedRegion(mergedRegion);
+//        row2.createCell(4).setCellValue("所属院系");
+//        export.reloadCellStyle(mergedRegion, sheet, style);
+//        sheet.setColumnWidth(2, 20 * 256);
+//
+//        //写入文件
+//        //使用字节数组读取
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        workbook.write(byteArrayOutputStream);
+//        byte[] bytes = byteArrayOutputStream.toByteArray();
+//
+//        return ResponseEntity.ok()
+//                .body(bytes);
+//    }
 }
