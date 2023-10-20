@@ -8,6 +8,6 @@ public class CourseTargetAnalyse {
     private Integer courseId;
     private Integer targetId;
     private String targetName;
-    private Integer value;
+    private Float value;
     private String matrix;
 }

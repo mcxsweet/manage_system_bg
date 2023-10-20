@@ -23,18 +23,5 @@ public class User {
      * 5    系主任 学院
      * 6    全部
      */
-
-    public void userInfo(String name, String password, String teacherName, int isAdmin, String department) {
-        this.name = name;
-        this.password = password;
-        this.teacherName = teacherName;
-        this.isAdmin = isAdmin;
-        this.department = department;
-    }
-
-    public void userInfo() {}
-
-    public void userInfo(String formatCellValue) {
-    }
 }
 
