@@ -1,27 +1,22 @@
 package com.example.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.alibaba.fastjson.JSONArray;
-import com.example.mapper.UserMAPPER;
-import com.example.object.CourseBasicInformation;
 import com.example.object.LoginDTO;
 import com.example.object.User;
-import com.example.object.finalExamine.StudentInformation;
 import com.example.service.impl.UserServiceIMPL;
-import com.example.service.impl.examinePaper.StudentInformationServiceIMPL;
 import com.example.utility.DataResponses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
 
 @Api(tags = "用户登录")
 @RestController
@@ -121,7 +116,31 @@ public class UserController {
     public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
         return new DataResponses(true,userService.removeById(user.getId()));
     }
+ /**
+     * 导出用户导入模板
+     */
+    @ApiOperation("导出用户导入模板")
+    @GetMapping("/userInformation")
+    public ResponseEntity<byte[]> userInformation(HttpServletRequest request, HttpServletResponse response)   {
+        try {
+            return userServiceIMPL.exportUserInformation(request,response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
+    /**
+     * 导出用户信息
+     */
+    @ApiOperation("导出用户信息")
+    @GetMapping("/outUserInformation")
+    public ResponseEntity<byte[]> outUserInformation(HttpServletRequest request, HttpServletResponse response)   {
+        try {
+            return userServiceIMPL.outUserInformation(request,response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
-
-
