@@ -208,7 +208,7 @@ public class export {
         try {
             Double.parseDouble(str);
             return true;
-        } catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
@@ -216,29 +216,31 @@ public class export {
     //根据表格的单元格格式读取相应的值
     public static String getCellStringValue(Cell cell) {
         String cellValue = "";
-        switch (cell.getCellType()) {
-            case Cell.CELL_TYPE_STRING://字符串类型
-                cellValue = cell.getStringCellValue();
-                if (cellValue.trim().equals("") || cellValue.trim().length() <= 0)
+        if(cell != null) {
+            switch (cell.getCellType()) {
+                case Cell.CELL_TYPE_STRING://字符串类型
+                    cellValue = cell.getStringCellValue();
+                    if (cellValue.trim().equals("") || cellValue.trim().length() <= 0)
+                        cellValue = "";
+                    break;
+                case Cell.CELL_TYPE_NUMERIC: //数值类型
+                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                    cellValue = cell.getStringCellValue();
+                    break;
+                case Cell.CELL_TYPE_FORMULA: //公式
+                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                    cellValue = cell.getStringCellValue();
+                    break;
+                case Cell.CELL_TYPE_BLANK:
                     cellValue = "";
-                break;
-            case Cell.CELL_TYPE_NUMERIC: //数值类型
-                cell.setCellType(Cell.CELL_TYPE_STRING);
-                cellValue = cell.getStringCellValue();
-                break;
-            case Cell.CELL_TYPE_FORMULA: //公式
-                cell.setCellType(Cell.CELL_TYPE_STRING);
-                cellValue = cell.getStringCellValue();
-                break;
-            case Cell.CELL_TYPE_BLANK:
-                cellValue = "";
-                break;
-            case Cell.CELL_TYPE_BOOLEAN:
-                break;
-            case Cell.CELL_TYPE_ERROR:
-                break;
-            default:
-                break;
+                    break;
+                case Cell.CELL_TYPE_BOOLEAN:
+                    break;
+                case Cell.CELL_TYPE_ERROR:
+                    break;
+                default:
+                    break;
+            }
         }
         return cellValue;
     }

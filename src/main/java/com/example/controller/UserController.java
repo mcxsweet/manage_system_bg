@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Api(tags = "用户登录")
 @RestController
 @RequestMapping("/user")
@@ -86,7 +85,6 @@ public class UserController {
     @ApiOperation("按id修改")
     @PutMapping("/updateUser")
     public DataResponses updateUser(@RequestBody User data) {
-        System.out.println("User修改功能");
         return new DataResponses(true,userService.updateById(data));
     }
 
@@ -95,14 +93,12 @@ public class UserController {
     @ApiOperation("添加")
     @PostMapping("/addUser")
     public DataResponses addUser(@RequestBody User user) {
-        System.out.println("User添加功能");
         return new DataResponses(true, userService.save(user),user.getName());
     }
 
     @ApiOperation("删除")
     @DeleteMapping("/deleteUser")
     public DataResponses deleteUser(@RequestBody User user) {
-        System.out.println("User删除功能");
         return new DataResponses(true,userService.removeById(user.getId()));
     }
 
@@ -118,10 +114,9 @@ public class UserController {
     @ApiOperation("导入教师信息表格")
     @PostMapping("/userInfo")
     public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
-        return userServiceIMPL.inputUserInfo(file);
+        return new DataResponses(true,userService.removeById(user.getId()));
     }
-
-    /**
+ /**
      * 导出用户导入模板
      */
     @ApiOperation("导出用户导入模板")
