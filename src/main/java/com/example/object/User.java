@@ -10,26 +10,24 @@ public class User {
     private String teacherName;
     private String password;
     private int isAdmin;
-    private String department;
+    private int collegeId;
+    private int departmentId;
 
     /**
      * 关于isAdmin的说明
      * 0    普通教师
      * 1    系主任
      * 2    学院
-     *
-     * 3    普通教师 系主任
-     * 4    普通教师 学院
-     * 5    系主任 学院
-     * 6    全部
+
      */
 
-    public void userInfo(String name, String password, String teacherName, int isAdmin, String department) {
+    public void userInfo(String name, String password, String teacherName, int isAdmin, int collegeId,int departmentId) {
         this.name = name;
         this.password = password;
         this.teacherName = teacherName;
         this.isAdmin = isAdmin;
-        this.department = department;
+        this.collegeId = collegeId;
+        this.departmentId = departmentId;
     }
 
     public void userInfo() {}

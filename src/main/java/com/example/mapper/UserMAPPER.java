@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface UserMAPPER extends BaseMapper<User> {
     //    在此出写拓展sql
-    @Select("Select id,name,teacher_name,password,is_admin,department from user ;")
+    @Select("Select id,name,teacher_name,password,is_admin,collegeid,departmentid from user ;")
     List<User> getAll();
 
 }
