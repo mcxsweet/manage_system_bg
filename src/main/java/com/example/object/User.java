@@ -10,8 +10,8 @@ public class User {
     private String teacherName;
     private String password;
     private int isAdmin;
-    private int collegeId;
-    private int departmentId;
+    private String collegeName;
+    private String departmentName;
 
     /**
      * 关于isAdmin的说明
@@ -21,13 +21,13 @@ public class User {
 
      */
 
-    public void userInfo(String name, String password, String teacherName, int isAdmin, int collegeId,int departmentId) {
+    public void userInfo(String name, String password, String teacherName, int isAdmin, String collegeName,String departmentName) {
         this.name = name;
         this.password = password;
         this.teacherName = teacherName;
         this.isAdmin = isAdmin;
-        this.collegeId = collegeId;
-        this.departmentId = departmentId;
+        this.collegeName = collegeName;
+        this.departmentName = departmentName;
     }
 
     public void userInfo() {}

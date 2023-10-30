@@ -7,6 +7,7 @@ import com.example.mapper.UserMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
 import com.example.object.LoginDTO;
 import com.example.object.User;
+
 import com.example.object.finalExamine.StudentInformation;
 import com.example.service.UserSERVICE;
 import com.example.utility.DataResponses;
@@ -36,7 +37,6 @@ import java.util.*;
 public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements UserSERVICE {
 
     private final UserMAPPER userMAPPER;
-
 
     private final StudentInformationMAPPER studentInformationMAPPER;
 
@@ -78,6 +78,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             QueryWrapper<User> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("name", user.getName());
             queryWrapper.last("limit 1");
+            System.out.println(queryWrapper.getSqlSelect());
             User user2 = userMAPPER.selectOne(queryWrapper);
             if (user2 == null) {
                 return new DataResponses(false, "用户不存在");
@@ -107,11 +108,6 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
 
         //此处只是为了前端不过多修改，实际可不用返回用户信息
         return new DataResponses(true, map, "登录成功");
-    }
-
-    @Override
-    public List<User> getAll() {
-        return userMAPPER.getAll();
     }
 
     //用户信息导入
@@ -183,7 +179,8 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                 user.setPassword (formatter.formatCellValue(row.getCell(password)));
                 user.setTeacherName (formatter.formatCellValue(row.getCell(teacherName)));
                 user.setIsAdmin (Integer.parseInt(formatter.formatCellValue(row.getCell(is_admin))));
-                user.setDepartment (formatter.formatCellValue(row.getCell(department)));
+                user.setCollegeName (formatter.formatCellValue(row.getCell(department)));
+                user.setDepartmentName (formatter.formatCellValue(row.getCell(department)));
 
 
                 Integer id;
@@ -321,7 +318,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
         }
 
         // Replace this with your code to retrieve user data and create a list of user information
-        List<User> users = getAll(); // Implement this method to get user data
+        List<User> users = list(); // Implement this method to get user data
 
         // Create a new Excel workbook
         XSSFWorkbook wb = new XSSFWorkbook();
@@ -332,7 +329,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             sheet.setDefaultColumnWidth(17);
 
             // Create the header row
-            List<String> headers = Arrays.asList("序号", "账号名称", "账号密码", "教师姓名", "教师权限", "所属院系");
+            List<String> headers = Arrays.asList("序号", "账号名称", "账号密码", "教师姓名", "教师权限", "所属院","所属系");
             XSSFRow headerRow = sheet.createRow(0);
             for (int i = 0; i < headers.size(); i++) {
                 XSSFCell headerCell = headerRow.createCell(i);
@@ -354,7 +351,9 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                 XSSFCell cell4 = dataRow.createCell(4);
                 cell4.setCellValue(user.getIsAdmin());
                 XSSFCell cell5 = dataRow.createCell(5);
-                cell5.setCellValue(user.getDepartment());
+                cell5.setCellValue(user.getCollegeName());
+                XSSFCell cell6= dataRow.createCell(5);
+                cell6.setCellValue(user.getDepartmentName());
             }
 
             // Write the Excel file to a ByteArrayOutputStream
@@ -377,5 +376,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 }
 

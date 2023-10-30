@@ -20,9 +20,6 @@ public interface UserSERVICE extends IService<User> {
 
     DataResponses login(LoginDTO user);
 
-
-    List<User> getAll();
-
     //用户信息导入
     @Transactional
     DataResponses inputUserInfo(MultipartFile file);

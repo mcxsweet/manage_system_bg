@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -25,6 +26,7 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserServiceIMPL userService;
+
 
     @Autowired
     private UserServiceIMPL userServiceIMPL;
@@ -86,30 +88,34 @@ public class UserController {
     @ApiOperation("按id修改")
     @PutMapping("/updateUser")
     public DataResponses updateUser(@RequestBody User data) {
-        System.out.println("User修改功能");
         return new DataResponses(true,userService.updateById(data));
     }
-
-
 
     @ApiOperation("添加")
     @PostMapping("/addUser")
     public DataResponses addUser(@RequestBody User user) {
-        System.out.println("User添加功能");
         return new DataResponses(true, userService.save(user),user.getName());
     }
+
+    @ApiOperation("重置密码")
+    @PutMapping("/resetPassword")
+    public DataResponses resetPassword(@RequestBody User data) {
+        data.setPassword("000000");
+        return new DataResponses(true,userService.updateById(data));
+    }
+
 
     @ApiOperation("删除")
     @DeleteMapping("/deleteUser")
     public DataResponses deleteUser(@RequestBody User user) {
-        System.out.println("User删除功能");
         return new DataResponses(true,userService.removeById(user.getId()));
     }
 
     @ApiOperation("查询全部")
     @GetMapping
     public DataResponses getAll() {
-        return new DataResponses(true, userService.list());
+        List<User> data= userService.list() ;
+        return new DataResponses(true, data);
     }
 
     /**
