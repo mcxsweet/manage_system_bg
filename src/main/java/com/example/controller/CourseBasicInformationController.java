@@ -9,15 +9,12 @@ import com.example.object.CourseBasicInformation;
 import com.example.object.CourseSyllabusInformation;
 import com.example.object.CourseTarget;
 import com.example.object.Indicators;
-import com.example.object.comprehensiveAnalyse.KeyValue;
-import com.example.object.courseSurvey.CourseAttainmentSurvey;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
+import com.example.service.impl.CourseSyllabusInformationIMPL;
 import com.example.service.impl.IndicatorOutlineSERVICEIMPL;
 import com.example.service.impl.IndicatorsServiceIMPL;
 import com.example.utility.DataResponses;
 import com.example.utility.export.export;
-//import com.sun.istack.internal.NotNull;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +31,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @Api(tags = "课程信息")
@@ -226,12 +220,19 @@ public class CourseBasicInformationController {
         return new DataResponses(indicators.updateById(item));
     }
 
+    @Autowired
+    CourseSyllabusInformationIMPL courseSyllabusInformationIMPL;
+    @ApiOperation("指标点课程")
+    @PostMapping("/indicatorCourse")
+    public DataResponses getMajorIndicatorCourse(@RequestBody HashMap<String, Object> major) {
+        return new DataResponses(true, courseSyllabusInformationIMPL.listByMap(major));
+    }
+
     @ApiOperation("指标点PDF")
     @GetMapping("/{major}/indicatorsPDF")
     public ResponseEntity<byte[]> IndicatorsPDF(@PathVariable String major) {
         return indicatorsServiceIMPL.IndicatorsPDF(major);
     }
-
 
     /*
         教学大纲相关接口
