@@ -51,7 +51,7 @@ public class CourseFinalExamPaperController {
     @PostMapping()
     public DataResponses addById(@RequestBody CourseFinalExamPaper information) {
 
-        return new DataResponses(courseFinalExamPaperService.save(information),information.getId());
+        return new DataResponses(courseFinalExamPaperService.save(information), information.getId());
     }
 
     @ApiOperation("提供id修改期末考察项目")

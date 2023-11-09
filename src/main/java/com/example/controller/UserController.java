@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @Api(tags = "用户登录")
 @RestController
 @RequestMapping("/user")
@@ -127,10 +126,9 @@ public class UserController {
     @ApiOperation("导入教师信息表格")
     @PostMapping("/userInfo")
     public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
-        return userServiceIMPL.inputUserInfo(file);
+        return new DataResponses(true,userService.removeById(user.getId()));
     }
-
-    /**
+ /**
      * 导出用户导入模板
      */
     @ApiOperation("导出用户导入模板")

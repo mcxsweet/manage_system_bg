@@ -174,7 +174,7 @@ public class CourseFinalExamPaperDetailServiceIMPL extends ServiceImpl<CourseFin
         int courseExamineMethodsId = 0;
         int columIndex = 2;
         int temp = 2;
-        int sum = 0;
+        float sum = 0;
 
         /*
             ========================================================================
