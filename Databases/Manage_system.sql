@@ -575,3 +575,17 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2023-08-29 15:33:39
+
+/**
+  modified by haobingo on 2023-09-28*/
+DROP TABLE IF EXISTS `education_program`;
+CREATE TABLE `education_program`
+(
+    `id`            int(10) NOT NULL AUTO_INCREMENT COMMENT '主键Id',
+    `major`         varchar(255)             DEFAULT NULL COMMENT '专业名称',
+    `major_version` varchar(255)             DEFAULT NULL COMMENT '专业版本',
+    `is_load`       int(1) unsigned zerofill DEFAULT NULL COMMENT '是否上传，0表示未上传，1表示已上传',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 58
+  DEFAULT CHARSET = utf8;

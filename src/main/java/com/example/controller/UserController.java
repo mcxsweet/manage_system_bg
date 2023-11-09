@@ -25,16 +25,18 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
+
     private UserServiceIMPL userService;
 
 
     @Autowired
+
     private UserServiceIMPL userServiceIMPL;
 
     // 会话登录接口
     @PostMapping("/doLogin")
     public DataResponses doLogin(@RequestBody LoginDTO user) {
-        return userService.login(user);
+        return userServiceIMPL.login(user);
     }
 
     // 查询登录信息 登录信息可以不存在前端，每次需通过后端验证获取
@@ -82,19 +84,19 @@ public class UserController {
     @ApiOperation("登录接口")
     @PostMapping
     public DataResponses submit(@RequestBody User user, HttpServletResponse response) {
-        return userService.loginCheck(user, response);
+        return userServiceIMPL.loginCheck(user, response);
     }
 
     @ApiOperation("按id修改")
     @PutMapping("/updateUser")
     public DataResponses updateUser(@RequestBody User data) {
-        return new DataResponses(true,userService.updateById(data));
+        return new DataResponses(true,userServiceIMPL.updateById(data));
     }
 
     @ApiOperation("添加")
     @PostMapping("/addUser")
     public DataResponses addUser(@RequestBody User user) {
-        return new DataResponses(true, userService.save(user),user.getName());
+        return new DataResponses(true, userServiceIMPL.save(user),user.getName());
     }
 
     @ApiOperation("重置密码")
@@ -108,16 +110,18 @@ public class UserController {
     @ApiOperation("删除")
     @DeleteMapping("/deleteUser")
     public DataResponses deleteUser(@RequestBody User user) {
-        return new DataResponses(true,userService.removeById(user.getId()));
+        return new DataResponses(true,userServiceIMPL.removeById(user.getId()));
     }
 
     @ApiOperation("查询全部")
     @GetMapping
     public DataResponses getAll() {
+
         List<User> data= userService.list() ;
         List<College> data2= userService.userPrCollegeList() ;
         List<College> data3= userService.userDerList() ;
         return new DataResponses(true, data,data2,data3);
+
     }
 
     /**
@@ -126,7 +130,19 @@ public class UserController {
     @ApiOperation("导入教师信息表格")
     @PostMapping("/userInfo")
     public DataResponses inputUserInfo(@RequestParam("file") MultipartFile file) {
-        return new DataResponses(true,userService.removeById(user.getId()));
+        return userServiceIMPL.inputUserInfo(file);
+    }
+
+    /*
+    *教学大纲管理页面的课程负责人查询
+    */
+    @ApiOperation("负责人查询")
+    @GetMapping("/searchTeacher")
+    public DataResponses searchTeacher() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.select("teacher_name");
+        queryWrapper.select("teacher_name").notLike("teacher_name","管理员").eq("is_admin",0);
+        return new DataResponses(true, userServiceIMPL.list(queryWrapper));
     }
  /**
      * 导出用户导入模板

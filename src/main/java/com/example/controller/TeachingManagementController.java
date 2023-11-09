@@ -22,7 +22,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 
@@ -137,6 +139,63 @@ public class TeachingManagementController {
         }
     }
 
+    @ApiOperation("批量下载")
+    @GetMapping("/downloadZip")
+    public ResponseEntity<byte[]> batchDownLoad(@RequestParam(name = "id") String courseIdGroup) {
+        String[] ids = courseIdGroup.split(",");
+
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        ZipOutputStream zipStream = new ZipOutputStream(byteStream);
+        String FileName = "批量导出.zip";
+
+        try {
+
+            File directory = new File("");
+            String filePath = directory.getCanonicalPath();
+
+            for (String s : ids) {
+                CourseBasicInformation info = courseBasicInformationServiceIMPL.getById(s);
+                String zipFileName = info.getCourseName() + "-" + info.getClassName() + "-" + info.getClassroomTeacher() + "-" + info.getTermStart() + "-" + info.getTermEnd() + "-" + info.getTerm() + ".zip";
+
+                String sourceFolder = "/doc/" + info.getMajor() + "/" + info.getClassroomTeacher() + "/" + info.getCourseName() + "/";
+                String filename = info.getCourseName() + "-" + info.getClassName() + "-" + info.getClassroomTeacher() + "-" + info.getTermStart() + "-" + info.getTermEnd() + "-" + info.getTerm();
+
+                String s1 = "课程目标达成评价分析报告.docx";
+                String s2 = "课程试卷分析报告.docx";
+                String s3 = "课程教学小结表.docx";
+
+                ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFileName));
+
+                File sourceDir1 = new File(filePath + sourceFolder + filename + s1);
+                File sourceDir2 = new File(filePath + sourceFolder + filename + s2);
+                File sourceDir3 = new File(filePath + sourceFolder + filename + s3);
+                addFilesToZip(sourceDir1, sourceDir1.getName(), zipOutputStream);
+                addFilesToZip(sourceDir2, sourceDir2.getName(), zipOutputStream);
+                addFilesToZip(sourceDir3, sourceDir3.getName(), zipOutputStream);
+
+                zipOutputStream.flush();
+                zipOutputStream.close();
+
+                File zip = new File(zipFileName);
+                addFilesToZip(zip, zip.getName(), zipStream);
+                zip.delete();
+            }
+
+            zipStream.flush();
+            zipStream.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", new String(FileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+
+            return new ResponseEntity<>(byteStream.toByteArray(), headers, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //添加文件到压缩包中
     private void addFilesToZip(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
         ZipEntry entry = new ZipEntry(fileName);
         zipOut.putNextEntry(entry);

@@ -22,6 +22,7 @@ public class User {
 
      */
 
+
     public void userInfo(String name, String password, String teacherName, int isAdmin, String collegeName,String departmentName) {
         this.name = name;
         this.password = password;
@@ -35,5 +36,5 @@ public class User {
 
     public void userInfo(String formatCellValue) {
     }
-}
+
 

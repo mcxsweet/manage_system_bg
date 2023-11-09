@@ -152,6 +152,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             int is_admin=0;
             int collegeName=0;
             int department=0;
+
             int i = 0;
 
             Row row1 = sheet.getRow(0);
@@ -227,8 +228,6 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                     userMAPPER.updateById(user);
                 }
             }
-
-
             return new DataResponses(true, "导入成功");
 
         } catch (IOException exception) {
