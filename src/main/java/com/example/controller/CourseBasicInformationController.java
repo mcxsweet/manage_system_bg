@@ -256,6 +256,12 @@ public class CourseBasicInformationController {
         return indicatorsServiceIMPL.IndicatorsPDF(major, version);
     }
 
+    @ApiOperation("指标点Word")
+    @GetMapping("/indicatorsWord/{major}/{version}")
+    public ResponseEntity<byte[]> IndicatorsWord(HttpServletResponse response, @PathVariable String major, @PathVariable String version) {
+        return indicatorsServiceIMPL.IndicatorsWord(response, major, version);
+    }
+
     /*
         教学大纲相关接口
      */
