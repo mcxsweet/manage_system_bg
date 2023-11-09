@@ -9,15 +9,12 @@ import com.example.object.CourseBasicInformation;
 import com.example.object.CourseSyllabusInformation;
 import com.example.object.CourseTarget;
 import com.example.object.Indicators;
-import com.example.object.comprehensiveAnalyse.KeyValue;
-import com.example.object.courseSurvey.CourseAttainmentSurvey;
 import com.example.service.impl.CourseBasicInformationServiceIMPL;
+import com.example.service.impl.CourseSyllabusInformationIMPL;
 import com.example.service.impl.IndicatorOutlineSERVICEIMPL;
 import com.example.service.impl.IndicatorsServiceIMPL;
 import com.example.utility.DataResponses;
 import com.example.utility.export.export;
-//import com.sun.istack.internal.NotNull;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +31,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @Api(tags = "课程信息")
@@ -208,6 +203,18 @@ public class CourseBasicInformationController {
         return new DataResponses(true, indicatorsServiceIMPL.save(item));
     }
 
+    @ApiOperation("查询所有指标点所有专业和版本")
+    @GetMapping("/indicatorMajorsAndVersions")
+    public DataResponses getAllIndicatorMajors() {
+        QueryWrapper majorQueryWrapper = new QueryWrapper<>();
+        majorQueryWrapper.select("DISTINCT major");
+        QueryWrapper versionQueryWrapper = new QueryWrapper<>();
+        versionQueryWrapper.select("DISTINCT version");
+        List majors = indicatorsServiceIMPL.listMaps(majorQueryWrapper);
+        List versions = indicatorsServiceIMPL.listMaps(versionQueryWrapper);
+        return new DataResponses(true, new List[]{majors, versions});
+    }
+
     @ApiOperation("查询专业指标点")
     @PostMapping("/indicators")
     public DataResponses getMajorIndicators(@RequestBody HashMap<String, String> major) {
@@ -226,12 +233,28 @@ public class CourseBasicInformationController {
         return new DataResponses(indicators.updateById(item));
     }
 
-    @ApiOperation("指标点PDF")
-    @GetMapping("/{major}/indicatorsPDF")
-    public ResponseEntity<byte[]> IndicatorsPDF(@PathVariable String major) {
-        return indicatorsServiceIMPL.IndicatorsPDF(major);
+    @ApiOperation("按专业和版本号查询指标点")
+    @PostMapping("/majorVersionIndicators")
+    public DataResponses getMajorVersionIndicators(@RequestBody HashMap<String, String> majorAndVersion) {
+        QueryWrapper<Indicators> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("major", majorAndVersion.get("major"));
+        queryWrapper.eq(!(majorAndVersion.get("version")==null), "version", majorAndVersion.get("version"));
+        return new DataResponses(true, indicatorsServiceIMPL.list(queryWrapper));
     }
 
+    @Autowired
+    CourseSyllabusInformationIMPL courseSyllabusInformationIMPL;
+    @ApiOperation("指标点课程")
+    @PostMapping("/indicatorCourse")
+    public DataResponses getMajorIndicatorCourse(@RequestBody HashMap<String, Object> major) {
+        return new DataResponses(true, courseSyllabusInformationIMPL.listByMap(major));
+    }
+
+    @ApiOperation("指标点PDF")
+    @GetMapping("/indicatorsPDF/{major}/{version}")
+    public ResponseEntity<byte[]> IndicatorsPDF(@PathVariable String major, @PathVariable String version) {
+        return indicatorsServiceIMPL.IndicatorsPDF(major, version);
+    }
 
     /*
         教学大纲相关接口

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicators> implements IndicatorsSERVICE {
@@ -35,7 +36,7 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
     private IndicatorOutlineMAPPER indicatorOutlineMAPPER;
 
     @Override
-    public ResponseEntity<byte[]> IndicatorsPDF(String major) {
+    public ResponseEntity<byte[]> IndicatorsPDF(String major, String version) {
         try {
             //工作簿事例
             int rowIndex = 2;
@@ -66,7 +67,9 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
             row1.setRowStyle(style2);
             CellRangeAddress mergedRegion2 = new CellRangeAddress(0, 0, 0, 2);
             sheet.addMergedRegion(mergedRegion2);
-            row1.createCell(0).setCellValue(major + "专业指标点");
+            String pdfTitle = major + "专业指标点";
+            if (!Objects.equals(version, "NotSelect")) pdfTitle = version + '级' + pdfTitle;
+            row1.createCell(0).setCellValue(pdfTitle);
             export.reloadCellStyle(mergedRegion2, sheet, style2);
 
             Row row = sheet.createRow(1);
@@ -89,12 +92,12 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
                 QueryWrapper<Indicators> queryWrapper1 = new QueryWrapper<>();
                 queryWrapper1.eq("indicator_index", id);
                 queryWrapper1.like("major", major);
+                queryWrapper1.like(!Objects.equals(version, "NotSelect"), "version", version);
                 List<Indicators> indicators = indicatorsMAPPER.selectList(queryWrapper1);
                 if (indicators.size() == 0) {
                     String S = outline.getName() + "\n" + outline.getContent();
                     export.valueToCell(sheet, temp, 0, S, style);
                     rowIndex++;
-                    temp = rowIndex;
                 } else {
                     for (Indicators indicator : indicators) {
                         sheet.createRow(rowIndex).setRowStyle(style);
@@ -108,8 +111,8 @@ public class IndicatorsServiceIMPL extends ServiceImpl<IndicatorsMAPPER, Indicat
                     mergedRegion = new CellRangeAddress(temp, rowIndex - 1, 0, 0);
                     sheet.addMergedRegion(mergedRegion);
                     export.reloadCellStyle(mergedRegion, sheet, style);
-                    temp = rowIndex;
                 }
+                temp = rowIndex;
             }
 
             //写入xls文件
