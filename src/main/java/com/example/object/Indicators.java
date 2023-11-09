@@ -10,5 +10,6 @@ public class Indicators {
     private String indicatorContent;
     private String major;
     private String courses;
+    private String version;
 }
 
