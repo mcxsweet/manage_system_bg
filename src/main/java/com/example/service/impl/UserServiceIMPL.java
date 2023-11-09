@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.UserMAPPER;
 import com.example.mapper.examinePaper.StudentInformationMAPPER;
+import com.example.object.College;
 import com.example.object.LoginDTO;
 import com.example.object.User;
-
 import com.example.object.finalExamine.StudentInformation;
 import com.example.service.UserSERVICE;
 import com.example.utility.DataResponses;
@@ -110,6 +110,23 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
         return new DataResponses(true, map, "登录成功");
     }
 
+    @Override
+    public List<User> userPreList() {
+        return userMAPPER.userPreList();
+    }
+
+
+    @Override
+    public List<College> userPrCollegeList(){
+        return userMAPPER.userPrCollegeList();}
+
+
+    @Override
+    public List<College> userDerList(){
+        return userMAPPER.userDerList();
+    }
+
+
     //用户信息导入
     @Override
     @Transactional
@@ -133,6 +150,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             int teacherName = 0;
             int password = 0;
             int is_admin=0;
+            int collegeName=0;
             int department=0;
             int i = 0;
 
@@ -153,10 +171,13 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                         case "教师姓名":
                             teacherName = i;
                             break;
-                        case "权限":
+                        case "教师权限":
                             is_admin = i;
                             break;
-                        case "所属院系":
+                        case "所属院":
+                            collegeName = i;
+                            break;
+                        case "所属系":
                             department = i;
                             break;
                     }
@@ -178,9 +199,19 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                 user.setName (formatter.formatCellValue(row.getCell(name)));
                 user.setPassword (formatter.formatCellValue(row.getCell(password)));
                 user.setTeacherName (formatter.formatCellValue(row.getCell(teacherName)));
-                user.setIsAdmin (Integer.parseInt(formatter.formatCellValue(row.getCell(is_admin))));
-                user.setCollegeName (formatter.formatCellValue(row.getCell(department)));
-                user.setDepartmentName (formatter.formatCellValue(row.getCell(department)));
+                int admin = 0;
+                if (formatter.formatCellValue(row.getCell(is_admin)) == "普通用户"){
+                    admin = 0;
+                }else if (formatter.formatCellValue(row.getCell(is_admin)) == "系主任"){
+                    admin = 1;
+                }else if (formatter.formatCellValue(row.getCell(is_admin)) == "学院"){
+                    admin = 2;
+                }else if (formatter.formatCellValue(row.getCell(is_admin)) == "校级"){
+                    admin = 3;
+                }
+                user.setIsAdmin (admin);
+                user.setCollegeName (formatter.formatCellValue(row.getCell(collegeName)));
+                user.setDepartment (formatter.formatCellValue(row.getCell(department)));
 
 
                 Integer id;
@@ -230,7 +261,7 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             sheet.setDefaultColumnWidth(17);
 
             // Create the header row
-            List<String> headers = Arrays.asList( "账号名称", "账号密码","教师姓名","教师权限", "所属院系");
+            List<String> headers = Arrays.asList( "账号名称", "账号密码","教师姓名","教师权限", "所属院", "所属系","注意：请勿修改HiddenSheet表");
             XSSFRow headerRow = sheet.createRow(0);
             for (int i = 0; i < headers.size(); i++) {
                 XSSFCell headerCell = headerRow.createCell(i);
@@ -240,36 +271,77 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             // Create cell style for constraints
             XSSFCellStyle constraintStyle = wb.createCellStyle();
 
-            // Create a list of valid permissions and departments
-            String[] validPermissions = {"权限1", "权限2", "权限3"};
-            String[] validDepartments = {"院系1", "院系2", "院系3"};
+// 使用Arrays.asList()将String数组转换为List<String>
+            List<User> userList =  userMAPPER.userPreList(); // 从数据库获取数据
+            String[] isAdminArray = new String[userList.size()]; // 创建与结果数量相同的数组
+
+            for (int i = 0; i < userList.size(); i++) {
+                User user = userList.get(i);
+                String isAdmin = null;
+                if (user.getIsAdmin()==0){
+                    isAdmin = "普通用户";
+                }else if (user.getIsAdmin()==1){
+                    isAdmin = "系主任";
+                }else if (user.getIsAdmin()==2){
+                    isAdmin = "学院";
+                }else if (user.getIsAdmin()==3){
+                    isAdmin = "校级";
+                }
+                isAdminArray[i] = isAdmin;  // 假设 User 类有一个名为 getIsAdmin 的方法来获取 is_admin 字段
+            }
+
+            List<College> collegeList =  userMAPPER.userPrCollegeList(); // 从数据库获取数据
+            String[] collegeArray = new String[collegeList.size()]; // 创建与结果数量相同的数组
+            for (int i = 0; i < collegeList.size(); i++) {
+                College college = collegeList.get(i);
+                String colleges = college.getCollegeName(); // 假设 User 类有一个名为 getIsAdmin 的方法来获取 is_admin 字段
+                collegeArray[i] = colleges;
+            }
+
+            List<College> departmentList =  userMAPPER.userDerList(); // 从数据库获取数据
+            String[] departmentArray = new String[departmentList.size()]; // 创建与结果数量相同的数组
+            for (int i = 0; i < departmentList.size(); i++) {
+                College department = departmentList.get(i);
+                String depart = department.getDepartmentName(); // 假设 User 类有一个名为 getIsAdmin 的方法来获取 is_admin 字段
+                departmentArray[i] = depart;
+            }
 
             // Create a drop-down list for "教师权限" and "所属院系"
             XSSFSheet hiddenSheet = wb.createSheet("HiddenSheet");
-            for (int i = 0; i < validPermissions.length; i++) {
-                XSSFRow row = hiddenSheet.createRow(i);
-                XSSFCell cell = row.createCell(0);
-                cell.setCellValue(validPermissions[i]);
-            }
-            for (int i = 0; i < validDepartments.length; i++) {
+            for (int i = 0; i < isAdminArray.length; i++) {
                 XSSFRow row = hiddenSheet.createRow(i);
                 XSSFCell cell = row.createCell(1);
-                cell.setCellValue(validDepartments[i]);
+                cell.setCellValue(isAdminArray[i]);
+            }
+            for (int i = 0; i < collegeArray.length; i++) {
+                XSSFRow row = hiddenSheet.createRow(i);
+                XSSFCell cell = row.createCell(2);
+                cell.setCellValue(collegeArray[i]);
+            }
+            for (int i = 0; i < departmentArray.length; i++) {
+                XSSFRow row = hiddenSheet.createRow(i);
+                XSSFCell cell = row.createCell(3);
+                cell.setCellValue(departmentArray[i]);
             }
 
             XSSFName namedCell = wb.createName();
             namedCell.setNameName("PermissionName");
-            namedCell.setRefersToFormula("HiddenSheet!$A$1:$A$" + validPermissions.length);
+            namedCell.setRefersToFormula("HiddenSheet!$A$1:$A$" + isAdminArray.length);
+
+            XSSFName namedCell1 = wb.createName();
+            namedCell1.setNameName("CollegeName");
+            namedCell1.setRefersToFormula("HiddenSheet!$B$1:$B$" + collegeArray.length);
 
             XSSFName namedCell2 = wb.createName();
             namedCell2.setNameName("DepartmentName");
-            namedCell2.setRefersToFormula("HiddenSheet!$B$1:$B$" + validDepartments.length);
+            namedCell2.setRefersToFormula("HiddenSheet!$C$1:$C$" + departmentArray.length);
 
 
             // Create a drop-down list for "教师权限" and "所属院系"
             DataValidationHelper dataValidationHelper = sheet.getDataValidationHelper();
-            DataValidationConstraint permissionConstraint = dataValidationHelper.createExplicitListConstraint(validPermissions);
-            DataValidationConstraint departmentConstraint = dataValidationHelper.createExplicitListConstraint(validDepartments);
+            DataValidationConstraint permissionConstraint = dataValidationHelper.createExplicitListConstraint(isAdminArray);
+            DataValidationConstraint CollegeConstraint = dataValidationHelper.createExplicitListConstraint(collegeArray);
+            DataValidationConstraint departmentConstraint = dataValidationHelper.createExplicitListConstraint(departmentArray);
 
             // Apply data validation to "教师权限" and "所属院系" cells
             CellRangeAddressList permissionAddressList = new CellRangeAddressList(1, 300, 3, 3);
@@ -277,7 +349,12 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
             permissionValidation.setShowPromptBox(true);
             sheet.addValidationData(permissionValidation);
 
-            CellRangeAddressList departmentAddressList = new CellRangeAddressList(1, 300, 4, 4);
+            CellRangeAddressList collegeAddressList = new CellRangeAddressList(1, 300, 4, 4);
+            DataValidation collegeValidation = dataValidationHelper.createValidation(CollegeConstraint, collegeAddressList);
+            collegeValidation.setShowPromptBox(true);
+            sheet.addValidationData(collegeValidation);
+
+            CellRangeAddressList departmentAddressList = new CellRangeAddressList(1, 300, 5, 5);
             DataValidation departmentValidation = dataValidationHelper.createValidation(departmentConstraint, departmentAddressList);
             departmentValidation.setShowPromptBox(true);
             sheet.addValidationData(departmentValidation);
@@ -349,11 +426,19 @@ public class UserServiceIMPL extends ServiceImpl<UserMAPPER, User> implements Us
                 XSSFCell cell3 = dataRow.createCell(3);
                 cell3.setCellValue(user.getTeacherName());
                 XSSFCell cell4 = dataRow.createCell(4);
-                cell4.setCellValue(user.getIsAdmin());
+                String adminName = null;
+                if (user.getIsAdmin()==0){
+                    adminName = "普通用户";
+                }else if (user.getIsAdmin()==1){
+                    adminName = "系主任";
+                }else if (user.getIsAdmin()==2){
+                    adminName = "学院";
+                }
+                cell4.setCellValue(adminName);
                 XSSFCell cell5 = dataRow.createCell(5);
                 cell5.setCellValue(user.getCollegeName());
-                XSSFCell cell6= dataRow.createCell(5);
-                cell6.setCellValue(user.getDepartmentName());
+                XSSFCell cell6= dataRow.createCell(6);
+                cell6.setCellValue(user.getDepartment());
             }
 
             // Write the Excel file to a ByteArrayOutputStream

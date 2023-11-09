@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.example.object.College;
 import com.example.object.LoginDTO;
 import com.example.object.User;
 import com.example.service.impl.UserServiceIMPL;
@@ -115,7 +116,9 @@ public class UserController {
     @GetMapping
     public DataResponses getAll() {
         List<User> data= userService.list() ;
-        return new DataResponses(true, data);
+        List<College> data2= userService.userPrCollegeList() ;
+        List<College> data3= userService.userDerList() ;
+        return new DataResponses(true, data,data2,data3);
     }
 
     /**

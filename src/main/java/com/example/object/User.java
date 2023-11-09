@@ -11,13 +11,14 @@ public class User {
     private String password;
     private int isAdmin;
     private String collegeName;
-    private String departmentName;
+    private String department;
 
     /**
      * 关于isAdmin的说明
      * 0    普通教师
      * 1    系主任
      * 2    学院
+     * 3    校级
 
      */
 
@@ -27,7 +28,7 @@ public class User {
         this.teacherName = teacherName;
         this.isAdmin = isAdmin;
         this.collegeName = collegeName;
-        this.departmentName = departmentName;
+        this.department = departmentName;
     }
 
     public void userInfo() {}
