@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.example.object.College;
 import com.example.object.LoginDTO;
 import com.example.object.User;
 import com.example.service.impl.UserServiceIMPL;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Api(tags = "用户登录")
@@ -23,6 +25,12 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
+
+    private UserServiceIMPL userService;
+
+
+    @Autowired
+
     private UserServiceIMPL userServiceIMPL;
 
     // 会话登录接口
@@ -85,13 +93,19 @@ public class UserController {
         return new DataResponses(true,userServiceIMPL.updateById(data));
     }
 
-
-
     @ApiOperation("添加")
     @PostMapping("/addUser")
     public DataResponses addUser(@RequestBody User user) {
         return new DataResponses(true, userServiceIMPL.save(user),user.getName());
     }
+
+    @ApiOperation("重置密码")
+    @PutMapping("/resetPassword")
+    public DataResponses resetPassword(@RequestBody User data) {
+        data.setPassword("000000");
+        return new DataResponses(true,userService.updateById(data));
+    }
+
 
     @ApiOperation("删除")
     @DeleteMapping("/deleteUser")
@@ -102,7 +116,12 @@ public class UserController {
     @ApiOperation("查询全部")
     @GetMapping
     public DataResponses getAll() {
-        return new DataResponses(true, userServiceIMPL.list());
+
+        List<User> data= userService.list() ;
+        List<College> data2= userService.userPrCollegeList() ;
+        List<College> data3= userService.userDerList() ;
+        return new DataResponses(true, data,data2,data3);
+
     }
 
     /**
